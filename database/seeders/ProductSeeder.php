@@ -29,12 +29,12 @@ class ProductSeeder extends Seeder
             $categorySlug = Str::slug($category->name);
             $response = Http::get("https://dummyjson.com/products/category/{$categorySlug}");
             if ($response->successful()) {
-                $products = $response->object()->products;
+                $products = array_splice($response->object()->products, 2);
 
                 $productsPayload = [];
                 foreach ($products as $product) {
                     // Download the image
-                    $imageContent = Http::get($product->images[0])->body();
+                    $imageContent = Http::retry(2)->get($product->images[0])->body();
                     $imageName = basename($product->images[0]);
                     $imagePath = 'products/' . $imageName;
                     Storage::put($imagePath, $imageContent);
