@@ -123,6 +123,12 @@
                     />
 
                     <SidebarItem
+                        name="Customer"
+                        routeName="customers.index"
+                        icon="fas fa-users"
+                    />
+
+                    <SidebarItem
                         name="Employee"
                         routeName="employees.index"
                         icon="fas fa-house-user"
@@ -132,12 +138,6 @@
                         name="Salary"
                         routeName="salaries.index"
                         icon="fas fa-money-bill"
-                    />
-
-                    <SidebarItem
-                        name="Customer"
-                        routeName="customers.index"
-                        icon="fas fa-users"
                     />
 
                     <SidebarItem
