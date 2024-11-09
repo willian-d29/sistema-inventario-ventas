@@ -15,8 +15,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.TARGET_FOLDER_PATH }}
-#            eval "$(ssh-agent)"
-#            ssh-add ~/.ssh/github_rsa
             git stash
             git pull
             composer install --optimize-autoloader --no-dev
