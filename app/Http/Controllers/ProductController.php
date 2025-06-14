@@ -251,4 +251,18 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('flash', $flash);
     }
+
+    public function publicIndex(): Response
+{
+    // Productos con estado "activo" y campos esenciales
+    $products = Product::select('id', 'name', 'selling_price', 'photo', 'status')
+        ->where('status', 'activo')
+        ->latest()
+        ->paginate(12);
+
+    return Inertia::render('Public/Productos', [
+        'products' => $products
+    ]);
+}
+
 }
