@@ -1,193 +1,294 @@
+<template>
+  <Head :title="pageTitle" />
+
+  <div class="bg-gray-100 min-h-screen font-sans">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-600 shadow">
+      <div class="container mx-auto max-w-screen-xl px-4 py-3 flex items-center justify-between">
+        <Link href="/">
+          <img src="/logo.png" alt="Logo" class="h-8"/>
+        </Link>
+        <ul class="hidden md:flex items-center space-x-6 text-white">
+          <li><Link href="#" class="hover:text-gray-200">Más vendidos</Link></li>
+          <li><Link href="#" class="hover:text-gray-200">Con descuentos</Link></li>
+          <li><Link href="#" class="hover:text-gray-200">Lo nuevo</Link></li>
+          <li class="relative">
+            <button class="flex items-center hover:text-gray-200">
+              Categoría <ChevronDownIcon class="w-4 h-4 ml-1"/>
+            </button>
+            <!-- dropdown aquí -->
+          </li>
+        </ul>
+        <div class="flex-1 px-4">
+          <div class="relative max-w-md mx-auto">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Buscar productos..."
+              class="w-full pl-4 pr-10 py-2 rounded-full text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <MagnifyingGlassIcon class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button @click="showCart = true" class="relative text-white hover:text-gray-200">
+            <ShoppingCartIcon class="w-6 h-6"/>
+            <span v-if="cart.length" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+              {{ cart.length }}
+            </span>
+          </button>
+          <div v-if="authUser" class="flex items-center space-x-2 text-white">
+            <img
+              v-if="authUser.photo"
+              :src="`/storage/users/${authUser.photo}`"
+              alt="Avatar"
+              class="w-8 h-8 rounded-full border-2 border-white"
+            />
+            <span>{{ authUser.name }}</span>
+            <button @click="logout" class="text-sm hover:underline">Cerrar sesión</button>
+          </div>
+          <div v-else class="space-x-2">
+            <Link href="/login" class="text-white hover:text-gray-200 text-sm">Iniciar sesión</Link>
+            <Link href="/register" class="text-white hover:text-gray-200 text-sm">Registrarse</Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto max-w-screen-xl px-4 py-8 flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar -->
+     
+
+      <!-- Contenido principal -->
+      <section class="flex-1 space-y-6">
+        <!-- Filtros -->
+        <div class="bg-white p-4 rounded-xl shadow flex flex-wrap items-center gap-4">
+          <select
+            v-model="selectedCategory"
+            class="border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">Todas las categorías</option>
+            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+          <input
+            v-model.number="minPrice"
+            type="number"
+            placeholder="Mín precio"
+            class="w-24 border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            min="0"
+          />
+          <input
+            v-model.number="maxPrice"
+            type="number"
+            placeholder="Máx precio"
+            class="w-24 border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            min="0"
+          />
+        </div>
+
+        <!-- Cabecera de orden y vista -->
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-2 text-gray-700">
+            <ArrowsUpDownIcon class="w-6 h-6"/>
+            <span class="text-lg font-semibold">Más relevantes</span>
+            <ChevronDownIcon class="w-5 h-5"/>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button @click="viewMode = 'grid'" :class="viewMode==='grid' ? 'text-blue-600' : 'text-gray-400'">
+              <Squares2X2Icon class="w-6 h-6"/>
+            </button>
+            <button @click="viewMode = 'list'" :class="viewMode==='list' ? 'text-blue-600' : 'text-gray-400'">
+              <Bars3Icon class="w-6 h-6"/>
+            </button>
+          </div>
+        </div>
+
+        <!-- Productos -->
+        <div
+          :class="viewMode==='grid'
+            ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4'
+            : 'flex flex-col space-y-4'"
+        >
+          <article
+            v-for="product in filteredProducts"
+            :key="product.id"
+            :class="viewMode==='grid'
+              ? 'bg-white rounded-xl shadow overflow-hidden text-center text-sm'
+              : 'bg-white rounded-xl shadow p-4 flex items-center text-sm'"
+          >
+            <div v-if="viewMode==='grid'" class="aspect-[4/5] overflow-hidden">
+              <img
+                :src="product.photo || '/images/no-image.png'"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div v-else class="h-16 w-16 overflow-hidden flex-shrink-0 rounded-lg">
+              <img
+                :src="product.photo || '/images/no-image.png'"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-2 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-medium text-gray-800 truncate">{{ product.name }}</h4>
+                <p class="text-emerald-600 font-semibold mt-1">S/. {{ product.selling_price }}</p>
+                <p class="text-gray-500">{{ product.category?.name || 'N/A' }}</p>
+              </div>
+              <button
+                class="mt-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded px-2 py-1"
+                @click.stop="addToCart(product)"
+              >
+                Agregar
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <FooterComponent />
+
+    <!-- Carrito Drawer -->
+    <div v-if="showCart" class="fixed inset-0 z-50 flex">
+      <div class="absolute inset-0 bg-black/50" @click="showCart = false"></div>
+      <div class="relative ml-auto w-full sm:w-80 bg-white shadow-xl p-6 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Tu Carrito</h2>
+          <button @click="showCart = false" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <ul class="space-y-4">
+          <li
+            v-for="item in cart"
+            :key="item.id"
+            class="flex justify-between items-center"
+          >
+            <div class="flex items-center space-x-3">
+              <img
+                :src="item.photo || '/images/no-image.png'"
+                alt=""
+                class="h-12 w-12 object-cover rounded"
+              />
+              <div>
+                <p class="font-medium text-gray-800">{{ item.name }}</p>
+                <p class="text-sm text-gray-500">S/. {{ (item.quantity * parseFloat(item.selling_price)).toFixed(2) }}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button @click="decrement(item)" class="text-gray-500 hover:text-gray-700">–</button>
+              <span class="w-6 text-center">{{ item.quantity }}</span>
+              <button @click="increment(item)" class="text-gray-500 hover:text-gray-700">+</button>
+            </div>
+            <button @click="remove(item)" class="text-red-500 hover:text-red-700 ml-2">✕</button>
+          </li>
+        </ul>
+        <div class="mt-6 border-t pt-4">
+          <p class="flex justify-between font-semibold text-gray-800">
+            <span>Total:</span>
+            <span>S/. {{ cartTotal }}</span>
+          </p>
+          <button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+            Pagar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { ref, computed } from "vue";
-import GuestNavbar from "@/Components/Navbars/GuestNavbar.vue";
-import FooterComponent from "@/Components/Footers/Footer.vue";
-import { Head, usePage, router, Link } from "@inertiajs/vue3";
-import ContactForm from "@/Components/ContactForm.vue";
-import banner from "@/assets/img/banner.avif";
+import { ref, computed, onMounted, watch } from 'vue';
+import { Head, usePage, router, Link } from '@inertiajs/vue3';
+import FooterComponent from '@/Components/Footers/Footer.vue';
+import {
+  ShoppingCartIcon,
+  UserIcon,
+  MagnifyingGlassIcon,
+  ChevronDownIcon,
+  Squares2X2Icon,
+  Bars3Icon,
+  ArrowsUpDownIcon
+} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
-    pageTitle: String,
-    products: Array
+  pageTitle: String,
+  products: Array
 });
 
 const page = usePage();
 const authUser = page.props.auth.user;
-const selectedCategory = ref("");
-const minPrice = ref("");
-const maxPrice = ref("");
-const selectedProduct = ref(null);
-const cart = ref([]);
-const showCart = ref(false);
-const showUserDropdown = ref(false);
+
+// Buscador
+const searchQuery = ref('');
+
+// Filtros
+const selectedCategory = ref('');
+const minPrice = ref('');
+const maxPrice = ref('');
 
 const categories = computed(() => {
-    const set = new Set();
-    props.products.forEach(p => p.category?.name && set.add(p.category.name));
-    return Array.from(set);
+  const set = new Set();
+  props.products.forEach(p => p.category?.name && set.add(p.category.name));
+  return Array.from(set);
 });
 
 const filteredProducts = computed(() => {
-    return props.products.filter(p => {
-        const price = parseFloat(p.selling_price);
-        const matchCategory = !selectedCategory.value || p.category?.name === selectedCategory.value;
-        const matchMin = minPrice.value === "" || (!isNaN(minPrice.value) && price >= Math.max(0, parseFloat(minPrice.value)));
-        const matchMax = maxPrice.value === "" || (!isNaN(maxPrice.value) && price <= parseFloat(maxPrice.value));
-        return matchCategory && matchMin && matchMax;
+  return props.products
+    .filter(p => {
+      const price = parseFloat(p.selling_price);
+      const byCat = !selectedCategory.value || p.category?.name === selectedCategory.value;
+      const byMin = minPrice.value === '' || price >= +minPrice.value;
+      const byMax = maxPrice.value === '' || price <= +maxPrice.value;
+      return byCat && byMin && byMax;
+    })
+    .filter(p => {
+      if (!searchQuery.value) return true;
+      return p.name.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
 });
 
-const openProductModal = (product) => selectedProduct.value = product;
-const closeModal = () => selectedProduct.value = null;
+// Vista (grid / list)
+const viewMode = ref('grid');
 
-const addToCart = (product) => {
-    const existing = cart.value.find(p => p.id === product.id);
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.value.push({ ...product, quantity: 1 });
-    }
+// Carrito
+const cart = ref([]);
+const showCart = ref(false);
+
+onMounted(() => {
+  const saved = localStorage.getItem('cart');
+  if (saved) cart.value = JSON.parse(saved);
+});
+watch(cart, v => localStorage.setItem('cart', JSON.stringify(v)), { deep: true });
+
+const addToCart = product => {
+  const ex = cart.value.find(i => i.id === product.id);
+  if (ex) ex.quantity++;
+  else cart.value.push({ ...product, quantity: 1 });
 };
 
-const cartTotal = computed(() => {
-    return cart.value.reduce((sum, item) => sum + item.quantity * parseFloat(item.selling_price), 0).toFixed(2);
-});
+const remove = product => {
+  cart.value = cart.value.filter(i => i.id !== product.id);
+};
 
+const increment = product => {
+  product.quantity++;
+};
+
+const decrement = product => {
+  if (product.quantity > 1) product.quantity--;
+  else remove(product);
+};
+
+const cartTotal = computed(() =>
+  cart.value.reduce(
+    (sum, item) => sum + item.quantity * parseFloat(item.selling_price),
+    0
+  ).toFixed(2)
+);
+
+// Logout
 const logout = () => {
-    router.post(route('logout'));
+  router.post(route('logout'));
 };
 </script>
-
-<template>
-    <Head :title="pageTitle" />
-
-    <div>
-        <GuestNavbar />
-
-        <main>
-            <!-- Banner y user info -->
-            <div class="relative pt-16 pb-32 flex content-center items-center justify-center min-h-screen-75">
-                <div class="absolute top-0 w-full h-full bg-center bg-cover" :style="{ backgroundImage: `url(${banner})` }">
-                    <span class="w-full h-full absolute opacity-75 bg-black"></span>
-                </div>
-                <div class="container relative mx-auto text-center text-white">
-                    <h1 class="text-4xl font-bold">Tu historia comienza con nosotros</h1>
-                    <p class="mt-4 text-lg">Descubre nuestros productos y servicios que potencian tu negocio.</p>
-
-                    <div v-if="authUser" class="mt-4 text-sm">
-                        <div class="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                            <img v-if="authUser.photo" :src="`/storage/users/${authUser.photo}`" class="w-8 h-8 rounded-full border" />
-                            <span>{{ authUser.name }}</span>
-                            <button @click="logout" class="ml-3 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Cerrar sesión</button>
-                        </div>
-                    </div>
-
-                    <div v-else class="mt-6 flex justify-center gap-4">
-                        <a href="/register" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Registrarse</a>
-                        <a href="/login" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">Iniciar sesión</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Productos y filtros -->
-            <section class="bg-white py-16">
-                <div class="container mx-auto px-4">
-                    <h2 class="text-3xl font-semibold text-center mb-10">Nuestros Productos</h2>
-
-                    <div class="flex flex-wrap justify-center gap-4 mb-10">
-                        <select v-model="selectedCategory" class="p-2 border rounded text-gray-700">
-                            <option value="">Todas las categorías</option>
-                            <option v-for="(cat, idx) in categories" :key="idx" :value="cat">{{ cat }}</option>
-                        </select>
-                        <input v-model.number="minPrice" type="number" min="0" placeholder="Precio mínimo" class="p-2 border rounded w-36" />
-                        <input v-model.number="maxPrice" type="number" min="0" placeholder="Precio máximo" class="p-2 border rounded w-36" />
-                    </div>
-
-                    <div class="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                        <div
-                            v-for="product in filteredProducts"
-                            :key="product.id"
-                            class="cursor-pointer bg-white shadow rounded-lg overflow-hidden border hover:shadow-md transition"
-                            @click="openProductModal(product)"
-                        >
-                            <img :src="product.photo || '/images/no-image.png'" :alt="product.name" class="w-full h-36 object-cover" />
-                            <div class="p-3">
-                                <h3 class="text-sm font-bold text-gray-800 truncate">{{ product.name }}</h3>
-                                <p class="text-emerald-600 font-semibold mt-1 text-sm">S/. {{ product.selling_price }}</p>
-                                <p class="text-xs text-gray-400">{{ product.category?.name || 'N/A' }}</p>
-                                <button
-                                    class="w-full mt-2 text-xs text-white bg-emerald-600 hover:bg-emerald-700 rounded px-2 py-1"
-                                    @click.stop="addToCart(product)"
-                                >
-                                    Agregar al carrito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Modal producto -->
-            <div v-if="selectedProduct" class="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
-                    <button class="absolute top-2 right-3 text-gray-600" @click="closeModal">✖</button>
-                    <img :src="selectedProduct.photo || '/images/no-image.png'" class="w-full h-40 object-cover rounded mb-4" />
-                    <h3 class="text-xl font-bold mb-2">{{ selectedProduct.name }}</h3>
-                    <p class="text-gray-600 text-sm mb-2">{{ selectedProduct.description }}</p>
-                    <p class="text-sm text-gray-500">Categoría: {{ selectedProduct.category?.name }}</p>
-                    <p class="text-emerald-700 font-semibold mt-2">S/. {{ selectedProduct.selling_price }}</p>
-                    <p class="text-sm mt-1">Stock: {{ selectedProduct.quantity }}</p>
-                </div>
-            </div>
-
-            <!-- Carrito -->
-            <button
-                v-if="cart.length > 0"
-                class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-emerald-700"
-                @click="showCart = !showCart"
-            >
-                🛒 Ver Carrito ({{ cart.length }})
-            </button>
-
-            <div
-                v-if="showCart"
-                class="fixed z-50 bottom-20 right-4 bg-white border shadow-lg rounded-lg p-4 w-80 max-h-[80vh] overflow-y-auto"
-            >
-                <h2 class="text-xl font-semibold mb-2">Tu Carrito</h2>
-                <ul>
-                    <li
-                        v-for="item in cart"
-                        :key="item.id"
-                        class="flex justify-between items-center border-b py-1 text-sm"
-                    >
-                        <span>{{ item.name }} x{{ item.quantity }}</span>
-                        <span>S/. {{ (item.quantity * parseFloat(item.selling_price)).toFixed(2) }}</span>
-                    </li>
-                </ul>
-                <p class="mt-2 font-bold text-right">Total: S/. {{ cartTotal }}</p>
-                <p class="text-xs text-gray-500 mt-2 mb-2">Para finalizar tu compra, por favor regístrate o inicia sesión.</p>
-                <div class="flex gap-2">
-                    <a href="/register" class="w-full text-center text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Registrarse</a>
-                    <a href="/login" class="w-full text-center text-sm bg-gray-600 hover:bg-gray-700 text-white py-2 rounded">Iniciar sesión</a>
-                </div>
-            </div>
-
-            <!-- Contacto -->
-            <section class="pb-20 bg-blueGray-800">
-                <div class="container mx-auto px-4 text-center">
-                    <h2 class="text-4xl font-semibold text-white mb-4">Contáctanos</h2>
-                    <p class="text-blueGray-400 mb-8">¿Tienes preguntas o deseas cotizar? Escríbenos.</p>
-                    <div class="flex justify-center">
-                        <div class="w-full lg:w-6/12">
-                            <div class="bg-blueGray-200 p-6 rounded-lg shadow">
-                                <ContactForm />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <FooterComponent />
-    </div>
-</template>
