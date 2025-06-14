@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import GuestNavbar from "@/Components/Navbars/GuestNavbar.vue";
 import FooterComponent from "@/Components/Footers/Footer.vue";
-import { Head, usePage, router } from "@inertiajs/vue3";
+import { Head, usePage, router, Link } from "@inertiajs/vue3";
 import ContactForm from "@/Components/ContactForm.vue";
 import banner from "@/assets/img/banner.avif";
 
@@ -13,21 +13,20 @@ const props = defineProps({
 
 const page = usePage();
 const authUser = page.props.auth.user;
-
 const selectedCategory = ref("");
 const minPrice = ref("");
 const maxPrice = ref("");
 const selectedProduct = ref(null);
 const cart = ref([]);
+const showCart = ref(false);
+const showUserDropdown = ref(false);
 
-// Categorías únicas
 const categories = computed(() => {
     const set = new Set();
     props.products.forEach(p => p.category?.name && set.add(p.category.name));
     return Array.from(set);
 });
 
-// Productos filtrados
 const filteredProducts = computed(() => {
     return props.products.filter(p => {
         const price = parseFloat(p.selling_price);
@@ -38,11 +37,9 @@ const filteredProducts = computed(() => {
     });
 });
 
-// Modal
 const openProductModal = (product) => selectedProduct.value = product;
 const closeModal = () => selectedProduct.value = null;
 
-// Agregar al carrito
 const addToCart = (product) => {
     const existing = cart.value.find(p => p.id === product.id);
     if (existing) {
@@ -52,10 +49,13 @@ const addToCart = (product) => {
     }
 };
 
-// Total
 const cartTotal = computed(() => {
     return cart.value.reduce((sum, item) => sum + item.quantity * parseFloat(item.selling_price), 0).toFixed(2);
 });
+
+const logout = () => {
+    router.post(route('logout'));
+};
 </script>
 
 <template>
@@ -65,7 +65,7 @@ const cartTotal = computed(() => {
         <GuestNavbar />
 
         <main>
-            <!-- Banner -->
+            <!-- Banner y user info -->
             <div class="relative pt-16 pb-32 flex content-center items-center justify-center min-h-screen-75">
                 <div class="absolute top-0 w-full h-full bg-center bg-cover" :style="{ backgroundImage: `url(${banner})` }">
                     <span class="w-full h-full absolute opacity-75 bg-black"></span>
@@ -73,15 +73,27 @@ const cartTotal = computed(() => {
                 <div class="container relative mx-auto text-center text-white">
                     <h1 class="text-4xl font-bold">Tu historia comienza con nosotros</h1>
                     <p class="mt-4 text-lg">Descubre nuestros productos y servicios que potencian tu negocio.</p>
+
+                    <div v-if="authUser" class="mt-4 text-sm">
+                        <div class="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                            <img v-if="authUser.photo" :src="`/storage/users/${authUser.photo}`" class="w-8 h-8 rounded-full border" />
+                            <span>{{ authUser.name }}</span>
+                            <button @click="logout" class="ml-3 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Cerrar sesión</button>
+                        </div>
+                    </div>
+
+                    <div v-else class="mt-6 flex justify-center gap-4">
+                        <a href="/register" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Registrarse</a>
+                        <a href="/login" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">Iniciar sesión</a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Productos -->
+            <!-- Productos y filtros -->
             <section class="bg-white py-16">
                 <div class="container mx-auto px-4">
                     <h2 class="text-3xl font-semibold text-center mb-10">Nuestros Productos</h2>
 
-                    <!-- Filtros -->
                     <div class="flex flex-wrap justify-center gap-4 mb-10">
                         <select v-model="selectedCategory" class="p-2 border rounded text-gray-700">
                             <option value="">Todas las categorías</option>
@@ -91,7 +103,6 @@ const cartTotal = computed(() => {
                         <input v-model.number="maxPrice" type="number" min="0" placeholder="Precio máximo" class="p-2 border rounded w-36" />
                     </div>
 
-                    <!-- Cards -->
                     <div class="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                         <div
                             v-for="product in filteredProducts"
@@ -105,7 +116,6 @@ const cartTotal = computed(() => {
                                 <p class="text-emerald-600 font-semibold mt-1 text-sm">S/. {{ product.selling_price }}</p>
                                 <p class="text-xs text-gray-400">{{ product.category?.name || 'N/A' }}</p>
                                 <button
-                                    v-if="authUser && authUser.role === 'cliente'"
                                     class="w-full mt-2 text-xs text-white bg-emerald-600 hover:bg-emerald-700 rounded px-2 py-1"
                                     @click.stop="addToCart(product)"
                                 >
@@ -117,7 +127,7 @@ const cartTotal = computed(() => {
                 </div>
             </section>
 
-            <!-- Modal -->
+            <!-- Modal producto -->
             <div v-if="selectedProduct" class="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                 <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
                     <button class="absolute top-2 right-3 text-gray-600" @click="closeModal">✖</button>
@@ -131,21 +141,36 @@ const cartTotal = computed(() => {
             </div>
 
             <!-- Carrito -->
-            <section class="bg-gray-100 py-10">
-                <div class="container mx-auto">
-                    <h2 class="text-2xl font-semibold mb-4">Carrito de Compras</h2>
-                    <div v-if="cart.length === 0" class="text-gray-500">Tu carrito está vacío.</div>
-                    <div v-else>
-                        <ul class="space-y-2">
-                            <li v-for="item in cart" :key="item.id" class="flex justify-between items-center bg-white p-2 rounded shadow">
-                                <span>{{ item.name }} x{{ item.quantity }}</span>
-                                <span>S/. {{ (item.quantity * parseFloat(item.selling_price)).toFixed(2) }}</span>
-                            </li>
-                        </ul>
-                        <p class="mt-4 font-bold text-right">Total: S/. {{ cartTotal }}</p>
-                    </div>
+            <button
+                v-if="cart.length > 0"
+                class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-emerald-700"
+                @click="showCart = !showCart"
+            >
+                🛒 Ver Carrito ({{ cart.length }})
+            </button>
+
+            <div
+                v-if="showCart"
+                class="fixed z-50 bottom-20 right-4 bg-white border shadow-lg rounded-lg p-4 w-80 max-h-[80vh] overflow-y-auto"
+            >
+                <h2 class="text-xl font-semibold mb-2">Tu Carrito</h2>
+                <ul>
+                    <li
+                        v-for="item in cart"
+                        :key="item.id"
+                        class="flex justify-between items-center border-b py-1 text-sm"
+                    >
+                        <span>{{ item.name }} x{{ item.quantity }}</span>
+                        <span>S/. {{ (item.quantity * parseFloat(item.selling_price)).toFixed(2) }}</span>
+                    </li>
+                </ul>
+                <p class="mt-2 font-bold text-right">Total: S/. {{ cartTotal }}</p>
+                <p class="text-xs text-gray-500 mt-2 mb-2">Para finalizar tu compra, por favor regístrate o inicia sesión.</p>
+                <div class="flex gap-2">
+                    <a href="/register" class="w-full text-center text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Registrarse</a>
+                    <a href="/login" class="w-full text-center text-sm bg-gray-600 hover:bg-gray-700 text-white py-2 rounded">Iniciar sesión</a>
                 </div>
-            </section>
+            </div>
 
             <!-- Contacto -->
             <section class="pb-20 bg-blueGray-800">
