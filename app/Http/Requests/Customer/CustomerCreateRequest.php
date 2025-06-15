@@ -34,8 +34,6 @@ class CustomerCreateRequest extends FormRequest
             "phone"   => ["required", "string", "max:255"],
             "address" => ["nullable", "string"],
             "photo"   => ["nullable", "file", "mimes:jpg,jpeg,png,gif,svg", "max:1024"],
-            'password' => ['nullable', 'string', 'min:6'],
-
         ];
     }
 }

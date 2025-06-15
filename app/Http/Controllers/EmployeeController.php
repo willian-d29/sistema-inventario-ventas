@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Hash;
-
 use App\Enums\Core\FilterFieldTypeEnum;
 use App\Enums\Core\SortOrderEnum;
 use App\Enums\Employee\EmployeeFiltersEnum;
@@ -19,7 +17,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-
 
 class EmployeeController extends Controller
 {
@@ -100,44 +97,31 @@ class EmployeeController extends Controller
             ]);
     }
 
-   
-public function store(EmployeeCreateRequest $request): RedirectResponse
-{
-    try {
-        $data = $request->validated();
+    public function store(EmployeeCreateRequest $request): RedirectResponse
+    {
+        try {
+            $this->service->create(
+                payload: $request->validated()
+            );
+            $flash = [
+                "message" => 'Employee created successfully.'
+            ];
+        } catch (Exception $e) {
+            $flash = [
+                "isSuccess" => false,
+                "message"   => "Employee creation failed!",
+            ];
 
-        // 1. Crear el usuario con rol vendedor
-        $user = \App\Models\User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-            'role' => 'vendedor',
-            'password' => Hash::make($data['password']),
-            'photo' => $data['photo'] ?? null,
-        ]);
+            Log::error("Employee creation failed!", [
+                "message" => $e->getMessage(),
+                "traces"  => $e->getTrace()
+            ]);
+        }
 
-        // 2. Crear el empleado
-        $this->service->create(payload: $data);
-
-        $flash = [
-            "message" => 'Empleado y usuario creados correctamente.'
-        ];
-    } catch (Exception $e) {
-        $flash = [
-            "isSuccess" => false,
-            "message"   => "¡Falló la creación del empleado!",
-        ];
-
-        Log::error("Employee creation failed!", [
-            "message" => $e->getMessage(),
-            "traces"  => $e->getTrace()
-        ]);
+        return redirect()
+            ->route('employees.index')
+            ->with('flash', $flash);
     }
-
-    return redirect()
-        ->route('employees.index')
-        ->with('flash', $flash);
-}
 
     public function update(EmployeeUpdateRequest $request, $id): RedirectResponse
     {

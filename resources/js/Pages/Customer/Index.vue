@@ -33,7 +33,6 @@ const form = useForm({
     phone: null,
     address: null,
     photo: null,
-     password: null,
 });
 
 const createCustomerModal = () => {
@@ -197,18 +196,6 @@ const closeModal = () => {
                         @keyupEnter="createCustomer"
                     />
                 </div>
-                <div class="flex flex-col">
-               <DashboardInputGroup
-                       label="Password (opcional)"
-                        name="password"
-                    v-model="form.password"
-                      placeholder="Enter password (only if login is needed)"
-                     :errorMessage="form.errors.password"
-                       type="password"
-                       @keyupEnter="createCustomer"
-                         />
-                      </div>
-
                 <div class="flex flex-col">
                     <label
                         class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
