@@ -23,7 +23,7 @@ const form = useForm({
 });
 
 watch(() => form.date, async (newDateRange, oldDateRange) => {
-    form.get(route('dashboard'), {
+    form.get(route('admin.dashboard'), {
         preserveScroll: true,
     });
 })
