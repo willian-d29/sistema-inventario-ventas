@@ -64,7 +64,7 @@ class FileManagerService
             }
 
             // Store file to public disk
-            $file->storeAs($path, $name);
+            $file->storeAs($path, $name, 'public');
             return $name ?? '';
         } catch (Exception $ex) {
             return '';

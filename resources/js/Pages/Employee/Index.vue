@@ -25,7 +25,16 @@ const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const nameInput = ref(null);
-const tableHeads = ref(['#', "Name", "Designation", "Email", "Phone", "Salary", "Joining Date", "Action"]);
+const tableHeads = ref([
+  '#',
+  'Nombre',
+  'Cargo',
+  'Correo',
+  'Teléfono',
+  'Salario',
+  'Fecha de ingreso',
+  'Acción',
+]);
 
 const form = useForm({
     name: null,

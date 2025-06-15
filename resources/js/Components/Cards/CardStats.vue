@@ -35,45 +35,42 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   name: "card-stats",
   props: {
     statSubtitle: {
       type: String,
-      default: "Traffic",
+      default: "Tráfico",
     },
     statTitle: {
       type: String,
-      default: "350,897",
+      default: "350.897",
     },
     statArrow: {
+      type: String,
       default: "up",
-      validator: function (value) {
-        // The value must match one of these strings
-        return ["up", "down"].indexOf(value) !== -1;
+      validator(value) {
+        return ["up", "down"].includes(value);
       },
     },
     statPercent: {
       type: String,
-      default: "3.48",
+      default: "3,48",
     },
-    // can be any of the text color utilities
-    // from tailwindcss
     statPercentColor: {
       type: String,
       default: "text-emerald-500",
     },
     statDescripiron: {
       type: String,
-      default: "Since last month",
+      default: "Desde el mes pasado",
     },
     statIconName: {
       type: String,
       default: "far fa-chart-bar",
     },
-    // can be any of the background color utilities
-    // from tailwindcss
     statIconColor: {
       type: String,
       default: "bg-red-500",

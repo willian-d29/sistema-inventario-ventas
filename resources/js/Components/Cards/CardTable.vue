@@ -42,7 +42,7 @@
                                 v-model="form[key]"
                                 class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                             >
-                                <option value="">Select option</option>
+                                <option value="">{{ filter.placeholder }}</option>
                                 <option
                                     v-for="(option, staticSelectIndex) in filter.options"
                                     :key="staticSelectIndex"
@@ -64,7 +64,7 @@
                             <input
                                 v-if="filter.type === 'number_range'"
                                 :id="key"
-                                placeholder="Sample range: 10-100"
+                                :placeholder="filter.placeholder"
                                 v-model="form[key]"
                                 @input="form[key] = $event.target.value.replace(/[^0-9-]/g, '')"
                                 type="text"
@@ -99,7 +99,7 @@
                                 <button
                                     @click="reset"
                                     class="active:scale-95 rounded-lg bg-gray-200 px-8 py-2 font-medium text-gray-600 outline-none focus:ring hover:opacity-90">
-                                    Reset
+                                    Restablecer
                                 </button>
                             </div>
                         </div>

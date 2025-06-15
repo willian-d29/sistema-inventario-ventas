@@ -1,196 +1,200 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import CardTable from "@/Components/Cards/CardTable.vue";
 import TableData from "@/Components/TableData.vue";
 import Button from "@/Components/Button.vue";
 import InputError from "@/Components/InputError.vue";
 import Modal from "@/Components/Modal.vue";
+import { useForm } from '@inertiajs/vue3';
+import { nextTick, ref } from 'vue';
+import { showToast } from "@/Utils/Helper.js";
 
 defineProps({
-    filters: {
-        type: Object
-    },
-    categories: {
-        type: Object
-    },
+  filters:    { type: Object },
+  categories: { type: Object },
 });
-
-import {useForm} from '@inertiajs/vue3';
-import {nextTick, ref} from 'vue';
-import {showToast} from "@/Utils/Helper.js";
 
 const selectedCategory = ref(null);
-const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteModal = ref(false);
-const nameInput = ref(null);
-const tableHeads = ref(['#', "Name", "Action"]);
+const showCreateModal  = ref(false);
+const showEditModal    = ref(false);
+const showDeleteModal  = ref(false);
+const nameInput        = ref(null);
 
-const form = useForm({
-    name: null,
-});
+// Cabeceras de tabla en español
+const tableHeads = ref([
+  '#',
+  'Nombre',
+  'Acción',
+]);
 
-const createCategoryModal = () => {
-    showCreateModal.value = true;
+const form = useForm({ name: null });
 
-    nextTick(() => nameInput.value.focus());
-};
+function createCategoryModal() {
+  showCreateModal.value = true;
+  nextTick(() => nameInput.value.focus());
+}
 
-const editCategoryModal = (category) => {
-    selectedCategory.value = category;
-    form.name = category.name
-    showEditModal.value = true;
+function editCategoryModal(category) {
+  selectedCategory.value = category;
+  form.name = category.name;
+  showEditModal.value = true;
+  nextTick(() => nameInput.value.focus());
+}
 
-    nextTick(() => nameInput.value.focus());
-};
+function deleteCategoryModal(category) {
+  selectedCategory.value = category;
+  showDeleteModal.value = true;
+}
 
-const deleteCategoryModal = (category) => {
-    selectedCategory.value = category;
-    showDeleteModal.value = true;
-};
+function createCategory() {
+  form.post(route('categories.store'), {
+    preserveScroll: true,
+    onSuccess: () => { closeModal(); showToast(); },
+    onError:   () => nameInput.value.focus(),
+  });
+}
 
-const createCategory = () => {
-    form.post(route('categories.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function updateCategory() {
+  form.put(route('categories.update', selectedCategory.value.id), {
+    preserveScroll: true,
+    onSuccess: () => { closeModal(); showToast(); },
+    onError:   () => nameInput.value.focus(),
+  });
+}
 
-const updateCategory = () => {
-    form.put(route('categories.update', selectedCategory.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function deleteCategory() {
+  form.delete(route('categories.destroy', selectedCategory.value.id), {
+    preserveScroll: true,
+    onSuccess: () => { closeModal(); showToast(); },
+  });
+}
 
-const deleteCategory = () => {
-    form.delete(route('categories.destroy', selectedCategory.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-    });
-};
-
-const closeModal = () => {
-    showCreateModal.value = false;
-    showEditModal.value = false;
-    showDeleteModal.value = false;
-    form.reset();
-};
+function closeModal() {
+  showCreateModal.value = false;
+  showEditModal.value   = false;
+  showDeleteModal.value = false;
+  form.reset();
+}
 </script>
 
 <template>
-    <Head title="Category"/>
+  <Head title="Categorías" />
 
-    <AuthenticatedLayout>
-        <template #breadcrumb>
-            Categories
-        </template>
+  <AuthenticatedLayout>
+    <template #breadcrumb>
+      Categorías
+    </template>
 
-        <div class="flex flex-wrap">
-            <div class="w-full px-4">
-                <CardTable
-                    indexRoute="categories.index"
-                    :paginatedData="categories"
-                    :filters="filters"
-                    :tableHeads="tableHeads"
-                >
-                    <template #cardHeader>
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-2xl">Apply filters({{categories.total}})</h4>
-                            <Button @click="createCategoryModal">Create Category</Button>
-                        </div>
-                    </template>
-
-                    <tr v-for="(category, index) in categories.data" :key="category.id">
-                        <TableData>
-                            {{ (categories.current_page * categories.per_page) - (categories.per_page - (index + 1)) }}
-                        </TableData>
-                        <TableData>{{ category.name }}</TableData>
-                        <TableData>
-                            <Button @click="editCategoryModal(category)">
-                                <i class="fa fa-edit"></i>
-                            </Button>
-                            <Button
-                                @click="deleteCategoryModal(category)"
-                                type="red"
-                            >
-                                <i class="fa fa-trash-alt"></i>
-                            </Button>
-                        </TableData>
-                    </tr>
-                </CardTable>
-            </div>
-        </div>
-
-        <!--Create data-->
-        <Modal
-            title="Create"
-            :show="showCreateModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="createCategory"
+    <div class="flex flex-wrap">
+      <div class="w-full px-4">
+        <CardTable
+          indexRoute="categories.index"
+          :paginatedData="categories"
+          :filters="filters"
+          :tableHeads="tableHeads"
         >
-            <div>
-                <label for="name">Name</label>
-                <input
-                    id="name"
-                    ref="nameInput"
-                    v-model="form.name"
-                    @keyup.enter="createCategory"
-                    type="text"
-                    placeholder="Enter name"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.name"/>
+          <template #cardHeader>
+            <div class="flex justify-between items-center">
+              <h4 class="text-2xl">
+                Aplicar filtros ({{ categories.total }})
+              </h4>
+              <Button @click="createCategoryModal">
+                Crear categoría
+              </Button>
             </div>
-        </Modal>
+          </template>
 
-        <!--Edit data-->
-        <Modal
-            title="Edit"
-            :show="showEditModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="updateCategory"
-        >
-            <div>
-                <label for="name">Name</label>
-                <input
-                    id="name"
-                    ref="nameInput"
-                    v-model="form.name"
-                    @keyup.enter="updateCategory"
-                    type="text"
-                    placeholder="Enter name"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.name"/>
-            </div>
-        </Modal>
+          <tr
+            v-for="(category, index) in categories.data"
+            :key="category.id"
+          >
+            <TableData>
+              {{ (categories.current_page - 1) * categories.per_page + index + 1 }}
+            </TableData>
+            <TableData>{{ category.name }}</TableData>
+            <TableData>
+              <Button @click="editCategoryModal(category)" class="mr-2">
+                <i class="fa fa-edit"></i>
+              </Button>
+              <Button
+                @click="deleteCategoryModal(category)"
+                type="red"
+              >
+                <i class="fa fa-trash-alt"></i>
+              </Button>
+            </TableData>
+          </tr>
+        </CardTable>
+      </div>
+    </div>
 
-        <!--Delete data-->
-        <Modal
-            title="Delete"
-            :show="showDeleteModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="deleteCategory"
-            maxWidth="sm"
-            submitButtonText="Yes, delete it!"
-        >
-            Are you sure you want to delete this category?
-        </Modal>
-    </AuthenticatedLayout>
+    <!-- Modal: Crear categoría -->
+    <Modal
+      title="Crear categoría"
+      cancelButtonText="Cancelar"
+      submitButtonText="Guardar"
+      :show="showCreateModal"
+      :formProcessing="form.processing"
+      @close="closeModal"
+      @submitAction="createCategory"
+    >
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">
+          Nombre
+        </label>
+        <input
+          id="name"
+          ref="nameInput"
+          v-model="form.name"
+          @keyup.enter="createCategory"
+          type="text"
+          placeholder="Ingrese nombre"
+          class="mt-1 block w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring"
+        />
+        <InputError :message="form.errors.name"/>
+      </div>
+    </Modal>
+
+    <!-- Modal: Editar categoría -->
+    <Modal
+      title="Editar categoría"
+      cancelButtonText="Cancelar"
+      submitButtonText="Guardar cambios"
+      :show="showEditModal"
+      :formProcessing="form.processing"
+      @close="closeModal"
+      @submitAction="updateCategory"
+    >
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">
+          Nombre
+        </label>
+        <input
+          id="name"
+          ref="nameInput"
+          v-model="form.name"
+          @keyup.enter="updateCategory"
+          type="text"
+          placeholder="Ingrese nombre"
+          class="mt-1 block w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring"
+        />
+        <InputError :message="form.errors.name"/>
+      </div>
+    </Modal>
+
+    <!-- Modal: Eliminar categoría -->
+    <Modal
+      title="Eliminar categoría"
+      cancelButtonText="Cancelar"
+      submitButtonText="¡Sí, eliminar!"
+      :show="showDeleteModal"
+      :formProcessing="form.processing"
+      @close="closeModal"
+      @submitAction="deleteCategory"
+      maxWidth="sm"
+    >
+      ¿Está seguro de que desea eliminar esta categoría?
+    </Modal>
+  </AuthenticatedLayout>
 </template>
