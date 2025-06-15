@@ -42,6 +42,11 @@
             icon="fas fa-money-bill-wave"
           />
           <SidebarItem
+                        name="Customer"
+                        routeName="customers.index"
+                        icon="fas fa-users"
+                    />
+          <SidebarItem
             name="Perfil"
             routeName="profile.edit"
             icon="fas fa-user-cog"
