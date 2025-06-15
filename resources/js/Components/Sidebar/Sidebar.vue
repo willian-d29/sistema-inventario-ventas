@@ -145,6 +145,13 @@
                         routeName="expenses.index"
                         icon="fas fa-book"
                     />
+                    
+                  <SidebarItem
+               name="Reportes"
+                routeName="reports.index"
+                   icon="fas fa-chart-bar"
+                    />
+
 
                     <SidebarItem
                         name="Settings"
