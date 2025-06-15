@@ -37,6 +37,8 @@ const form = useForm({
     nid: null,
     joining_date: null,
     photo: null,
+    password: null,
+
 });
 
 const createEmployeeModal = () => {
@@ -168,126 +170,140 @@ const closeModal = () => {
             </div>
         </div>
 
-        <!--Create data-->
-        <Modal
-            title="Create"
-            :show="showCreateModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="createEmployee"
-        >
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Name"
-                        name="name"
-                        v-model="form.name"
-                        placeholder="Enter name"
-                        :errorMessage="form.errors.name"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Email"
-                        name="email"
-                        v-model="form.email"
-                        placeholder="Enter email"
-                        :errorMessage="form.errors.email"
-                        @keyupEnter="createEmployee"
-                        type="email"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Phone"
-                        name="phone"
-                        v-model="form.phone"
-                        placeholder="Enter phone"
-                        :errorMessage="form.errors.phone"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="NID"
-                        name="nid"
-                        v-model="form.nid"
-                        placeholder="Enter nid"
-                        :errorMessage="form.errors.nid"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-            </div>
-            <div class="my-3 grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Designation"
-                        name="designation"
-                        v-model="form.designation"
-                        placeholder="Enter designation"
-                        :errorMessage="form.errors.designation"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Salary"
-                        name="salary"
-                        v-model="form.salary"
-                        placeholder="Enter salary"
-                        :errorMessage="form.errors.salary"
-                        @keyupEnter="createEmployee"
-                        type="number"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Joining Date"
-                        name="joining_date"
-                        v-model="form.joining_date"
-                        placeholder="Enter joining_date"
-                        :errorMessage="form.errors.joining_date"
-                        @keyupEnter="createEmployee"
-                        type="date"
-                    />
-                </div>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <label
-                        class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
-                        <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
-                        </svg>
-                        <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
-                                form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
-                            }}</span>
-                        <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
-                        <input
-                            @input="form.photo = $event.target.files[0]"
-                            type='file'
-                            class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
-                        />
-                    </label>
-                    <InputError :message="form.errors.photo"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
-                    <textarea
-                        id="address"
-                        v-model="form.address"
-                        type="text"
-                        rows="3"
-                        placeholder="Enter address"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    ></textarea>
-                    <InputError :message="form.errors.address"/>
-                </div>
-            </div>
-        </Modal>
+       <!--Create data-->
+<Modal
+    title="Create"
+    :show="showCreateModal"
+    :formProcessing="form.processing"
+    @close="closeModal"
+    @submitAction="createEmployee"
+>
+    <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Name"
+                name="name"
+                v-model="form.name"
+                placeholder="Enter name"
+                :errorMessage="form.errors.name"
+                @keyupEnter="createEmployee"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Email"
+                name="email"
+                v-model="form.email"
+                placeholder="Enter email"
+                :errorMessage="form.errors.email"
+                @keyupEnter="createEmployee"
+                type="email"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Phone"
+                name="phone"
+                v-model="form.phone"
+                placeholder="Enter phone"
+                :errorMessage="form.errors.phone"
+                @keyupEnter="createEmployee"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Password"
+                name="password"
+                v-model="form.password"
+                placeholder="Enter password"
+                :errorMessage="form.errors.password"
+                @keyupEnter="createEmployee"
+                type="password"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="NID"
+                name="nid"
+                v-model="form.nid"
+                placeholder="Enter nid"
+                :errorMessage="form.errors.nid"
+                @keyupEnter="createEmployee"
+            />
+        </div>
+    </div>
+
+    <div class="my-3 grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Designation"
+                name="designation"
+                v-model="form.designation"
+                placeholder="Enter designation"
+                :errorMessage="form.errors.designation"
+                @keyupEnter="createEmployee"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Salary"
+                name="salary"
+                v-model="form.salary"
+                placeholder="Enter salary"
+                :errorMessage="form.errors.salary"
+                @keyupEnter="createEmployee"
+                type="number"
+            />
+        </div>
+        <div class="flex flex-col">
+            <DashboardInputGroup
+                label="Joining Date"
+                name="joining_date"
+                v-model="form.joining_date"
+                placeholder="Enter joining_date"
+                :errorMessage="form.errors.joining_date"
+                @keyupEnter="createEmployee"
+                type="date"
+            />
+        </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+        <div class="flex flex-col">
+            <label
+                class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
+                <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path
+                        d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
+                </svg>
+                <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
+                        form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
+                    }}</span>
+                <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
+                <input
+                    @input="form.photo = $event.target.files[0]"
+                    type='file'
+                    class="hidden"
+                    accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
+                />
+            </label>
+            <InputError :message="form.errors.photo"/>
+        </div>
+        <div class="flex flex-col">
+            <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
+            <textarea
+                id="address"
+                v-model="form.address"
+                type="text"
+                rows="3"
+                placeholder="Enter address"
+                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+            ></textarea>
+            <InputError :message="form.errors.address"/>
+        </div>
+    </div>
+</Modal>
+
 
         <!--Edit data-->
         <Modal

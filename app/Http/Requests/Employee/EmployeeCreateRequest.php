@@ -26,7 +26,12 @@ class EmployeeCreateRequest extends FormRequest
     {
         return [
             EmployeeFieldsEnum::NAME->value         => ["required", "string", "max:255"],
-            EmployeeFieldsEnum::EMAIL->value        => ["required", "email", Rule::unique((new Employee())->getTable())],
+            EmployeeFieldsEnum::EMAIL->value        => [
+                "required",
+                "email",
+                Rule::unique((new Employee())->getTable()),
+                Rule::unique('users', 'email'), // Asegura que el email no exista en la tabla users
+            ],
             EmployeeFieldsEnum::PHONE->value        => ["required", "string", "max:255"],
             EmployeeFieldsEnum::DESIGNATION->value  => ["required", "string", "max:255"],
             EmployeeFieldsEnum::ADDRESS->value      => ["required", "string"],
@@ -34,6 +39,9 @@ class EmployeeCreateRequest extends FormRequest
             EmployeeFieldsEnum::PHOTO->value        => ["nullable", "file", "mimes:jpg,jpeg,png,gif,svg", "max:1024"],
             EmployeeFieldsEnum::NID->value          => ["nullable", "string", "max:255"],
             EmployeeFieldsEnum::JOINING_DATE->value => ["required", "date", "max:255"],
+            
+            //  NUEVA REGLA PARA CONTRASEÑA
+            'password' => ['required', 'string', 'min:6', 'max:100'],
         ];
     }
 }

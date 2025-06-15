@@ -20,6 +20,7 @@ use App\Http\Controllers\{
     TransactionController,
     UnitTypeController,
     UserController,
+    ReportController, // controlador para reportes
     Auth\AuthenticatedSessionController
 };
 
@@ -129,8 +130,13 @@ Route::prefix('sistema')->middleware(['auth', 'role:admin'])->group(function () 
     Route::apiResource('/employees', EmployeeController::class);
     Route::apiResource('/salaries', SalaryController::class);
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
-});
 
+    //  Reportes
+    
+Route::get('/reports', fn () => Inertia::render('Reports/Index'))->name('reports.index');
+Route::get('/reports/ventas/pdf', [ReportController::class, 'ventasPDF'])->name('reports.ventas.pdf');
+Route::get('/reports/ventas/excel', [ReportController::class, 'ventasExcel'])->name('reports.ventas.excel');
+});
 /*
 |--------------------------------------------------------------------------
 | Panel exclusivo para Vendedor (opcional)
