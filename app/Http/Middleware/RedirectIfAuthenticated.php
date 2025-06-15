@@ -18,6 +18,8 @@ class RedirectIfAuthenticated
    
 
    
+
+
 public function handle(Request $request, Closure $next, string ...$guards): Response
 {
     $guards = empty($guards) ? [null] : $guards;
@@ -31,14 +33,16 @@ public function handle(Request $request, Closure $next, string ...$guards): Resp
             }
 
             return match ($user->role) {
-                'admin', 'vendedor' => redirect('/sistema/dashboard'),
-                'cliente' => redirect('/'),
-                default => abort(403),
+                'admin'    => redirect('/sistema/dashboard'),
+                'vendedor' => redirect('/sistema/pos'),
+                'cliente'  => redirect('/'),
+                default    => abort(403),
             };
         }
     }
 
     return $next($request);
 }
+
 
 }

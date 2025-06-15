@@ -46,9 +46,10 @@ public function store(LoginRequest $request): RedirectResponse
     }
 
     return match ($user->role) {
-        'admin', 'vendedor' => redirect()->to('/sistema/dashboard'),
-        'cliente' => redirect()->to('/'),
-        default => abort(403),
+        'admin'    => redirect()->to('/sistema/dashboard'),
+        'vendedor' => redirect()->to('/sistema/pos'),
+        'cliente'  => redirect()->to('/'),
+        default    => abort(403),
     };
 }
 
