@@ -6,37 +6,39 @@ use App\Enums\Core\FilterFieldTypeEnum;
 use App\Enums\Core\SortOrderEnum;
 use App\Enums\Customer\CustomerFiltersEnum;
 use App\Enums\Customer\CustomerSortFieldsEnum;
-use App\Exceptions\CustomerNotFoundException;
-use App\Helpers\BaseHelper;
 use App\Http\Requests\Customer\CustomerCreateRequest;
 use App\Http\Requests\Customer\CustomerIndexRequest;
 use App\Http\Requests\Customer\CustomerUpdateRequest;
-use App\Services\CustomerService;
+use App\Models\User;
 use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CustomerController extends Controller
 {
-    public function __construct(private readonly CustomerService $service)
+    public function index(CustomerIndexRequest $request): Response
     {
-    }
+        $search = $request->input('search');
 
-    public function index(CustomerIndexRequest $request): LengthAwarePaginator|Response
-    {
-        if ($request->inertia == "disabled"){
-            $query = $request->validated();
-            $query["sort_by"] = CustomerSortFieldsEnum::NAME->value;
-            return $this->service->getAll($query);
-        }
+        $clientes = User::where('role', 'cliente')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render(
             component: 'Customer/Index',
             props: [
-                'customers' => $this->service->getAll($request->validated()),
+                'customers' => $clientes,
                 'filters'   => [
                     CustomerFiltersEnum::NAME->value       => [
                         'label'       => CustomerFiltersEnum::NAME->label(),
@@ -61,14 +63,14 @@ class CustomerController extends Controller
                         'placeholder' => 'Select a sort field',
                         'type'        => FilterFieldTypeEnum::SELECT_STATIC->value,
                         'value'       => $request->validated()['sort_by'] ?? "",
-                        'options'     => BaseHelper::convertKeyValueToLabelValueArray(CustomerSortFieldsEnum::choices()),
+                        'options'     => \App\Helpers\BaseHelper::convertKeyValueToLabelValueArray(CustomerSortFieldsEnum::choices()),
                     ],
                     "sort_order"                           => [
                         'label'       => 'Sort order',
                         'placeholder' => 'Select a sort order',
                         'type'        => FilterFieldTypeEnum::SELECT_STATIC->value,
                         'value'       => $request->validated()['sort_order'] ?? "",
-                        'options'     => BaseHelper::convertKeyValueToLabelValueArray(SortOrderEnum::choices()),
+                        'options'     => \App\Helpers\BaseHelper::convertKeyValueToLabelValueArray(SortOrderEnum::choices()),
                     ],
                     CustomerFiltersEnum::CREATED_AT->value => [
                         'label'       => CustomerFiltersEnum::CREATED_AT->label(),
@@ -77,22 +79,34 @@ class CustomerController extends Controller
                         'value'       => $request->validated()[CustomerFiltersEnum::CREATED_AT->value] ?? "",
                     ],
                 ],
-            ]);
+            ]
+        );
     }
 
     public function store(CustomerCreateRequest $request): RedirectResponse
     {
         try {
-            $this->service->create(
-                payload: $request->validated()
-            );
-            $flash = [
-                "message" => 'Customer created successfully.'
-            ];
+            $data = $request->validated();
+
+            $password = isset($data['password']) && $data['password']
+                ? Hash::make($data['password'])
+                : null;
+
+            User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'phone'    => $data['phone'] ?? null,
+                'address'  => $data['address'] ?? null,
+                'photo'    => $data['photo'] ?? null,
+                'role'     => 'cliente',
+                'password' => $password,
+            ]);
+
+            $flash = ["message" => 'Cliente creado correctamente.'];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Customer creation failed!",
+                "message"   => "¡Error al crear el cliente!",
             ];
 
             Log::error("Customer creation failed!", [
@@ -101,30 +115,23 @@ class CustomerController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('customers.index')
-            ->with('flash', $flash);
+        return redirect()->route('customers.index')->with('flash', $flash);
     }
 
     public function update(CustomerUpdateRequest $request, $id): RedirectResponse
     {
         try {
-            $this->service->update(
-                id: $id,
-                payload: $request->validated()
-            );
-            $flash = [
-                "message" => 'Customer updated successfully.'
-            ];
-        } catch (CustomerNotFoundException $e) {
-            $flash = [
-                "isSuccess" => false,
-                "message"   => $e->getMessage(),
-            ];
+            $data = $request->validated();
+
+            $cliente = User::where('id', $id)->where('role', 'cliente')->firstOrFail();
+
+            $cliente->update($data);
+
+            $flash = ["message" => 'Cliente actualizado correctamente.'];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Customer update failed!",
+                "message"   => "¡Error al actualizar el cliente!",
             ];
 
             Log::error("Customer update failed!", [
@@ -133,27 +140,20 @@ class CustomerController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('customers.index')
-            ->with('flash', $flash);
+        return redirect()->route('customers.index')->with('flash', $flash);
     }
 
     public function destroy($id): RedirectResponse
     {
         try {
-            $this->service->delete(id: $id);
-            $flash = [
-                "message" => 'Customer deleted successfully.'
-            ];
-        } catch (CustomerNotFoundException $e) {
-            $flash = [
-                "isSuccess" => false,
-                "message"   => $e->getMessage(),
-            ];
+            $cliente = User::where('id', $id)->where('role', 'cliente')->firstOrFail();
+            $cliente->delete();
+
+            $flash = ["message" => 'Cliente eliminado correctamente.'];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Customer deletion failed!",
+                "message"   => "¡Error al eliminar el cliente!",
             ];
 
             Log::error("Customer deletion failed!", [
@@ -162,8 +162,6 @@ class CustomerController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('customers.index')
-            ->with('flash', $flash);
+        return redirect()->route('customers.index')->with('flash', $flash);
     }
 }

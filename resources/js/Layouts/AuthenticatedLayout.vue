@@ -1,11 +1,14 @@
 <script setup>
 import Sidebar from "@/Components/Sidebar/Sidebar.vue";
+import SidebarVendedor from "@/Components/Sidebar/SidebarVendedor.vue";
 import AdminNavbar from "@/Components/Navbars/AdminNavbar.vue";
 import FooterAdmin from "@/Components/Footers/FooterAdmin.vue";
 import { Notification, Notivue, pastelTheme } from "notivue";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 
-// Función segura para logout con POST
+// Accedemos al usuario autenticado
+const user = usePage().props.auth.user;
+
 function logout() {
     router.post('/logout');
 }
@@ -17,8 +20,8 @@ function logout() {
     </Notivue>
 
     <div>
-        <!-- Menú lateral -->
-        <Sidebar />
+        <!-- Menú lateral dinámico -->
+        <component :is="user.role === 'vendedor' ? SidebarVendedor : Sidebar" />
 
         <!-- Contenido principal -->
         <div class="relative md:ml-64 bg-blueGray-100">
@@ -28,22 +31,12 @@ function logout() {
                 </template>
             </AdminNavbar>
 
-            <!-- 👇 Botón logout fuera del slot, siempre visible -->
-            <div class="flex justify-end px-6 py-4 bg-white shadow">
-                <button
-                    @click="logout"
-                    class="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
-                >
-                    Cerrar sesión
-                </button>
-            </div>
+            
 
             <!-- Header -->
             <div class="relative bg-emerald-600 md:pt-32 pb-32 pt-12">
                 <div class="px-4 md:px-10 mx-auto w-full">
-                    <div>
-                        <slot name="headerState" />
-                    </div>
+                    <slot name="headerState" />
                 </div>
             </div>
 
