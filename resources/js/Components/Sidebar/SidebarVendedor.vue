@@ -42,7 +42,7 @@
             icon="fas fa-money-bill-wave"
           />
           <SidebarItem
-                        name="Customer"
+                        name="Clientes"
                         routeName="customers.index"
                         icon="fas fa-users"
                     />
