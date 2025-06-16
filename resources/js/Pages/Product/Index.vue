@@ -86,6 +86,7 @@ function closeModal() {
             v-for="(product, index) in products.data"
             :key="product.id"
           >
+          
             <TableData>
               {{ (products.current_page - 1) * products.per_page + index + 1 }}
             </TableData>

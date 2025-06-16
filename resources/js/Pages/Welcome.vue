@@ -166,7 +166,7 @@
       <section v-else class="container mx-auto max-w-screen-xl px-4 pb-10">
         <div
           :class="viewMode==='grid'
-            ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6'
+            ? 'grid grid-cols-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6'
             : 'flex flex-col space-y-6'"
         >
           <article
