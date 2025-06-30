@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -164,4 +165,37 @@ class CustomerController extends Controller
 
         return redirect()->route('customers.index')->with('flash', $flash);
     }
+
+    
+public function editProfile(Request $request)
+{
+    return Inertia::render('Profile', [
+        'user' => $request->user(),
+    ]);
+}
+
+public function updateProfile(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
+        'photo' => 'nullable|image|max:2048', // validación para la foto
+    ]);
+
+    $user = $request->user();
+
+    // Subida de foto si viene en la solicitud
+    if ($request->hasFile('photo')) {
+        $photo = $request->file('photo')->store('users', 'public');
+        $user->photo = $photo;
+    }
+
+    $user->fill($request->only('name', 'email', 'phone', 'address'))->save();
+
+    return redirect()->route('perfil')->with('flash', ['message' => 'Perfil actualizado correctamente']);
+}
+
+
 }

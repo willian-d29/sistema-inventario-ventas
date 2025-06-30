@@ -135,23 +135,29 @@ const closeModal = () => {
                 {{ getCurrency() }}{{ order.due }}
               </span>
               <br>
-              <div class="flex mt-1" v-if="order.due > 0">
-                <Button
-                  @click="payDueOrderModal(order)"
-                  title="Pagar deuda"
-                  class="px-2"
-                >
-                  <i class="fa fa-money-bill-wave"></i>
-                </Button>
-                <Button
-                  @click="settleOrderModal(order)"
-                  type="red"
-                  class="px-2"
-                  title="Liquidar deuda"
-                >
-                  <i class="fa fa-handshake"></i>
-                </Button>
-              </div>
+              
+               <div class="flex mt-1">
+  <Button
+    v-if="order.status === 'unpaid' || order.status === 'partial_paid'"
+    @click="payDueOrderModal(order)"
+    title="Pagar deuda"
+    class="px-2"
+  >
+    <i class="fa fa-money-bill-wave"></i>
+  </Button>
+  <Button
+    v-if="order.paid >= order.total && order.status !== 'paid'"
+    @click="settleOrderModal(order)"
+    type="red"
+    class="px-2"
+    title="Liquidar deuda"
+  >
+    <i class="fa fa-handshake"></i>
+  </Button>
+</div>
+
+
+
             </TableData>
             <TableData :class="order.profit > 0 ? 'text-emerald-500 font-bold' : ''">
               {{ getCurrency() }}{{ order.profit }}

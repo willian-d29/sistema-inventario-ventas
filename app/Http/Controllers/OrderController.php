@@ -23,6 +23,9 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+use App\Models\Order;
 
 class OrderController extends Controller
 {
@@ -123,37 +126,55 @@ class OrderController extends Controller
             ]);
     }
 
-    public function store(OrderCreateRequest $request): RedirectResponse
-    {
-        try {
-            $this->service->createForUser(
-                payload: $request->validated(),
-                userId: auth()->id()
-            );
-            $flash = [
-                "message" => 'Order placed successfully.'
-            ];
-        } catch (OrderCreateException $e) {
-            $flash = [
-                "isSuccess" => false,
-                "message"   => $e->getMessage(),
-            ];
-        } catch (Exception $e) {
-            $flash = [
-                "isSuccess" => false,
-                "message"   => "Failed to place order.!",
-            ];
 
-            Log::error("Failed to place order", [
-                "message" => $e->getMessage(),
-                "traces"  => $e->getTrace()
+public function store(OrderCreateRequest $request): RedirectResponse
+{
+    try {
+        $order = $this->service->createForUser(
+            payload: $request->validated(),
+            userId: auth()->id()
+        );
+
+      
+
+            return redirect()
+    ->route('carts.index')
+    ->with([
+        'order_id' => $order->id, // ✅ esto va fuera de 'flash'
+        'flash' => [
+            'isSuccess' => true,
+            'message' => 'Pedido registrado con éxito.',
+        ],
+    ]);
+
+
+    } catch (OrderCreateException $e) {
+        return redirect()
+            ->route('carts.index')
+            ->with('flash', [
+                'isSuccess' => false,
+                'message' => $e->getMessage(),
             ]);
-        }
+    } catch (Exception $e) {
+        \Log::error("Error al registrar el pedido", [
+            "message" => $e->getMessage(),
+            "traces" => $e->getTrace()
+        ]);
 
         return redirect()
             ->route('carts.index')
-            ->with('flash', $flash);
+            ->with('flash', [
+                'isSuccess' => false,
+                'message' => 'Error interno al registrar pedido.',
+            ]);
     }
+}
+
+
+
+
+
+
 
     /**
      * @param int $id
@@ -224,4 +245,82 @@ class OrderController extends Controller
             ->route('orders.index')
             ->with('flash', $flash);
     }
+
+    
+
+public function success(\Illuminate\Http\Request $request, \App\Services\OrderService $orderService)
+{
+    $order = \App\Models\Order::where('customer_id', auth()->id())
+        ->latest()
+        ->first();
+
+    if (!$order) {
+        return redirect('/')->with('error', 'Orden no encontrada.');
+    }
+
+    // Registrar el pago como completo
+    $orderService->pay($order->id, [
+        'amount' => $order->total,
+        'paid_through' => 'card',
+    ]);
+
+    return \Inertia\Inertia::render('Checkout/Success', [
+        'order' => $order->fresh()
+    ]);
+}
+
+
+
+
+public function clientOrders()
+{
+    $orders = \App\Models\Order::with('items.product')
+        ->where('customer_id', auth()->id())
+        ->latest()
+        ->paginate(10);
+
+    return \Inertia\Inertia::render('Cliente/Pedidos', [
+        'orders' => $orders
+    ]);
+}
+
+
+public function downloadPDF($id)
+{
+    $order = \App\Models\Order::with('items.product')->findOrFail($id);
+
+    $pdf = Pdf::loadView('pdf.order', [
+        'order' => $order
+    ]);
+
+    return $pdf->download('pedido_'.$order->id.'.pdf');
+}
+
+public function destroy($id)
+{
+    $order = Order::where('id', $id)
+        ->where('customer_id', auth()->id())
+        ->firstOrFail();
+
+    $order->delete();
+
+    return back()->with('flash', ['message' => 'Pedido eliminado']);
+}
+
+
+
+
+
+//Comprobante de pago para clientes fisicos 
+
+public function receipt($id)
+{
+    $order = Order::with('items.product')->findOrFail($id);
+    $pdf = \PDF::loadView('pdf.invoice', ['order' => $order]);
+
+    return $pdf->stream("orden-{$order->id}.pdf"); // <- usa ID directamente
+}
+
+
+
 }

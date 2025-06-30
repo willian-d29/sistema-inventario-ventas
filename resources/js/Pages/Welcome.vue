@@ -83,6 +83,23 @@
               alt="Avatar"
               class="w-9 h-9 rounded-full border-2 border-emerald-500 object-cover shadow"
             />
+            <Link
+  v-if="authUser?.role === 'cliente'"
+  href="/perfil"
+  class="ml-2 text-xs px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-600 shadow transition"
+>
+  Mi perfil
+</Link>
+
+<Link
+  v-if="authUser?.role === 'cliente'"
+  href="/cliente/pedidos"
+  class="ml-2 text-xs px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white shadow transition"
+>
+  Mis Pedidos
+</Link>
+
+
             <span>{{ authUser.name }}</span>
             <button @click="logout" class="ml-2 text-xs px-3 py-1 rounded bg-red-500 hover:bg-red-600 shadow transition">Cerrar sesión</button>
           </div>
@@ -273,9 +290,18 @@
               <span>Total:</span>
               <span>S/. {{ cartTotal }}</span>
             </p>
-            <button class="mt-5 w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-emerald-600 hover:to-blue-600 text-white py-3 rounded-xl font-semibold shadow transition-all duration-200 text-lg">
-              <CreditCardIcon class="w-6 h-6 mr-1 inline"/> Pagar ahora
-            </button>
+            <button
+  v-if="authUser"
+  @click="router.visit('/checkout')"
+  class="mt-5 w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-emerald-600 hover:to-blue-600 text-white py-3 rounded-xl font-semibold shadow transition-all duration-200 text-lg flex items-center justify-center gap-2"
+>
+  <CreditCardIcon class="w-6 h-6" /> Pagar ahora
+</button>
+
+<p v-else class="mt-5 text-sm text-center text-red-600 font-semibold">
+  Inicia sesión para procesar el pago
+</p>
+
           </div>
         </div>
       </div>

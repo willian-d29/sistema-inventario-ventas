@@ -65,20 +65,29 @@ class OrderItemService
      * @return void
      * @throws DBCommitException
      */
-    public function insert(array $payloads, int $orderId): void
-    {
-        $processPayloads = [];
-        foreach ($payloads as $payload) {
-            $processPayloads[] = [
-                OrderItemFieldsEnum::ORDER_ID->value     => $orderId,
-                OrderItemFieldsEnum::PRODUCT_ID->value   => $payload[OrderItemFieldsEnum::PRODUCT_ID->value],
-                OrderItemFieldsEnum::PRODUCT_JSON->value => json_encode($payload[OrderItemFieldsEnum::PRODUCT_JSON->value]),
-                OrderItemFieldsEnum::QUANTITY->value     => $payload[OrderItemFieldsEnum::QUANTITY->value],
-            ];
-        }
+    
+     public function insert(array $payloads, int $orderId): void
+{
+    $processPayloads = [];
+    foreach ($payloads as $payload) {
+        $quantity = $payload[OrderItemFieldsEnum::QUANTITY->value];
+        $price = $payload[OrderItemFieldsEnum::PRODUCT_JSON->value]['selling_price'];
+        $total = $quantity * $price;
 
-        $this->repository->insert($processPayloads);
+        $processPayloads[] = [
+            OrderItemFieldsEnum::ORDER_ID->value     => $orderId,
+            OrderItemFieldsEnum::PRODUCT_ID->value   => $payload[OrderItemFieldsEnum::PRODUCT_ID->value],
+            OrderItemFieldsEnum::PRODUCT_JSON->value => json_encode($payload[OrderItemFieldsEnum::PRODUCT_JSON->value]),
+            OrderItemFieldsEnum::QUANTITY->value     => $quantity,
+            'price'                                   => $price,
+            'total'                                   => $total,
+        ];
     }
+
+    $this->repository->insert($processPayloads);
+}
+
+
 
     /**
      * @param int $id

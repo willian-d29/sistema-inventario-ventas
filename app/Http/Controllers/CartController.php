@@ -65,6 +65,9 @@ class CartController extends Controller
             number: $cartSubtotal - $discountData["totalDiscount"] + $taxData["totalTax"]
         );
 
+
+        $clientes = \App\Models\User::where('role', 'cliente')->get(['id', 'name']);
+
         return Inertia::render(
             component: 'Cart/Pos',
             props: [
@@ -78,6 +81,8 @@ class CartController extends Controller
                 'totalTax'         => $taxData["totalTax"],
                 'total'            => $total,
                 'orderPaidByTypes' => BaseHelper::convertKeyValueToLabelValueArray(TransactionPaidThroughEnum::choices()),
+                'clientes' => $clientes,
+
             ]
         );
     }

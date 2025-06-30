@@ -222,9 +222,11 @@ class OrderService
     {
         $order = $this->findByIdOrFail(id: $id, expands: [OrderExpandEnum::ORDER_ITEMS->value]);
 
-        if ($order->due <= 0) {
-            throw new OrderSettleException("No due amount left to settle.");
-        }
+        
+        if ($order->paid < $order->total) {
+    throw new OrderSettleException("El pedido aún no está completamente pagado.");
+}
+
 
         // +discount
         $discountTotal = $order->discount_total + $order->due;
@@ -246,7 +248,8 @@ class OrderService
             OrderFieldsEnum::DUE->value            => 0,
             OrderFieldsEnum::PROFIT->value         => $profit,
             OrderFieldsEnum::LOSS->value           => $loss,
-            OrderFieldsEnum::STATUS->value         => OrderStatusEnum::SETTLED->value,
+            OrderFieldsEnum::STATUS->value => OrderStatusEnum::PAID->value,
+
         ];
 
         return $this->repository->update($order, $processPayload);
@@ -267,11 +270,14 @@ class OrderService
         $due = max($order->total - $paid, 0);
 
         // Calculate profit and loss
+        
+
         [$profit, $loss] = $this->decideProfitLoss(
-            paid: $paid,
-            taxTotal: $order->tax_total,
-            order: $order,
-        );
+    paid: $paid,
+    taxTotal: $order->tax_total ?? 0.0,
+    order: $order,
+);
+
 
         // Decide status
         $status = $this->decideStatus(
@@ -326,27 +332,30 @@ class OrderService
      * @param Order|null $order
      * @return array
      */
-    private function decideProfitLoss(int|float $paid, int|float $taxTotal, int|float $productBuyingSubtotal = 0, Order $order = null): array
-    {
-        if ($order) {
-            $productBuyingSubtotal = 0;
-            foreach ($order->orderItems as $orderItem) {
-                $productBuyingSubtotal += $orderItem->product_json['buying_price'] * $orderItem->quantity;
-            }
-        }
+    
+private function decideProfitLoss(int|float $paid, int|float|null $taxTotal = 0.0, int|float $productBuyingSubtotal = 0, Order $order = null): array
+{
+    $taxTotal = $taxTotal ?? 0.0;
 
-        $profit = $paid - $productBuyingSubtotal - $taxTotal;
-        if ($profit < 0) {
-            $loss = abs($profit);
-            $profit = 0;
-        } elseif ($profit == 0) {
-            $loss = 0;
-        } else {
-            $loss = 0;
-        }
+    if ($order) {
+        $productBuyingSubtotal = 0;
+        foreach ($order->orderItems as $orderItem) {
+            $productData = json_decode($orderItem->product_json, true);
+$productBuyingSubtotal += $productData['buying_price'] * $orderItem->quantity;
 
-        return [$profit, $loss];
+        }
     }
+
+    $profit = $paid - $productBuyingSubtotal - $taxTotal;
+
+    return [
+        max($profit, 0),
+        $profit < 0 ? abs($profit) : 0,
+    ];
+}
+
+
+
 
     /**
      * @param int|float $paid

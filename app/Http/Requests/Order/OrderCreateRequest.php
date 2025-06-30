@@ -31,7 +31,8 @@ class OrderCreateRequest extends FormRequest
                 "bail",
                 "nullable",
                 "integer",
-                Rule::exists((new Customer())->getTable(), 'id')
+                    Rule::exists('users', 'id')->where('role', 'cliente'), // 
+
             ],
             OrderFieldsEnum::PAID->value        => ["nullable", "numeric"],
             "paid_through"                      => ["required", "string", Rule::in(TransactionPaidThroughEnum::values())],

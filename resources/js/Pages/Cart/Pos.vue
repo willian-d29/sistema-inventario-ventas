@@ -8,6 +8,25 @@ import { getCurrency, numberFormat, showToast, truncateString } from "@/Utils/He
 import InputError from "@/Components/InputError.vue";
 import SubmitButton from "@/Components/SubmitButton.vue";
 
+
+import { ref } from 'vue';
+
+const lastOrderId = ref(null); // ✅ ID de la última orden creada
+
+
+import { usePage } from '@inertiajs/vue3'
+import { watchEffect } from 'vue'
+
+const page = usePage()
+
+watchEffect(() => {
+  if (page.props.flash?.order_id) {
+    console.log("🎯 Flash recibido:", page.props.flash)
+    lastOrderId.value = page.props.flash.order_id
+  }
+})
+
+
 const props = defineProps({
   products: Object,
   carts: Object,
@@ -19,6 +38,8 @@ const props = defineProps({
   totalTax: Number,
   total: Number,
   orderPaidByTypes: Object,
+    clientes: Array, // ✅ agregado aquí
+
 });
 
 const form = useForm({
@@ -30,6 +51,8 @@ const form = useForm({
     discount: 0,
     discount_type: "fixed"
   },
+    order_id: null, // ✅ agregado
+
 });
 
 // Watch props and update the form fields reactively
@@ -99,16 +122,34 @@ const deleteCartAllItems = () => {
   });
 };
 
+
+
 const createOrder = () => {
   if (!props.carts.total) return;
+
   form.post(route('orders.store'), {
     preserveScroll: true,
-    onSuccess: () => {
+    preserveState: true,
+    onSuccess: (page) => {
       showToast();
+
+      const orderId = page.props.order_id; // ✅ ya no dentro de flash
+
+      console.log("✅ Flash message:", page.props.flash?.message);
+      console.log("✅ order_id recibido:", orderId);
+
+      if (orderId) {
+        lastOrderId.value = orderId;
+        window.open(route('orders.receipt', orderId), '_blank');
+      }
+
       form.reset();
     },
   });
 };
+
+
+
 </script>
 
 <template>
@@ -284,12 +325,35 @@ const createOrder = () => {
                 <div class="rounded-md shadow-lg px-4 py-4">
                   <div>
                     <label for="customer" class="text-stone-600 text-sm font-medium">Cliente</label>
-                    <AsyncVueSelect
-                      v-model="form.customer_id"
-                      class="my-1"
-                      resource="customers.index"
-                      placeholder="Seleccionar cliente"
-                    />
+                    <select
+  v-model="form.customer_id"
+  class="w-full px-2 py-2 border border-gray-200 rounded"
+>
+  <option value="">Seleccionar cliente</option>
+  <option
+    v-for="cliente in clientes"
+    :key="cliente.id"
+    :value="cliente.id"
+  >
+    {{ cliente.name }}
+  </option>
+</select>
+
+<select
+  v-model="form.customer_id"
+  class="w-full px-2 py-2 border border-gray-200 rounded"
+>
+  <option value="">Seleccionar cliente</option>
+  <option
+    v-for="cliente in props.clientes"
+    :key="cliente.id"
+    :value="cliente.id"
+  >
+    {{ cliente.name }}
+  </option>
+</select>
+
+
                     <InputError :message="form.errors.customer_id" />
                   </div>
 
@@ -323,17 +387,35 @@ const createOrder = () => {
               </div>
               <!-- end payment -->
 
-              <!-- submit -->
-              <div class="px-5 mt-3 mb-4">
-                <SubmitButton
-                  @click="createOrder"
-                  :processing="form.processing"
-                  class="w-full px-4 py-4 rounded-md shadow-lg text-center bg-emerald-500 text-white font-semibold focus:outline-none"
-                  :class="!carts.total ? 'cursor-not-allowed' : ''"
-                >
-                  Pagar e imprimir
-                </SubmitButton>
-              </div>
+
+<!-- Botón de pagar -->
+<div class="px-5 mt-3 mb-2">
+  <SubmitButton
+    @click="createOrder"
+    :processing="form.processing"
+    class="w-full px-4 py-4 rounded-md shadow-lg text-center bg-emerald-500 text-white font-semibold focus:outline-none"
+    :class="!carts.total ? 'cursor-not-allowed' : ''"
+  >
+    Pagar e imprimir
+  </SubmitButton>
+
+</div>
+
+
+<div v-if="lastOrderId" class="px-5 mt-1 mb-4">
+  <p class="text-sm text-gray-600 mb-1">Última orden: #{{ lastOrderId }}</p>
+  <button
+    @click="() => window.open(route('orders.receipt', lastOrderId), '_blank')"
+    class="w-full px-4 py-2 rounded-md shadow bg-blue-600 text-white font-semibold hover:bg-blue-700"
+  >
+    Ver comprobante generado
+  </button>
+
+
+</div>
+
+
+
               <!-- end submit -->
             </div>
             <!-- end right section -->
