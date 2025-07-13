@@ -18,4 +18,13 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: '10.100.154.91', // ← tu IP local
+            protocol: 'ws',
+            port: 5173,
+        },
+    },
 });

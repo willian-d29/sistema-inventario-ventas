@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Servicio PHP + Laravel
   app:
     build:
       context: .
@@ -15,34 +16,42 @@ services:
     networks:
       - app-network
     ports:
-      - "9000:9000"
+      - "9000:9000"  # Exponer PHP-FPM solo si lo necesitas fuera del contenedor
+      - "5173:5173"
 
+  # Servicio MySQL
   db:
     image: mysql:8.0
     container_name: mysql-db
     environment:
       MYSQL_DATABASE: inventario2
       MYSQL_ROOT_PASSWORD: root
-    tmpfs:
-      - /var/lib/mysql
+    volumes:
+      - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
     networks:
       - app-network
 
+  # Servicio NGINX
   webserver:
     image: nginx:alpine
     container_name: nginx-web
     ports:
-      - "8080:80"
+      - "8080:80"  # Tu app será accesible en http://localhost:8080
     volumes:
-      - ./src:/var/www
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./src:/var/www              # Código fuente
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d  # Configuración NGINX
     depends_on:
       - app
     networks:
       - app-network
 
+# Red Docker compartida entre servicios
 networks:
   app-network:
     driver: bridge
+
+# Volumen persistente para MySQL
+volumes:
+  db_data:
