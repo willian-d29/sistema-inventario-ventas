@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HigherOrderWhenProxy;
 
+
 class ProductRepository
 {
     const MAX_RETRY = 5;
@@ -124,62 +125,50 @@ class ProductRepository
      * @param array $filters
      * @return Builder|HigherOrderWhenProxy
      */
-    private function getQuery(array $filters): Builder|HigherOrderWhenProxy
-    {
-        return Product::query()
-            ->when(isset($filters[ProductFiltersEnum::KEYWORD->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::ID->value, $filters[ProductFiltersEnum::KEYWORD->value])
+    
+    
+
+    public function getQuery(
+    array $filters = [],
+    array $fields = ['*'],
+    array $expand = [],
+    string $sortBy = 'created_at',
+    string $sortOrder = 'desc'
+): Builder|HigherOrderWhenProxy
+{
+    return Product::query()
+        ->select($fields)
+        ->with($expand)
+        ->when(isset($filters[ProductFiltersEnum::KEYWORD->value]), function ($query) use ($filters) {
+            $query->where(ProductFieldsEnum::ID->value, $filters[ProductFiltersEnum::KEYWORD->value])
                 ->orWhere(ProductFieldsEnum::NAME->value, "like", "%" . $filters[ProductFiltersEnum::KEYWORD->value] . "%")
                 ->orWhere(ProductFieldsEnum::PRODUCT_NUMBER->value, $filters[ProductFiltersEnum::KEYWORD->value])
                 ->orWhere(ProductFieldsEnum::PRODUCT_CODE->value, $filters[ProductFiltersEnum::KEYWORD->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::ID->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::ID->value, $filters[ProductFiltersEnum::ID->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::CATEGORY_ID->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::CATEGORY_ID->value, $filters[ProductFiltersEnum::CATEGORY_ID->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::SUPPLIER_ID->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::SUPPLIER_ID->value, $filters[ProductFiltersEnum::SUPPLIER_ID->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::NAME->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::NAME->value, "like", "%" . $filters[ProductFiltersEnum::NAME->value] . "%");
-            })
-            ->when(isset($filters[ProductFiltersEnum::PRODUCT_NUMBER->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::PRODUCT_NUMBER->value, $filters[ProductFiltersEnum::PRODUCT_NUMBER->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::PRODUCT_CODE->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::PRODUCT_CODE->value, $filters[ProductFiltersEnum::PRODUCT_CODE->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::UNIT_TYPE_ID->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::UNIT_TYPE_ID->value, $filters[ProductFiltersEnum::UNIT_TYPE_ID->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::QUANTITY->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::QUANTITY->value, $filters[ProductFiltersEnum::QUANTITY->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::QUANTITIES->value]), function ($query) use ($filters) {
-                $query->whereBetween(ProductFieldsEnum::QUANTITY->value, $filters[ProductFiltersEnum::QUANTITIES->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::BUYING_PRICE->value]), function ($query) use ($filters) {
-                $query->whereBetween(ProductFieldsEnum::BUYING_PRICE->value, $filters[ProductFiltersEnum::BUYING_PRICE->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::SELLING_PRICE->value]), function ($query) use ($filters) {
-                $query->whereBetween(ProductFieldsEnum::SELLING_PRICE->value, $filters[ProductFiltersEnum::SELLING_PRICE->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::STATUS->value]), function ($query) use ($filters) {
-                $query->where(ProductFieldsEnum::STATUS->value, $filters[ProductFiltersEnum::STATUS->value]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::BUYING_DATE->value]), function ($query) use ($filters) {
-                $query->whereBetween(ProductFieldsEnum::BUYING_DATE->value, [
-                    $filters[ProductFiltersEnum::BUYING_DATE->value][0],
-                    $filters[ProductFiltersEnum::BUYING_DATE->value][1] ?? Carbon::parse($filters[ProductFiltersEnum::BUYING_DATE->value][0])->endOfDay()->format("Y-m-d H:i:s")
-                ]);
-            })
-            ->when(isset($filters[ProductFiltersEnum::CREATED_AT->value]), function ($query) use ($filters) {
-                $query->whereBetween(ProductFieldsEnum::CREATED_AT->value, [
-                    $filters[ProductFiltersEnum::CREATED_AT->value][0],
-                    $filters[ProductFiltersEnum::CREATED_AT->value][1] ?? Carbon::parse($filters[ProductFiltersEnum::CREATED_AT->value][0])->endOfDay()->format("Y-m-d H:i:s")
-                ]);
-            });
-    }
+        })
+        ->when(isset($filters[ProductFiltersEnum::ID->value]), fn($q) => $q->where(ProductFieldsEnum::ID->value, $filters[ProductFiltersEnum::ID->value]))
+        ->when(isset($filters[ProductFiltersEnum::CATEGORY_ID->value]), fn($q) => $q->where(ProductFieldsEnum::CATEGORY_ID->value, $filters[ProductFiltersEnum::CATEGORY_ID->value]))
+        ->when(isset($filters[ProductFiltersEnum::SUPPLIER_ID->value]), fn($q) => $q->where(ProductFieldsEnum::SUPPLIER_ID->value, $filters[ProductFiltersEnum::SUPPLIER_ID->value]))
+        ->when(isset($filters[ProductFiltersEnum::NAME->value]), fn($q) => $q->where(ProductFieldsEnum::NAME->value, "like", "%" . $filters[ProductFiltersEnum::NAME->value] . "%"))
+        ->when(isset($filters[ProductFiltersEnum::PRODUCT_NUMBER->value]), fn($q) => $q->where(ProductFieldsEnum::PRODUCT_NUMBER->value, $filters[ProductFiltersEnum::PRODUCT_NUMBER->value]))
+        ->when(isset($filters[ProductFiltersEnum::PRODUCT_CODE->value]), fn($q) => $q->where(ProductFieldsEnum::PRODUCT_CODE->value, $filters[ProductFiltersEnum::PRODUCT_CODE->value]))
+        ->when(isset($filters[ProductFiltersEnum::UNIT_TYPE_ID->value]), fn($q) => $q->where(ProductFieldsEnum::UNIT_TYPE_ID->value, $filters[ProductFiltersEnum::UNIT_TYPE_ID->value]))
+        ->when(isset($filters[ProductFiltersEnum::QUANTITY->value]), fn($q) => $q->where(ProductFieldsEnum::QUANTITY->value, $filters[ProductFiltersEnum::QUANTITY->value]))
+        ->when(isset($filters[ProductFiltersEnum::QUANTITIES->value]), fn($q) => $q->whereBetween(ProductFieldsEnum::QUANTITY->value, $filters[ProductFiltersEnum::QUANTITIES->value]))
+        ->when(isset($filters[ProductFiltersEnum::BUYING_PRICE->value]), fn($q) => $q->whereBetween(ProductFieldsEnum::BUYING_PRICE->value, $filters[ProductFiltersEnum::BUYING_PRICE->value]))
+        ->when(isset($filters[ProductFiltersEnum::SELLING_PRICE->value]), fn($q) => $q->whereBetween(ProductFieldsEnum::SELLING_PRICE->value, $filters[ProductFiltersEnum::SELLING_PRICE->value]))
+        ->when(isset($filters[ProductFiltersEnum::STATUS->value]), fn($q) => $q->where(ProductFieldsEnum::STATUS->value, $filters[ProductFiltersEnum::STATUS->value]))
+        ->when(isset($filters[ProductFiltersEnum::BUYING_DATE->value]), function ($q) use ($filters) {
+            $q->whereBetween(ProductFieldsEnum::BUYING_DATE->value, [
+                $filters[ProductFiltersEnum::BUYING_DATE->value][0],
+                $filters[ProductFiltersEnum::BUYING_DATE->value][1] ?? Carbon::parse($filters[ProductFiltersEnum::BUYING_DATE->value][0])->endOfDay()->format("Y-m-d H:i:s")
+            ]);
+        })
+        ->when(isset($filters[ProductFiltersEnum::CREATED_AT->value]), function ($q) use ($filters) {
+            $q->whereBetween(ProductFieldsEnum::CREATED_AT->value, [
+                $filters[ProductFiltersEnum::CREATED_AT->value][0],
+                $filters[ProductFiltersEnum::CREATED_AT->value][1] ?? Carbon::parse($filters[ProductFiltersEnum::CREATED_AT->value][0])->endOfDay()->format("Y-m-d H:i:s")
+            ]);
+        })
+        ->orderBy($sortBy, $sortOrder);
+}
 }

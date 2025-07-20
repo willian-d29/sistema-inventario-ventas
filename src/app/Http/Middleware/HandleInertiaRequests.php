@@ -29,23 +29,25 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-    public function share(Request $request): array
-    {
-        return [
-            ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
-            ],
-            'ziggy' => fn () => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
-            'flash' => [
-                'isSuccess' => fn () => $request->session()->get('flash')['isSuccess'] ?? true,
-                'message' => fn () => $request->session()->get('flash')['message'] ?? null,
-            ],
-            'currency' => settings()->get(SettingFieldsEnum::CURRENCY_SYMBOL->value, '$'),
-            'decimal_point' => settings()->get(SettingFieldsEnum::DECIMAL_POINT->value, 4),
-        ];
-    }
+  public function share(Request $request): array
+{
+    return [
+        ...parent::share($request),
+        'auth' => [
+            'user' => $request->user(),
+        ],
+        'ziggy' => fn () => [
+            ...(new Ziggy)->toArray(),
+            'location' => $request->url(),
+        ],
+        'flash' => [
+            'isSuccess' => $request->session()->get('flash.isSuccess', false),
+            'message'   => $request->session()->get('flash.message', ''),
+            'order_id'  => $request->session()->get('flash.order_id', null),
+        ],
+        'currency' => settings()->get(SettingFieldsEnum::CURRENCY_SYMBOL->value, '$'),
+        'decimal_point' => settings()->get(SettingFieldsEnum::DECIMAL_POINT->value, 4),
+    ];
+}
+
 }

@@ -124,34 +124,40 @@ class EmployeeRepository
      * @return Builder|HigherOrderWhenProxy
      */
     private function getQuery(array $filters): Builder|HigherOrderWhenProxy
-    {
-        return Employee::query()
-            ->when(isset($filters[EmployeeFiltersEnum::ID->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::ID->value, $filters[EmployeeFiltersEnum::ID->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::NAME->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::NAME->value, "like", "%" . $filters[EmployeeFiltersEnum::NAME->value] . "%");
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::EMAIL->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::EMAIL->value, $filters[EmployeeFiltersEnum::EMAIL->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::PHONE->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::PHONE->value, $filters[EmployeeFiltersEnum::PHONE->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::DESIGNATION->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::DESIGNATION->value, "like", "%" . $filters[EmployeeFiltersEnum::DESIGNATION->value] . "%");
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::NID->value]), function ($query) use ($filters) {
-                $query->where(EmployeeFieldsEnum::NID->value, $filters[EmployeeFiltersEnum::NID->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::SALARY->value]), function ($query) use ($filters) {
-                $query->whereBetween(EmployeeFieldsEnum::SALARY->value, $filters[EmployeeFiltersEnum::SALARY->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::JOINING_DATE->value]), function ($query) use ($filters) {
-                $query->whereBetween(EmployeeFieldsEnum::JOINING_DATE->value, $filters[EmployeeFiltersEnum::JOINING_DATE->value]);
-            })
-            ->when(isset($filters[EmployeeFiltersEnum::CREATED_AT->value]), function ($query) use ($filters) {
-                $query->whereBetween(EmployeeFieldsEnum::CREATED_AT->value, $filters[EmployeeFiltersEnum::CREATED_AT->value]);
-            });
-    }
+{
+    return Employee::query()
+        ->when(isset($filters[EmployeeFiltersEnum::ID->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::ID->value, $filters[EmployeeFiltersEnum::ID->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::NAME->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::NAME->value, "like", "%" . $filters[EmployeeFiltersEnum::NAME->value] . "%");
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::EMAIL->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::EMAIL->value, $filters[EmployeeFiltersEnum::EMAIL->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::PHONE->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::PHONE->value, $filters[EmployeeFiltersEnum::PHONE->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::DESIGNATION->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::DESIGNATION->value, "like", "%" . $filters[EmployeeFiltersEnum::DESIGNATION->value] . "%");
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::NID->value]), function ($query) use ($filters) {
+            $query->where(EmployeeFieldsEnum::NID->value, $filters[EmployeeFiltersEnum::NID->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::SALARY->value]), function ($query) use ($filters) {
+            $query->whereBetween(EmployeeFieldsEnum::SALARY->value, $filters[EmployeeFiltersEnum::SALARY->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::JOINING_DATE->value]), function ($query) use ($filters) {
+            $query->whereBetween(EmployeeFieldsEnum::JOINING_DATE->value, $filters[EmployeeFiltersEnum::JOINING_DATE->value]);
+        })
+        ->when(isset($filters[EmployeeFiltersEnum::CREATED_AT->value]), function ($query) use ($filters) {
+            $query->whereBetween(EmployeeFieldsEnum::CREATED_AT->value, $filters[EmployeeFiltersEnum::CREATED_AT->value]);
+        })
+
+        // Añadir esta condición para incluir empleados que tengan usuarios con rol vendedor o empleado:
+        ->whereHas('user', function ($q) {
+            $q->whereIn('role', ['empleado', 'vendedor']);
+        });
+}
+
 }

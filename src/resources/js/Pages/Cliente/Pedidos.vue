@@ -1,58 +1,68 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-10">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold text-indigo-800 mb-8 animate-fade-in text-center">Mis Pedidos</h1>
+      <h1 class="text-3xl font-bold text-indigo-800 mb-8 animate-fade-in text-center">
+        Mis Pedidos
+      </h1>
 
       <div v-if="orders.data.length">
         <div
           v-for="order in orders.data"
           :key="order.id"
-          class="bg-white rounded-2xl shadow-md mb-6 p-6 transition-transform transform hover:scale-[1.01]"
+          class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 mb-6 p-6 border border-indigo-100 animate-fade-in"
         >
           <div class="flex justify-between items-center mb-2">
-            <h2 class="text-lg font-semibold text-gray-700">
-              <i class="las la-box text-indigo-600 mr-1"></i> Pedido #{{ order.id }}
+            <h2 class="text-lg font-bold text-indigo-700">
+              <i class="las la-box-open mr-2 text-xl text-indigo-500"></i>
+              Pedido #{{ order.id }}
             </h2>
             <span
-              class="px-3 py-1 text-sm rounded-full font-medium"
-              :class="order.status === 'pendiente' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'"
+              class="px-3 py-1 text-xs rounded-full font-bold tracking-wide border"
+              :class="order.status === 'pendiente'
+                ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                : 'bg-green-100 text-green-800 border-green-300'"
             >
               {{ order.status }}
             </span>
           </div>
 
           <p class="text-sm text-gray-500 mb-4">
-            <i class="las la-calendar-alt mr-1"></i> Fecha: {{ formatDate(order.created_at) }}
+            <i class="las la-calendar-alt mr-1 text-indigo-400"></i>
+            {{ formatDate(order.created_at) }}
           </p>
 
           <ul class="divide-y divide-gray-200 mb-4">
             <li
               v-for="item in order.items"
               :key="item.id"
-              class="flex justify-between py-2 text-sm"
+              class="flex justify-between py-2 text-sm text-gray-700"
             >
               <span>
+                <i class="las la-tag text-indigo-300 mr-1"></i>
                 {{ item.product?.name ?? 'Producto eliminado' }} (x{{ parseFloat(item.quantity) }})
               </span>
-              <span>S/. {{ parseFloat(item.total).toFixed(2) }}</span>
+              <span class="font-medium">S/. {{ parseFloat(item.total).toFixed(2) }}</span>
             </li>
           </ul>
 
-          <div class="flex flex-wrap justify-between items-center gap-2 mt-4">
-            <p class="font-bold text-indigo-700">Total: S/. {{ parseFloat(order.total).toFixed(2) }}</p>
-            <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap justify-between items-center gap-3 mt-4">
+            <p class="text-md font-bold text-indigo-700">
+              <i class="las la-coins mr-1 text-yellow-500"></i>
+              Total: <span class="text-indigo-800">S/. {{ parseFloat(order.total).toFixed(2) }}</span>
+            </p>
+            <div class="flex gap-2">
               <a
-                class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded hover:bg-indigo-700"
                 :href="`/order/${order.id}/pdf`"
                 target="_blank"
+                class="flex items-center px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-all"
               >
-                <i class="las la-file-download mr-1"></i> PDF
+                <i class="las la-file-pdf mr-2 text-white text-lg"></i> PDF
               </a>
               <button
                 @click="openModal(order.id)"
-                class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded hover:bg-red-600"
+                class="flex items-center px-4 py-2 text-sm bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-all"
               >
-                <i class="las la-trash-alt mr-1"></i> Eliminar
+                <i class="las la-trash-alt mr-2 text-white text-lg"></i> Eliminar
               </button>
             </div>
           </div>
@@ -63,14 +73,14 @@
           <button
             @click="goToPage(orders.prev_page_url)"
             :disabled="!orders.prev_page_url"
-            class="px-4 py-2 bg-indigo-500 text-white rounded disabled:opacity-50"
+            class="px-4 py-2 bg-indigo-500 text-white rounded disabled:opacity-50 hover:bg-indigo-600 transition"
           >
             Anterior
           </button>
           <button
             @click="goToPage(orders.next_page_url)"
             :disabled="!orders.next_page_url"
-            class="px-4 py-2 bg-indigo-500 text-white rounded disabled:opacity-50"
+            class="px-4 py-2 bg-indigo-500 text-white rounded disabled:opacity-50 hover:bg-indigo-600 transition"
           >
             Siguiente
           </button>
@@ -117,9 +127,7 @@ import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { defineProps } from 'vue'
 
-const props = defineProps({
-  orders: Object,
-})
+const props = defineProps({ orders: Object })
 
 const showModal = ref(false)
 const selectedOrderId = ref(null)
@@ -138,7 +146,7 @@ const confirmDelete = () => {
     },
     onError: () => {
       alert('No se pudo eliminar el pedido')
-    }
+    },
   })
 }
 

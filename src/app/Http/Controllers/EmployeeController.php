@@ -115,7 +115,8 @@ public function store(EmployeeCreateRequest $request): RedirectResponse
             'password' => Hash::make($data['password']),
             'photo' => $data['photo'] ?? null,
         ]);
-
+        $data['user_id'] = $user->id; // Asignar el ID del usuario al empleado
+ 
         // 2. Crear el empleado
         $this->service->create(payload: $data);
 

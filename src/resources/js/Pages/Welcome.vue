@@ -4,107 +4,76 @@
   <!-- FUENTE PERSONALIZADA GOOGLE FONTS -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet" />
 
-  <div class="min-h-screen flex flex-col font-[Montserrat] bg-gradient-to-br from-sky-50 via-white to-emerald-50">
-
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-20 bg-gradient-to-r from-blue-800 to-indigo-600 shadow-lg text-white">
+<div class="min-h-screen flex flex-col font-[Montserrat] bg-gradient-to-br from-sky-50 via-white to-emerald-50">
+    <!-- Navbar mejorada con menú de usuario -->
+    <nav class="sticky top-0 z-30 bg-gradient-to-r from-blue-800 to-indigo-600 shadow-lg text-white">
       <div class="container mx-auto max-w-screen-xl px-4 py-3 flex items-center justify-between">
-        <!-- Logo y nombre -->
         <Link href="/" class="flex items-center gap-3">
-          <img src="/logo.png" alt="Logo Laratoy" class="h-10 w-10 rounded-full bg-white shadow-md object-cover"/>
+          <img src="/logo.png" alt="Logo" class="h-10 w-10 rounded-full bg-white shadow-md object-cover" />
           <span class="text-2xl md:text-3xl font-extrabold tracking-wider logo-gradient drop-shadow">Laratoy</span>
         </Link>
-        <!-- Navegación -->
+
         <ul class="hidden md:flex items-center space-x-8 font-medium tracking-wide">
-          <li>
-            <Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150">
-              <BoltIcon class="w-5 h-5"/> Más vendidos
-            </Link>
-          </li>
-          <li>
-            <Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150">
-              <TagIcon class="w-5 h-5"/> Con descuentos
-            </Link>
-          </li>
-          <li>
-            <Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150">
-              <SparklesIcon class="w-5 h-5"/> Lo nuevo
-            </Link>
-          </li>
+          <li><Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150"><BoltIcon class="w-5 h-5" /> Más vendidos</Link></li>
+          <li><Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150"><TagIcon class="w-5 h-5" /> Con descuentos</Link></li>
+          <li><Link href="#" class="hover:text-emerald-200 flex items-center gap-2 transition-colors duration-150"><SparklesIcon class="w-5 h-5" /> Lo nuevo</Link></li>
           <li class="relative group">
             <button @click="showDropdown = !showDropdown" class="flex items-center hover:text-emerald-200 transition-colors duration-150 focus:outline-none">
-              <Squares2X2Icon class="w-5 h-5 mr-1"/> Categorías <ChevronDownIcon class="w-4 h-4 ml-1"/>
+              <Squares2X2Icon class="w-5 h-5 mr-1" /> Categorías <ChevronDownIcon class="w-4 h-4 ml-1" />
             </button>
             <transition name="fade">
-              <div
-                v-show="showDropdown"
-                class="absolute left-0 mt-3 w-48 bg-white text-blue-900 rounded shadow-2xl z-30 py-2 animate-fade-down"
-                @mouseleave="showDropdown = false"
-              >
-                <button
-                  v-for="cat in categories"
-                  :key="cat"
-                  @click="selectCategory(cat)"
-                  class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors text-sm"
-                >
-                  {{ cat }}
-                </button>
-                <button @click="selectCategory('')" class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors text-sm">
-                  Todas las categorías
-                </button>
+              <div v-show="showDropdown" class="absolute left-0 mt-3 w-48 bg-white text-blue-900 rounded shadow-2xl z-30 py-2 animate-fade-down" @mouseleave="showDropdown = false">
+                <button v-for="cat in categories" :key="cat" @click="selectCategory(cat)" class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors text-sm">{{ cat }}</button>
+                <button @click="selectCategory('')" class="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors text-sm">Todas las categorías</button>
               </div>
             </transition>
           </li>
         </ul>
-        <!-- Searchbar y acciones -->
+
         <div class="flex-1 px-4 hidden md:block">
           <div class="relative max-w-lg mx-auto">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar productos..."
-              class="w-full pl-5 pr-12 py-2 rounded-full text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition shadow"
-            />
-            <MagnifyingGlassIcon class="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"/>
+            <input v-model="searchQuery" type="text" placeholder="Buscar productos..." class="w-full pl-5 pr-12 py-2 rounded-full text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 transition shadow" />
+            <MagnifyingGlassIcon class="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
         </div>
-        <!-- Acciones usuario/carrito -->
+
         <div class="flex items-center space-x-6">
           <button @click="showCart = true" class="relative hover:text-emerald-200 transition-colors duration-150 flex items-center">
-            <ShoppingCartIcon class="w-7 h-7"/>
-            <span v-if="cart.length" class="absolute -top-1 -right-2 bg-emerald-500 text-white text-xs rounded-full px-1 animate-pulse">
-              {{ cart.length }}
-            </span>
+            <ShoppingCartIcon class="w-7 h-7" />
+            <span v-if="cart.length" class="absolute -top-1 -right-2 bg-emerald-500 text-white text-xs rounded-full px-1 animate-pulse">{{ cart.length }}</span>
           </button>
-          <div v-if="authUser" class="flex items-center gap-2 text-white">
-            <img
-              v-if="authUser.photo"
-              :src="`/storage/users/${authUser.photo}`"
-              alt="Avatar"
-              class="w-9 h-9 rounded-full border-2 border-emerald-500 object-cover shadow"
-            />
-            <Link
-  v-if="authUser?.role === 'cliente'"
-  href="/perfil"
-  class="ml-2 text-xs px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-600 shadow transition"
->
-  Mi perfil
-</Link>
 
-<Link
-  v-if="authUser?.role === 'cliente'"
-  href="/cliente/pedidos"
-  class="ml-2 text-xs px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white shadow transition"
->
-  Mis Pedidos
-</Link>
+          <div v-if="authUser" class="relative group">
+           
+<img
+  src="/assets/img/avatar2.png"
+  alt="avatar"
+  class="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition"
+  @click="showUserMenu = !showUserMenu"
+/>
 
 
-            <span>{{ authUser.name }}</span>
-            <button @click="logout" class="ml-2 text-xs px-3 py-1 rounded bg-red-500 hover:bg-red-600 shadow transition">Cerrar sesión</button>
+
+
+
+            <transition name="fade">
+              <div v-show="showUserMenu" class="absolute right-0 mt-3 w-52 bg-white text-blue-900 rounded-xl shadow-xl z-30 overflow-hidden animate-fade-down">
+                <div class="px-4 py-2 border-b border-gray-200">
+                  <p class="font-semibold">{{ authUser.name }}</p>
+                  <p class="text-xs text-gray-500">{{ authUser.email }}</p>
+                </div>
+                <ul class="text-sm">
+                  <li><Link href="/perfil" class="block px-4 py-2 hover:bg-blue-50">Editar perfil</Link></li>
+                  <li><Link href="/cliente/pedidos" class="block px-4 py-2 hover:bg-blue-50">Mis pedidos</Link></li>
+                  <li><Link href="/carrito" class="block px-4 py-2 hover:bg-blue-50">Ver carrito</Link></li>
+                  <li><button @click="logout" class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600">Cerrar sesión</button></li>
+                </ul>
+              </div>
+            </transition>
           </div>
+
           <div v-else class="space-x-2 flex items-center">
-            <UserIcon class="w-5 h-5 text-white"/>
+            <UserIcon class="w-5 h-5 text-white" />
             <Link href="/login" class="hover:text-emerald-200 text-sm font-semibold transition">Iniciar sesión</Link>
             <span>|</span>
             <Link href="/register" class="hover:text-emerald-200 text-sm font-semibold transition">Registrarse</Link>
@@ -337,6 +306,9 @@
   </div>
 </template>
 
+
+
+
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { Head, usePage, router, Link } from '@inertiajs/vue3';
@@ -359,8 +331,14 @@ const props = defineProps({
   products: Array
 });
 
+const showUserMenu = ref(false);
+
 const page = usePage();
 const authUser = page.props.auth.user ?? null;
+
+
+
+
 
 // Loader de productos (simula carga inicial)
 const loading = ref(true);
@@ -436,21 +414,69 @@ const closeProductModal = () => showProductModal.value = false;
 
 // Logout
 const logout = () => { router.post(route('logout')); };
+
 </script>
 
+
 <style scoped>
+/* Importar fuente Montserrat */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap');
+
+/* Texto con degradado para logotipo */
 .logo-gradient {
   background: linear-gradient(90deg, #60a5fa 0%, #06b6d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-.animate-fade-down { animation: fadeDown .3s cubic-bezier(.4,0,.2,1);}
-.animate-fade-in { animation: fadeIn .6s cubic-bezier(.4,0,.2,1);}
-.animate-slide-left { animation: slideLeft .4s cubic-bezier(.4,0,.2,1);}
-@keyframes fadeDown { from { opacity:0; transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@keyframes slideLeft { from { transform: translateX(100%);} to { transform: translateX(0);} }
+
+/* Transiciones suaves de opacidad */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease-in-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Animación de aparición descendente */
+.animate-fade-down {
+  animation: fade-down 0.3s ease-out;
+}
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación de aparición progresiva */
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animación de entrada lateral desde la derecha */
+.animate-slide-left {
+  animation: slide-left 0.4s ease-out;
+}
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
 </style>

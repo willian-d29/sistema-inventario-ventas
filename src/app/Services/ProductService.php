@@ -14,6 +14,8 @@ use App\Repositories\ProductRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection; 
+
 
 class ProductService
 {
@@ -154,4 +156,21 @@ class ProductService
 
         return $this->repository->delete($product);
     }
+
+
+public function getAllWithoutPagination(array $queryParameters = []): Collection
+{
+    $filters = ArrayHelper::getFiltersValues($queryParameters, ProductFiltersEnum::values());
+    $fields  = $queryParameters["fields"] ?? ['*'];
+    $expand  = $queryParameters["expand"] ?? [];
+
+    return $this->repository->getQuery(
+        filters: $filters,
+        fields: $fields,
+        expand: $expand,
+        sortBy: ProductFieldsEnum::CREATED_AT->value,
+        sortOrder: SortOrderEnum::DESC->value
+    )->get(); // <-  Esto evita la paginación
+}
+
 }

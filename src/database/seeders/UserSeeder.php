@@ -2,40 +2,69 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::firstOrCreate(
-    ['email' => 'admin@admin.com'],
-    [
-        'name' => 'Admin Principal',
-        'password' => Hash::make('password'),
-        'role' => 'admin',
-    ]
-);
+        $faker = Faker::create('es_ES');
 
-User::firstOrCreate(
-    ['email' => 'vendedor@empresa.com'],
-    [
-        'name' => 'Vendedor Juan',
-        'password' => Hash::make('password'),
-        'role' => 'vendedor',
-    ]
-);
+        //  Admins
+        for ($i = 1; $i <= 2; $i++) {
+            User::updateOrCreate(
+                ['email' => "admin{$i}@sistema.com"],
+                [
+                    'name'     => "Administrador {$i}",
+                    'email'    => "admin{$i}@sistema.com",
+                    'password' => Hash::make('password'),
+                    'role'     => 'admin',
+                    'photo'    => 'admin.jpg',
+                    'address'  => $faker->address,
+                    'phone'    => $faker->phoneNumber,
+                ]
+            );
+        }
 
-User::firstOrCreate(
-    ['email' => 'cliente@correo.com'],
-    [
-        'name' => 'Cliente Demo',
-        'password' => Hash::make('password'),
-        'role' => 'cliente',
-    ]
-);
+        // Vendedores
+        for ($i = 1; $i <= 5; $i++) {
+            User::updateOrCreate(
+                ['email' => "vendedor{$i}@empresa.com"],
+                [
+                    'name'     => "Vendedor {$i}",
+                    'email'    => "vendedor{$i}@empresa.com",
+                    'password' => Hash::make('password'),
+                    'role'     => 'vendedor',
+                    'photo'    => 'vendedor.jpg',
+                    'address'  => $faker->address,
+                    'phone'    => $faker->phoneNumber,
+                ]
+            );
+        }
 
+        //  Clientes (muchos)
+        for ($i = 1; $i <= 100; $i++) {
+            $nombre = $faker->name;
+            $correo = "cliente{$i}@correo.com";
+
+            User::updateOrCreate(
+                ['email' => $correo],
+                [
+                    'name'     => $nombre,
+                    'email'    => $correo,
+                    'password' => Hash::make('123456789'), // o algo genérico para pruebas
+                    'role'     => 'cliente',
+                    'photo'    => 'cliente.jpg',
+                    'address'  => $faker->address,
+                    'phone'    => $faker->phoneNumber,
+                ]
+            );
+        }
+
+        $this->command->info("Usuarios insertados: 2 admins, 5 vendedores, 100 clientes.");
     }
 }

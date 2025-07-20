@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\UnitType\UnitTypeFieldsEnum;
 use App\Models\UnitType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UnitTypeSeeder extends Seeder
@@ -15,15 +14,16 @@ class UnitTypeSeeder extends Seeder
     public function run(): void
     {
         $unitTypes = [
-            'p'  => 'Piece',
-            'kg' => 'Kilogram',
-            'g'  => 'Gram',
-            'l'  => 'Liter',
-            'ml' => 'Milliliter',
-            'm'  => 'Meter',
-            'cm' => 'Centimeter',
-            'in' => 'Inch',
-            'ft' => 'Foot'
+            'pz'  => 'Pieza',
+            'kg'  => 'Kilogramo',
+            'g'   => 'Gramo',
+            'l'   => 'Litro',
+            'ml'  => 'Mililitro',
+            'm'   => 'Metro',
+            'cm'  => 'Centímetro',
+            'u'   => 'Unidad',
+            'tb'  => 'Tabla',
+            'cj'  => 'Caja',
         ];
 
         foreach ($unitTypes as $symbol => $unitType) {
@@ -34,5 +34,7 @@ class UnitTypeSeeder extends Seeder
                 ],
             );
         }
+
+        $this->command->info(' Tipos de unidad insertados en español.');
     }
 }

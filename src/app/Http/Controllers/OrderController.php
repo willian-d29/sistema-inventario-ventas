@@ -127,6 +127,8 @@ class OrderController extends Controller
     }
 
 
+
+
 public function store(OrderCreateRequest $request): RedirectResponse
 {
     try {
@@ -135,22 +137,13 @@ public function store(OrderCreateRequest $request): RedirectResponse
             userId: auth()->id()
         );
 
-      
-
-            return redirect()
-    ->route('carts.index')
-    ->with([
-        'order_id' => $order->id, // ✅ esto va fuera de 'flash'
-        'flash' => [
-            'isSuccess' => true,
-            'message' => 'Pedido registrado con éxito.',
-        ],
-    ]);
-
+        // ✅ Redirige con query param ?order_id=ID
+        return redirect()->route('carts.index', [
+            'order_id' => $order->id
+        ]);
 
     } catch (OrderCreateException $e) {
-        return redirect()
-            ->route('carts.index')
+        return redirect()->route('carts.index')
             ->with('flash', [
                 'isSuccess' => false,
                 'message' => $e->getMessage(),
@@ -161,14 +154,18 @@ public function store(OrderCreateRequest $request): RedirectResponse
             "traces" => $e->getTrace()
         ]);
 
-        return redirect()
-            ->route('carts.index')
+        return redirect()->route('carts.index')
             ->with('flash', [
                 'isSuccess' => false,
                 'message' => 'Error interno al registrar pedido.',
             ]);
     }
 }
+
+
+
+
+
 
 
 
@@ -313,13 +310,21 @@ public function destroy($id)
 
 //Comprobante de pago para clientes fisicos 
 
+
+
 public function receipt($id)
 {
-    $order = Order::with('items.product')->findOrFail($id);
-    $pdf = \PDF::loadView('pdf.invoice', ['order' => $order]);
+    $order = \App\Models\Order::with([
+        'customer',
+        'items.product.unitType'
+    ])->findOrFail($id);
 
-    return $pdf->stream("orden-{$order->id}.pdf"); // <- usa ID directamente
+    $pdf = \PDF::loadView('pdf.receipt', ['order' => $order])
+        ->setPaper('A5', 'portrait'); // puedes ajustar el tamaño si deseas
+
+    return $pdf->stream("orden-{$order->id}.pdf");
 }
+
 
 
 

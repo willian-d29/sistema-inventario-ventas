@@ -15,7 +15,8 @@
         "maatwebsite/excel": "^3.1",
         "qcod/laravel-settings": "^1.2",
         "rap2hpoutre/laravel-log-viewer": "^2.4",
-        "stripe/stripe-php": "^17.3",
+        "stichoza/google-translate-php": "^5.3",
+        "stripe/stripe-php": "^17.4",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

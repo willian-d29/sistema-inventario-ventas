@@ -22,7 +22,7 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         hmr: {
-            host: '10.100.154.91', // ← tu IP local
+            host: 'localhost', // ← tu IP local
             protocol: 'ws',
             port: 5173,
         },

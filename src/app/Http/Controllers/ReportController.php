@@ -15,17 +15,18 @@ class ReportController extends Controller
      * Vista principal de reportes para el admin.
      */
     public function index()
-    {
-        $summary = [
-            'totalVentas'    => Order::sum('total'),
-            'totalGanancias' => Order::sum('profit'), // Asegúrate que existe el campo
-            'totalOrdenes'   => Order::count(),
-        ];
+{
+    $summary = [
+        'totalVentas'    => round(Order::sum('total'), 2),
+        'totalGanancias' => round(Order::sum('profit'), 2), // Asegúrate de que la columna "profit" exista
+        'totalOrdenes'   => Order::count(),
+    ];
 
-        return Inertia::render('Reports/Index', [
-            'summary' => $summary,
-        ]);
-    }
+    return Inertia::render('Reports/Index', [
+        'summary' => $summary,
+    ]);
+}
+
 
     /**
      * Generar PDF con las ventas.
@@ -45,6 +46,9 @@ class ReportController extends Controller
      */
     public function ventasExcel()
     {
-        return Excel::download(new VentasExport, 'reporte_ventas.xlsx');
+        return Excel::download(new VentasExport, 'ventas_actualizadas.xlsx');
     }
+
+
+
 }

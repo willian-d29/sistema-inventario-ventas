@@ -30,7 +30,7 @@
     "dependencies": {
         "@heroicons/vue": "^2.2.0",
         "@inertiajs/progress": "^0.2.7",
-        "@stripe/stripe-js": "^7.4.0",
+        "@stripe/stripe-js": "^7.5.0",
         "@vuepic/vue-datepicker": "^9.0.2",
         "lodash": "^4.17.21",
         "notivue": "^2.4.4",

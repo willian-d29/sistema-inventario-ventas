@@ -9,9 +9,45 @@ import InputError from "@/Components/InputError.vue";
 import SubmitButton from "@/Components/SubmitButton.vue";
 
 
+import { onMounted } from 'vue'
+
 import { ref } from 'vue';
 
-const lastOrderId = ref(null); // ✅ ID de la última orden creada
+const lastOrderId = ref(null); //  ID de la última orden creada
+
+
+onMounted(() => {
+  console.log(' Productos recibidos:', products);
+});
+
+
+
+
+onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('order_id');
+
+  console.log(" Analizando URL...");
+  console.log("Parámetros completos:", urlParams.toString());
+  console.log(" Valor de 'order_id' en URL:", orderId);
+
+  if (orderId) {
+    console.log(" Se recibió order_id:", orderId);
+    const url = route('orders.receipt', orderId);
+    console.log(" URL a abrir:", url);
+
+    window.open(url, '_blank');
+    lastOrderId.value = orderId;
+
+    // Evitar reapertura al recargar
+    const cleanUrl = window.location.origin + window.location.pathname;
+    console.log("🧹 Limpiando URL:", cleanUrl);
+    window.history.replaceState({}, document.title, cleanUrl);
+  } else {
+    console.warn(" No se encontró 'order_id' en la URL.");
+  }
+});
+
 
 
 import { usePage } from '@inertiajs/vue3'
@@ -21,10 +57,12 @@ const page = usePage()
 
 watchEffect(() => {
   if (page.props.flash?.order_id) {
-    console.log("🎯 Flash recibido:", page.props.flash)
+    console.log(" Flash recibido:", page.props.flash)
     lastOrderId.value = page.props.flash.order_id
   }
 })
+
+
 
 
 const props = defineProps({
@@ -38,7 +76,7 @@ const props = defineProps({
   totalTax: Number,
   total: Number,
   orderPaidByTypes: Object,
-    clientes: Array, // ✅ agregado aquí
+  clientes: Array, //  agregado aquí
 
 });
 
@@ -51,9 +89,12 @@ const form = useForm({
     discount: 0,
     discount_type: "fixed"
   },
-    order_id: null, // ✅ agregado
+    order_id: null, //  agregado
 
 });
+
+
+
 
 // Watch props and update the form fields reactively
 watch(props, (newProps) => {
@@ -125,28 +166,46 @@ const deleteCartAllItems = () => {
 
 
 const createOrder = () => {
-  if (!props.carts.total) return;
+  if (!props.carts.total || !form.customer_id) {
+    showToast(' Selecciona al menos un producto y un cliente.');
+    return;
+  }
 
   form.post(route('orders.store'), {
     preserveScroll: true,
     preserveState: true,
-    onSuccess: (page) => {
-      showToast();
 
-      const orderId = page.props.order_id; // ✅ ya no dentro de flash
+    onSuccess: async () => {
+      try {
+        //  Ruta escrita directamente, sin Ziggy
+        const response = await axios.get('/orders/last-id');
+        const orderId = response.data.id;
 
-      console.log("✅ Flash message:", page.props.flash?.message);
-      console.log("✅ order_id recibido:", orderId);
-
-      if (orderId) {
-        lastOrderId.value = orderId;
-        window.open(route('orders.receipt', orderId), '_blank');
+        if (orderId) {
+          const url = `/orders/${orderId}/receipt`; // Ruta también directa
+          window.open(url, '_blank');
+          lastOrderId.value = orderId;
+          showToast(' Pedido registrado con éxito.');
+          form.reset();
+        } else {
+          console.warn(' No se encontró order_id en /orders/last-id');
+          showToast('No se pudo generar el comprobante.');
+        }
+      } catch (err) {
+        console.error(' Error al obtener último ID:', err);
+        showToast('No se pudo generar el comprobante (error de red).');
       }
-
-      form.reset();
     },
+
+    onError: (errors) => {
+      console.error(' Error al registrar pedido:', errors);
+      showToast('Ocurrió un error al registrar el pedido.');
+    }
   });
 };
+
+
+
 
 
 
@@ -177,7 +236,7 @@ const createOrder = () => {
               <!-- products -->
               <div class="grid grid-cols-3 gap-4 px-5 mt-5 overflow-y-auto h-4/6">
                 <div
-                  v-for="product in products.data"
+                  v-for="product in products"
                   :key="product.id"
                   role="button"
                   class="select-none cursor-pointer transition-shadow rounded-md bg-white shadow hover:shadow-lg border border-gray-200 flex flex-col justify-between max-h-56"
@@ -339,19 +398,6 @@ const createOrder = () => {
   </option>
 </select>
 
-<select
-  v-model="form.customer_id"
-  class="w-full px-2 py-2 border border-gray-200 rounded"
->
-  <option value="">Seleccionar cliente</option>
-  <option
-    v-for="cliente in props.clientes"
-    :key="cliente.id"
-    :value="cliente.id"
-  >
-    {{ cliente.name }}
-  </option>
-</select>
 
 
                     <InputError :message="form.errors.customer_id" />
@@ -388,33 +434,16 @@ const createOrder = () => {
               <!-- end payment -->
 
 
+
 <!-- Botón de pagar -->
-<div class="px-5 mt-3 mb-2">
-  <SubmitButton
-    @click="createOrder"
-    :processing="form.processing"
-    class="w-full px-4 py-4 rounded-md shadow-lg text-center bg-emerald-500 text-white font-semibold focus:outline-none"
-    :class="!carts.total ? 'cursor-not-allowed' : ''"
-  >
-    Pagar e imprimir
-  </SubmitButton>
-
-</div>
-
-
-<div v-if="lastOrderId" class="px-5 mt-1 mb-4">
-  <p class="text-sm text-gray-600 mb-1">Última orden: #{{ lastOrderId }}</p>
-  <button
-    @click="() => window.open(route('orders.receipt', lastOrderId), '_blank')"
-    class="w-full px-4 py-2 rounded-md shadow bg-blue-600 text-white font-semibold hover:bg-blue-700"
-  >
-    Ver comprobante generado
-  </button>
-
-
-</div>
-
-
+<SubmitButton
+  @click="createOrder"
+  :processing="form.processing"
+  class="w-full px-4 py-4 rounded-md shadow-lg text-center bg-emerald-500 text-white font-semibold focus:outline-none"
+  :class="!carts.total ? 'cursor-not-allowed' : ''"
+>
+  Pagar e imprimir
+</SubmitButton>
 
               <!-- end submit -->
             </div>

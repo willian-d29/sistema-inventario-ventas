@@ -25,6 +25,17 @@ use App\Http\Controllers\{
     Auth\AuthenticatedSessionController
 };
 
+
+Route::get('/debug-ping', fn () => 'pong')->name('debug.ping');
+
+Route::get('/orders/last-id', function () {
+    $last = \App\Models\Order::latest('id')->first();
+    return response()->json(['id' => $last?->id]);
+})->name('orders.last-id');
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Página pública (catálogo de productos)
@@ -33,8 +44,9 @@ use App\Http\Controllers\{
 Route::get('/', function () {
     $products = Product::with('category')
         ->where('status', 'active')
-        ->take(20)
         ->get();
+
+        
 
     return Inertia::render('Welcome', [
         'pageTitle' => 'Home',
@@ -129,7 +141,8 @@ Route::prefix('sistema')->middleware(['auth', 'role:admin'])->group(function () 
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
     // Reportes
-    Route::get('/reports', fn () => Inertia::render('Reports/Index'))->name('reports.index');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
     Route::get('/reports/ventas/pdf', [ReportController::class, 'ventasPDF'])->name('reports.ventas.pdf');
     Route::get('/reports/ventas/excel', [ReportController::class, 'ventasExcel'])->name('reports.ventas.excel');
 });
@@ -176,10 +189,11 @@ Route::get('/order/{id}/pdf', [OrderController::class, 'downloadPDF'])
 
 
 
-
 /*
 |--------------------------------------------------------------------------
 | Rutas de autenticación Fortify/Breeze
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
+
+

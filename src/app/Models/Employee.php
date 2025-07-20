@@ -6,6 +6,8 @@ use App\Helpers\BaseHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+
 
 class Employee extends Model
 {
@@ -27,4 +29,9 @@ class Employee extends Model
             ),
         );
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

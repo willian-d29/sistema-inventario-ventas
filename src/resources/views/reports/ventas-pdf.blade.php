@@ -2,16 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Ventas</title>
+    <title>Reporte de Ventas - LARATORY</title>
     <style>
         body {
-            font-family: sans-serif;
-            font-size: 12px;
+            font-family: 'Helvetica', sans-serif;
+            font-size: 11.5px;
+            color: #333;
             margin: 20px;
         }
-        h1 {
+        .header {
             text-align: center;
-            color: #333;
+            margin-bottom: 20px;
+        }
+        .header img {
+            height: 60px;
+        }
+        .header h2 {
+            margin: 5px 0;
+            font-size: 22px;
+            color: #2c3e50;
         }
         .meta {
             margin-bottom: 20px;
@@ -25,22 +34,36 @@
             margin-top: 10px;
         }
         th {
-            background-color: #f2f2f2;
-            text-align: left;
+            background-color: #f4f6f8;
+            text-align: center;
+            font-size: 12px;
         }
         th, td {
-            border: 1px solid #999;
+            border: 1px solid #ccc;
             padding: 8px;
+        }
+        td {
+            font-size: 11.5px;
+            text-align: center;
         }
         .total {
             font-weight: bold;
-            text-align: right;
+            background-color: #f0f0f0;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 10px;
+            text-align: center;
+            color: #999;
         }
     </style>
 </head>
 <body>
 
-    <h1>Reporte de Ventas</h1>
+    <div class="header">
+        <img src="{{ public_path('assets/laratory-logo-zip-file/png/logo-no-background.png') }}" alt="LARATORY Logo">
+        <h2>LARATORY - Reporte de Ventas</h2>
+    </div>
 
     <table class="meta">
         <tr>
@@ -52,7 +75,7 @@
             <td>S/. {{ number_format($ventas->sum('total'), 2) }}</td>
         </tr>
         <tr>
-            <td><strong>Ventas Registradas:</strong></td>
+            <td><strong>Total de Pedidos:</strong></td>
             <td>{{ $ventas->count() }}</td>
         </tr>
     </table>
@@ -62,7 +85,7 @@
             <tr>
                 <th>#</th>
                 <th>Cliente</th>
-                <th>Número de Orden</th>
+                <th>N° Orden</th>
                 <th>Total (S/.)</th>
                 <th>Pagado (S/.)</th>
                 <th>Deuda (S/.)</th>
@@ -83,8 +106,19 @@
                     <td>{{ \Carbon\Carbon::parse($venta->created_at)->format('d/m/Y') }}</td>
                 </tr>
             @endforeach
+            <tr class="total">
+                <td colspan="3">Totales:</td>
+                <td>S/. {{ number_format($ventas->sum('total'), 2) }}</td>
+                <td>S/. {{ number_format($ventas->sum('paid'), 2) }}</td>
+                <td>S/. {{ number_format($ventas->sum('due'), 2) }}</td>
+                <td colspan="2"></td>
+            </tr>
         </tbody>
     </table>
+
+    <div class="footer">
+        © {{ date('Y') }} LARATORY. Sistema de Inventario y Ventas - Reporte generado automáticamente.
+    </div>
 
 </body>
 </html>

@@ -16,9 +16,10 @@ enum EmployeeFieldsEnum: string implements BaseEnumInterface
     case DESIGNATION  = 'designation';
     case ADDRESS      = 'address';
     case SALARY       = 'salary';
-    case PHOTO        = 'photo'; // nullable
-    case NID          = 'nid'; // nullable
+    case PHOTO        = 'photo';
+    case NID          = 'nid';
     case JOINING_DATE = 'joining_date';
+    case USER_ID      = 'user_id';       //
     case CREATED_AT   = 'created_at';
 
     public static function labels(): array
@@ -34,6 +35,7 @@ enum EmployeeFieldsEnum: string implements BaseEnumInterface
             self::PHOTO->value        => "Photo",
             self::NID->value          => "NID",
             self::JOINING_DATE->value => "Joining Date",
+            self::USER_ID->value      => "User ID",     // 
         ];
     }
 }

@@ -14,9 +14,12 @@
       <div class="flex justify-center mb-6">
         <label class="relative cursor-pointer group">
           <img
-            :src="form.previewPhoto || user.photo || '/images/user-default.png'"
-            class="w-28 h-28 rounded-full object-cover border-4 border-blue-400 shadow-md group-hover:opacity-80 transition"
-          />
+  src="/assets/img/avatar.png"
+  alt="avatar"
+  class="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition"
+  @click="showUserMenu = !showUserMenu"
+/>
+
           <input type="file" class="hidden" @change="handlePhotoUpload" accept="image/*" />
           <div class="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold bg-black/40 opacity-0 group-hover:opacity-100 rounded-full">
             Cambiar
@@ -24,7 +27,7 @@
         </label>
       </div>
 
-      <form @submit.prevent="updateProfile" class="space-y-5">
+      <form @submit.prevent="showModal = true" class="space-y-5">
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
           <div class="flex items-center border rounded-md px-3 py-2 bg-white shadow-sm">
@@ -65,11 +68,32 @@
         </button>
       </form>
     </div>
+
+    <!-- Modal de confirmación -->
+    <transition name="fade">
+      <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 shadow-lg w-full max-w-md space-y-4 animate-fade-in">
+          <h3 class="text-lg font-semibold text-gray-800">¿Confirmar cambios?</h3>
+          <p class="text-sm text-gray-600">¿Deseas guardar los cambios realizados en tu perfil?</p>
+          <div class="flex justify-end gap-4 mt-4">
+            <button
+              class="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-100 transition"
+              @click="showModal = false"
+            >Cancelar</button>
+            <button
+              class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+              @click="confirmSubmit"
+            >Sí, guardar</button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
 import { useForm, usePage, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import {
   UserIcon,
   EnvelopeIcon,
@@ -88,6 +112,8 @@ const form = useForm({
   photo: null,
   previewPhoto: null,
 })
+
+const showModal = ref(false)
 
 const handlePhotoUpload = (e) => {
   const file = e.target.files[0]
@@ -108,6 +134,11 @@ const updateProfile = () => {
   })
 }
 
+const confirmSubmit = () => {
+  showModal.value = false
+  updateProfile()
+}
+
 const goBack = () => window.history.back()
 </script>
 
@@ -118,5 +149,13 @@ const goBack = () => window.history.back()
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

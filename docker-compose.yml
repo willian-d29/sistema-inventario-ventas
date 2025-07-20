@@ -18,6 +18,12 @@ services:
     ports:
       - "9000:9000"  # Exponer PHP-FPM solo si lo necesitas fuera del contenedor
       - "5173:5173"
+    env_file:
+      - ./src/.env
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+  
 
   # Servicio MySQL
   db:

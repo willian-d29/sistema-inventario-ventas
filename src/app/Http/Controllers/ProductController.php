@@ -258,7 +258,7 @@ class ProductController extends Controller
     $products = Product::select('id', 'name', 'selling_price', 'photo', 'status')
         ->where('status', 'activo')
         ->latest()
-        ->paginate(12);
+        ->paginate(15);
 
     return Inertia::render('Public/Productos', [
         'products' => $products

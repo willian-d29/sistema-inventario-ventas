@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -25,10 +26,9 @@ class Product extends Model
     protected function photo(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => BaseHelper::storageLink(
-                fileName: $value,
-                folderPath: self::PHOTO_PATH
-            ),
+            get: fn ($value) => $value
+                ? BaseHelper::storageLink(fileName: $value, folderPath: self::PHOTO_PATH)
+                : asset('images/product-default.png'),
         );
     }
 
@@ -45,5 +45,10 @@ class Product extends Model
     public function unitType(): BelongsTo
     {
         return $this->belongsTo(UnitType::class, 'unit_type_id');
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(\App\Models\OrderItem::class);
     }
 }

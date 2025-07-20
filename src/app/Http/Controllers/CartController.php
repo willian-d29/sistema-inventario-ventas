@@ -31,61 +31,54 @@ class CartController extends Controller
     }
 
     public function index(ProductIndexRequest $request): Response
-    {
-        // Get products
-        $productParams = $request->validated();
-        $productParams[ProductFiltersEnum::STATUS->value] = ProductStatusEnum::ACTIVE;
-        $productParams['expand'] = array_unique(array_merge($params['expand'] ?? [], [
-            ProductExpandEnum::UNIT_TYPE->value,
-        ]));
+{
+    // Get products
+    $productParams = $request->validated();
+    $productParams[ProductFiltersEnum::STATUS->value] = ProductStatusEnum::ACTIVE;
+    $productParams['expand'] = array_unique(array_merge($productParams['expand'] ?? [], [
+        ProductExpandEnum::UNIT_TYPE->value,
+    ]));
 
-        // Get cart items
-        $carts = $this->cartService->getAll([
-            CartFiltersEnum::USER_ID->value => auth()->id(),
-            "expand"                        => [
-                CartExpandEnum::PRODUCT_UNIT_TYPE->value
-            ],
-            "per_page"                      => 500
-        ]);
+    $products = $this->productService->getAllWithoutPagination($productParams);
 
-        // Calculate cart subtotal
-        $cartSubtotal = 0;
-        foreach ($carts as $cart) {
-            $cartSubtotal += $cart->product->selling_price * $cart->quantity;
-        }
+    $carts = $this->cartService->getAll([
+        CartFiltersEnum::USER_ID->value => auth()->id(),
+        "expand" => [CartExpandEnum::PRODUCT_UNIT_TYPE->value],
+        "per_page" => 500
+    ]);
 
-        // Calculate total discount
-        $discountData = BaseHelper::calculateDefaultDiscount(amount: $cartSubtotal);
-
-        // Calculate total tax
-        $taxData = BaseHelper::calculateTax(amount: $cartSubtotal);
-
-        // Calculate total
-        $total = BaseHelper::numberFormat(
-            number: $cartSubtotal - $discountData["totalDiscount"] + $taxData["totalTax"]
-        );
-
-
-        $clientes = \App\Models\User::where('role', 'cliente')->get(['id', 'name']);
-
-        return Inertia::render(
-            component: 'Cart/Pos',
-            props: [
-                'products'         => $this->productService->getAll($productParams),
-                'carts'            => $carts,
-                'cartSubtotal'     => $cartSubtotal,
-                'discountType'     => $discountData["discountType"],
-                'discount'         => $discountData["discount"],
-                'totalDiscount'    => $discountData["totalDiscount"],
-                'tax'              => $taxData["tax"],
-                'totalTax'         => $taxData["totalTax"],
-                'total'            => $total,
-                'orderPaidByTypes' => BaseHelper::convertKeyValueToLabelValueArray(TransactionPaidThroughEnum::choices()),
-                'clientes' => $clientes,
-
-            ]
-        );
+    $cartSubtotal = 0;
+    foreach ($carts as $cart) {
+        $cartSubtotal += $cart->product->selling_price * $cart->quantity;
     }
+
+    $discountData = BaseHelper::calculateDefaultDiscount(amount: $cartSubtotal);
+    $taxData = BaseHelper::calculateTax(amount: $cartSubtotal);
+
+    $total = BaseHelper::numberFormat(
+        number: $cartSubtotal - $discountData["totalDiscount"] + $taxData["totalTax"]
+    );
+
+    $clientes = \App\Models\User::where('role', 'cliente')->get(['id', 'name']);
+
+    return Inertia::render(
+        component: 'Cart/Pos',
+        props: [
+            'products' => $products,
+            'carts' => $carts,
+            'cartSubtotal' => $cartSubtotal,
+            'discountType' => $discountData["discountType"],
+            'discount' => $discountData["discount"],
+            'totalDiscount' => $discountData["totalDiscount"],
+            'tax' => $taxData["tax"],
+            'totalTax' => $taxData["totalTax"],
+            'total' => $total,
+            'orderPaidByTypes' => BaseHelper::convertKeyValueToLabelValueArray(TransactionPaidThroughEnum::choices()),
+            'clientes' => $clientes,
+        ]
+    );
+}
+
 
     /**
      * @param int $productId

@@ -3,18 +3,30 @@
 namespace App\Exports;
 
 use App\Models\Order;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
+use App\Models\Product;
+use App\Models\Customer;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use App\Exports\ResumenSheet;
+use App\Exports\VentasSheet;
+use App\Exports\ProductosSheet;
+use App\Exports\ClientesSheet;
+use App\Exports\CategoriasSheet;
+use App\Exports\DashboardSheet;
+use App\Exports\VentasMensualesSheet;
 
-class VentasExport implements FromCollection, WithHeadings
+class VentasExport implements WithMultipleSheets
 {
-    public function collection()
+    public function sheets(): array
     {
-        return Order::select('id', 'order_number', 'total', 'profit', 'status', 'created_at')->get();
-    }
-
-    public function headings(): array
-    {
-        return ['ID', 'N° Orden', 'Total', 'Ganancia', 'Estado', 'Fecha'];
+        return [
+            new ResumenSheet(),
+            new VentasSheet(),
+            new ProductosSheet(),
+            new ClientesSheet(),
+            new CategoriasSheet(),
+            new DashboardSheet(),
+            new VentasMensualesSheet()
+        ];
     }
 }

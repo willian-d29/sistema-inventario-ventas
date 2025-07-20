@@ -115,17 +115,20 @@ class EmployeeService
             );
         }
 
+        
         $processPayload = [
-            EmployeeFieldsEnum::NAME->value         => $payload[EmployeeFieldsEnum::NAME->value] ?? $employee->name,
-            EmployeeFieldsEnum::EMAIL->value        => $payload[EmployeeFieldsEnum::EMAIL->value] ?? $employee->email,
-            EmployeeFieldsEnum::PHONE->value        => $payload[EmployeeFieldsEnum::PHONE->value] ?? $employee->phone,
-            EmployeeFieldsEnum::DESIGNATION->value  => $payload[EmployeeFieldsEnum::DESIGNATION->value] ?? $employee->designation,
-            EmployeeFieldsEnum::SALARY->value       => $payload[EmployeeFieldsEnum::SALARY->value] ?? $employee->salary,
-            EmployeeFieldsEnum::ADDRESS->value      => $payload[EmployeeFieldsEnum::ADDRESS->value] ?? $employee->address,
-            EmployeeFieldsEnum::NID->value          => $payload[EmployeeFieldsEnum::NID->value] ?? $employee->nid,
-            EmployeeFieldsEnum::JOINING_DATE->value => $payload[EmployeeFieldsEnum::JOINING_DATE->value] ?? $employee->joining_date,
-            EmployeeFieldsEnum::PHOTO->value        => $photo,
-        ];
+    EmployeeFieldsEnum::NAME->value         => $payload[EmployeeFieldsEnum::NAME->value],
+    EmployeeFieldsEnum::EMAIL->value        => $payload[EmployeeFieldsEnum::EMAIL->value],
+    EmployeeFieldsEnum::PHONE->value        => $payload[EmployeeFieldsEnum::PHONE->value],
+    EmployeeFieldsEnum::DESIGNATION->value  => $payload[EmployeeFieldsEnum::DESIGNATION->value],
+    EmployeeFieldsEnum::SALARY->value       => $payload[EmployeeFieldsEnum::SALARY->value],
+    EmployeeFieldsEnum::ADDRESS->value      => $payload[EmployeeFieldsEnum::ADDRESS->value],
+    EmployeeFieldsEnum::NID->value          => $payload[EmployeeFieldsEnum::NID->value],
+    EmployeeFieldsEnum::JOINING_DATE->value => $payload[EmployeeFieldsEnum::JOINING_DATE->value],
+    EmployeeFieldsEnum::PHOTO->value        => $photo,
+    EmployeeFieldsEnum::USER_ID->value      => $payload[EmployeeFieldsEnum::USER_ID->value], //
+];
+
 
         return $this->repository->update(
             employee: $employee,

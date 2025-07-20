@@ -104,6 +104,8 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+    
 public function success(Request $request, OrderService $orderService)
 {
     $order = \App\Models\Order::where('customer_id', auth()->id())
