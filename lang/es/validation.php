@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'accepted' => 'El campo :attribute debe ser aceptado.',
+    'array' => 'El campo :attribute debe ser una lista válida.',
+    'boolean' => 'El campo :attribute debe ser verdadero o falso.',
+    'confirmed' => 'La confirmación de :attribute no coincide.',
+    'date' => 'El campo :attribute debe ser una fecha válida.',
+    'email' => 'El campo :attribute debe ser un correo válido.',
+    'exists' => 'El valor seleccionado en :attribute no es válido.',
+    'image' => 'El campo :attribute debe ser una imagen.',
+    'in' => 'El valor seleccionado en :attribute no es válido.',
+    'integer' => 'El campo :attribute debe ser un número entero.',
+    'max' => [
+        'file' => 'El archivo :attribute no debe superar :max kilobytes.',
+        'numeric' => 'El campo :attribute no debe ser mayor que :max.',
+        'string' => 'El campo :attribute no debe superar :max caracteres.',
+    ],
+    'min' => [
+        'numeric' => 'El campo :attribute debe ser al menos :min.',
+        'string' => 'El campo :attribute debe tener al menos :min caracteres.',
+    ],
+    'mimes' => 'El campo :attribute debe ser un archivo de tipo: :values.',
+    'numeric' => 'El campo :attribute debe ser numérico.',
+    'required' => 'El campo :attribute es obligatorio.',
+    'required_if' => 'El campo :attribute es obligatorio cuando :other es :value.',
+    'string' => 'El campo :attribute debe ser texto.',
+    'unique' => 'El valor de :attribute ya está registrado.',
+    'url' => 'El campo :attribute debe ser una URL válida.',
+    'custom' => [
+        'document_number' => [
+            'required_for_document' => 'Ingresa el número de documento.',
+            'dni_size' => 'El DNI debe tener exactamente 8 dígitos.',
+            'ruc_size' => 'El RUC debe tener exactamente 11 dígitos.',
+        ],
+    ],
+    'attributes' => [
+        'email' => 'correo',
+        'password' => 'contraseña',
+        'name' => 'nombre',
+        'amount' => 'monto',
+        'description' => 'descripción',
+        'document_number' => 'número de documento',
+        'document_type' => 'tipo de documento',
+        'payment_method' => 'método de pago',
+        'opening_amount' => 'monto inicial',
+        'closing_notes' => 'observación de cierre',
+        'locale' => 'idioma',
+        'theme' => 'tema',
+    ],
+];

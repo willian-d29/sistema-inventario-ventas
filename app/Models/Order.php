@@ -14,19 +14,34 @@ class Order extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        "sub_total"      => "double",
-        "tax_total"      => "double",
-        "discount_total" => "double",
-        "total"          => "double",
-        "paid"           => "double",
-        "due"            => "double",
-        "profit"         => "double",
-        "loss"           => "double",
+        'sub_total' => 'double',
+        'tax_total' => 'double',
+        'discount_total' => 'double',
+        'total' => 'double',
+        'paid' => 'double',
+        'due' => 'double',
+        'profit' => 'double',
+        'loss' => 'double',
     ];
 
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function cashier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    public function cashRegister(): BelongsTo
+    {
+        return $this->belongsTo(CashRegister::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 
     public function orderItems(): HasMany

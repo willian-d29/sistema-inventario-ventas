@@ -68,12 +68,12 @@ class CategoryController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Category created successfully.'
+                "message" => __('messages.categories.created'),
             ];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Category creation failed!",
+                "message"   => __('messages.categories.create_failed'),
             ];
 
             Log::error("Category creation failed!", [
@@ -95,7 +95,7 @@ class CategoryController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Category updated successfully.'
+                "message" => __('messages.categories.updated'),
             ];
         } catch (CategoryNotFoundException $e) {
             $flash = [
@@ -105,7 +105,7 @@ class CategoryController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Category update failed!",
+                "message"   => __('messages.categories.update_failed'),
             ];
 
             Log::error("Category update failed!", [
@@ -124,7 +124,7 @@ class CategoryController extends Controller
         try {
             $this->service->delete(id: $id);
             $flash = [
-                "message" => 'Category deleted successfully.'
+                "message" => __('messages.categories.deleted'),
             ];
         } catch (CategoryNotFoundException $e) {
             $flash = [
@@ -134,7 +134,7 @@ class CategoryController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Category deletion failed!",
+                "message"   => __('messages.categories.delete_failed'),
             ];
 
             Log::error("Category deletion failed!", [

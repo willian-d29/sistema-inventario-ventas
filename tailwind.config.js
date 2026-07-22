@@ -2,23 +2,25 @@ import plugin from "tailwindcss/plugin";
 import colors from "tailwindcss/colors";
 import forms from '@tailwindcss/forms';
 
+const deprecatedColors = ['lightBlue', 'warmGray', 'trueGray', 'coolGray', 'blueGray'];
+const modernColors = Object.fromEntries(
+    Object.keys(colors)
+        .filter((name) => !deprecatedColors.includes(name))
+        .map((name) => [name, colors[name]])
+);
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
-        "./**/*.html",
-        "./*.html",
-        "./**/*.js",
-        "./*.js",
-        "./**/*.vue",
-        "./*.vue",
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.js',
         './resources/js/**/*.vue',
     ],
     theme: {
         colors: {
-            ...colors,
+            ...modernColors,
         },
         extend: {
             minHeight: {

@@ -2,23 +2,18 @@
 
 namespace App\Services;
 
-use App\Enums\Setting\SettingFieldsEnum;
-
 class SettingService
 {
+    public function __construct(private readonly BusinessSettingsService $businessSettings)
+    {
+    }
+
     /**
      * @param array $payload
      * @return mixed
      */
     public function update(array $payload): mixed
     {
-        $processPayload = [];
-        foreach (SettingFieldsEnum::values() as $value) {
-            if (isset($payload[$value])) {
-                $processPayload[$value] = $payload[$value];
-            }
-        }
-
-        return settings()->set($processPayload);
+        return $this->businessSettings->update($payload);
     }
 }

@@ -13,33 +13,57 @@ defineProps({
     href: {
         type: String,
     },
+    target: {
+        type: String,
+        default: null,
+    },
+    rel: {
+        type: String,
+        default: null,
+    },
 });
 </script>
 
 <template>
     <button
         v-if="buttonType === 'button'"
-        class="text-white active:bg-emerald-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+        class="app-button mr-1"
         :class="[
             type === 'red'
-            ? 'bg-red-500'
+            ? 'border-[var(--color-danger)] bg-[var(--color-danger)] text-white hover:opacity-90'
             : type === 'gray'
-            ? 'bg-gray-500'
-            : 'bg-emerald-500'
+            ? 'app-button-secondary'
+            : 'app-button-primary'
         ]"
     >
         <slot/>
     </button>
+    <a
+        v-else-if="target"
+        :href="href"
+        :target="target"
+        :rel="target === '_blank' ? rel || 'noopener noreferrer' : rel"
+        class="app-button mr-1"
+        :class="[
+            type === 'red'
+            ? 'border-[var(--color-danger)] bg-[var(--color-danger)] text-white hover:opacity-90'
+            : type === 'gray'
+            ? 'app-button-secondary'
+            : 'app-button-primary'
+        ]"
+    >
+        <slot/>
+    </a>
     <Link
         v-else
         :href="href"
-        class="text-white active:bg-emerald-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+        class="app-button mr-1"
         :class="[
             type === 'red'
-            ? 'bg-red-500'
+            ? 'border-[var(--color-danger)] bg-[var(--color-danger)] text-white hover:opacity-90'
             : type === 'gray'
-            ? 'bg-gray-500'
-            : 'bg-emerald-500'
+            ? 'app-button-secondary'
+            : 'app-button-primary'
         ]"
     >
         <slot/>

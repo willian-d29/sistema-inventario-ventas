@@ -24,6 +24,7 @@ onMounted(() => {
   form.name          = props.product.name;
   form.description   = props.product.description;
   form.product_code  = props.product.product_code;
+  form.barcode       = props.product.barcode;
   form.root          = props.product.root;
   form.buying_date   = props.product.buying_date.split(" ")[0] ?? "";
   form.buying_price  = props.product.buying_price;
@@ -42,6 +43,7 @@ const form = useForm({
   name:           null,
   description:    null,
   product_code:   null,
+  barcode:        null,
   root:           null,
   buying_date:    null,
   buying_price:   null,
@@ -150,17 +152,26 @@ const updateProduct = () => {
                 <InputError :message="form.errors.product_code"/>
               </div>
 
-              <!-- Raíz -->
+              <!-- Código de barras -->
               <div class="flex flex-col">
-                <label for="root" class="text-stone-600 text-sm font-medium">Raíz</label>
+                <label for="barcode" class="text-stone-600 text-sm font-medium">Código de barras</label>
+                <input id="barcode" v-model="form.barcode" @keyup.enter="updateProduct" type="text"
+                  placeholder="Escanea o ingresa el código" class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm focus:outline-none" />
+                <InputError :message="form.errors.barcode"/>
+              </div>
+              <!-- Producto base -->
+              <div class="flex flex-col">
+                <label for="root" class="text-stone-600 text-sm font-medium">Producto base</label>
                 <input
                   id="root"
                   v-model="form.root"
                   @keyup.enter="updateProduct"
                   type="text"
-                  placeholder="Ingrese raíz"
+                  placeholder="Sin producto base"
                   class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm focus:outline-none"
+                  aria-describedby="root-help"
                 />
+                <p id="root-help" class="app-ui-help">Úsalo solo si el producto deriva de otro producto principal.</p>
                 <InputError :message="form.errors.root"/>
               </div>
 

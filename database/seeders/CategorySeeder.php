@@ -4,32 +4,34 @@ namespace Database\Seeders;
 
 use App\Enums\Category\CategoryFieldsEnum;
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Http;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    public static function minimarketCategories(): array
+    {
+        return [
+            'Abarrotes',
+            'Bebidas',
+            'Lacteos',
+            'Snacks y golosinas',
+            'Panaderia',
+            'Limpieza del hogar',
+            'Cuidado personal',
+            'Congelados y refrigerados',
+            'Bebes',
+            'Mascotas',
+            'Frutas y verduras',
+            'Farmacia basica',
+        ];
+    }
+
     public function run(): void
     {
-        $response = Http::get("https://dummyjson.com/products/categories");
-        if ($response->successful()) {
-            $categories = $response->object();
-
-            foreach ($categories as $category) {
-                $categoriesPayload = [
-                    CategoryFieldsEnum::NAME->value       => $category->name,
-                ];
-
-                Category::query()->updateOrCreate(
-                    $categoriesPayload,
-                );
-            }
-        } else {
-            $this->command->error('Failed to seed category data.');
+        foreach (self::minimarketCategories() as $category) {
+            Category::query()->updateOrCreate([
+                CategoryFieldsEnum::NAME->value => $category,
+            ]);
         }
     }
 }

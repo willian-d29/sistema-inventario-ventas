@@ -1,0 +1,56 @@
+{
+    "advisories": {
+        "laravel/framework": [
+            {
+                "advisoryId": "PKSA-m5cs-t1y6-qpcs",
+                "packageName": "laravel/framework",
+                "affectedVersions": "<12.61.1|>=13.0.0,<13.12.0",
+                "title": "Laravel Framework: Temporary Signed URL Path Confusion",
+                "cve": null,
+                "link": "https://github.com/advisories/GHSA-crmm-hgp2-wgrp",
+                "reportedAt": "2026-06-17T13:54:13+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-crmm-hgp2-wgrp"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-3r5d-mb8f-1qw9",
+                "packageName": "laravel/framework",
+                "affectedVersions": "<12.60.0|>=13.0.0,<=13.9.0",
+                "title": "Laravel Framework: CRLF injection in default email rule ",
+                "cve": null,
+                "link": "https://github.com/advisories/GHSA-5vg9-5847-vvmq",
+                "reportedAt": "2026-06-17T13:53:44+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-5vg9-5847-vvmq"
+                    }
+                ],
+                "severity": "high"
+            },
+            {
+                "advisoryId": "PKSA-mdq4-51ck-6kdq",
+                "packageName": "laravel/framework",
+                "affectedVersions": ">=9.0.0,<10.0.0|>=10.0.0,<11.0.0|>=11.0.0,<12.0.0|>=12.0.0,<12.60.0|>=13.0.0,<13.10.0",
+                "title": "Laravel CRLF injection in default email rule",
+                "cve": "CVE-2026-48019",
+                "link": "https://github.com/laravel/framework/security/advisories/GHSA-5vg9-5847-vvmq",
+                "reportedAt": "2026-05-19T18:13:00+00:00",
+                "sources": [
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "laravel/framework/CVE-2026-48019.yaml"
+                    }
+                ],
+                "severity": null
+            }
+        ]
+    },
+    "abandoned": [],
+    "filter": []
+}

@@ -49,7 +49,9 @@ class BaseIndexRequest extends FormRequest
             $rangeFilters = $this->rangeFilters();
             foreach ($rangeFilters as $rangeFilter) {
                 if ($this->has($rangeFilter) && $this->filled($rangeFilter)) {
-                    $ranges = explode("-", $this->get($rangeFilter));
+                    $value = $this->get($rangeFilter);
+                    $ranges = is_array($value) ? array_values($value) : explode("-", $value);
+
                     if (count($ranges) === 1 || (count($ranges) === 2 && $ranges[1] == "")) {
                         $values[$rangeFilter] = [
                             $ranges[0],

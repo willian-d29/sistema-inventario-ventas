@@ -22,7 +22,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
+    <h6 class="text-slate-400 text-sm mt-3 mb-6 font-bold uppercase">
         System Settings
     </h6>
     <form @submit.prevent="$inertia.put(route('settings.update'), form, {preserveScroll: true})">
@@ -35,7 +35,7 @@ onMounted(() => {
             >
                 <div class="relative w-full mb-3">
                     <label
-                        class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                        class="block uppercase text-slate-600 text-xs font-bold mb-2"
                         :for="settingField.value"
                     >
                         {{ settingField.label }}
@@ -43,7 +43,7 @@ onMounted(() => {
                     <input
                         :id="settingField.value"
                         type="text"
-                        class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        class="border-0 px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                         v-model="form[settingField.value]"
                     />
 <!--                    <InputError :message="form.errors[settingField.value]"/>-->

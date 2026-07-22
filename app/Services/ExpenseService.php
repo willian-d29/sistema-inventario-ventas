@@ -9,15 +9,20 @@ use App\Exceptions\DBCommitException;
 use App\Exceptions\ExpenseNotFoundException;
 use App\Helpers\ArrayHelper;
 use App\Helpers\BaseHelper;
+use App\Models\CashRegister;
 use App\Models\Expense;
 use App\Repositories\ExpenseRepository;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ExpenseService
 {
-    public function __construct(private readonly ExpenseRepository $repository)
-    {
+    public function __construct(
+        private readonly ExpenseRepository $repository,
+        private readonly CashRegisterService $cashRegisterService
+    ) {
     }
 
     /**
@@ -81,14 +86,37 @@ class ExpenseService
      */
     public function create(array $payload): mixed
     {
-        $processPayload = [
-            ExpenseFieldsEnum::NAME->value         => $payload[ExpenseFieldsEnum::NAME->value],
-            ExpenseFieldsEnum::DESCRIPTION->value  => $payload[ExpenseFieldsEnum::DESCRIPTION->value],
-            ExpenseFieldsEnum::AMOUNT->value       => $payload[ExpenseFieldsEnum::AMOUNT->value],
-            ExpenseFieldsEnum::EXPENSE_DATE->value => $payload[ExpenseFieldsEnum::EXPENSE_DATE->value],
-        ];
+        return DB::transaction(function () use ($payload) {
+            $cashRegister = null;
+            if ((bool) ($payload['paid_from_cash_register'] ?? false)) {
+                $cashRegister = CashRegister::query()
+                    ->where('user_id', auth()->id())
+                    ->where('status', 'open')
+                    ->lockForUpdate()
+                    ->first();
 
-        return $this->repository->create(payload: $processPayload);
+                if (! $cashRegister) {
+                    throw ValidationException::withMessages([
+                        'paid_from_cash_register' => 'Debes tener una caja abierta para descontar este gasto.',
+                    ]);
+                }
+            }
+
+            $expense = Expense::create([
+                'cash_register_id' => $cashRegister?->id,
+                'paid_from_cash_register' => (bool) ($payload['paid_from_cash_register'] ?? false),
+                ExpenseFieldsEnum::NAME->value => $payload[ExpenseFieldsEnum::NAME->value],
+                ExpenseFieldsEnum::DESCRIPTION->value => $payload[ExpenseFieldsEnum::DESCRIPTION->value] ?? null,
+                ExpenseFieldsEnum::AMOUNT->value => $payload[ExpenseFieldsEnum::AMOUNT->value],
+                ExpenseFieldsEnum::EXPENSE_DATE->value => $payload[ExpenseFieldsEnum::EXPENSE_DATE->value],
+            ]);
+
+            if ($cashRegister) {
+                $this->cashRegisterService->createExpenseMovement($cashRegister, auth()->user(), $expense);
+            }
+
+            return $expense;
+        });
     }
 
     /**

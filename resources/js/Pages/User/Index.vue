@@ -50,7 +50,7 @@ const tableHeads = ref(['#', "Name", "Email", "Email Verified At"]);
                                 class="h-12 w-12 bg-white rounded-full border"
                                 alt="Inventory management system"
                             />
-                            <span class="ml-3 font-bold text-blueGray-600">{{ truncateString(user.name, 20) }}</span>
+                            <span class="ml-3 font-bold text-slate-600">{{ truncateString(user.name, 20) }}</span>
                         </TableData>
                         <TableData>{{ user.email }}</TableData>
                         <TableData>

@@ -1,451 +1,298 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import CardTable from "@/Components/Cards/CardTable.vue";
-import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
-import InputError from "@/Components/InputError.vue";
-import Modal from "@/Components/Modal.vue";
-import {useForm} from '@inertiajs/vue3';
-import {nextTick, ref} from 'vue';
-import DashboardInputGroup from "@/Components/DashboardInputGroup.vue";
-import {showToast} from "@/Utils/Helper.js";
+import AppAlert from '@/Components/UI/AppAlert.vue';
+import AppBadge from '@/Components/UI/AppBadge.vue';
+import AppButton from '@/Components/UI/AppButton.vue';
+import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
+import AppInput from '@/Components/UI/AppInput.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
+import AppPagination from '@/Components/UI/AppPagination.vue';
+import AppTextarea from '@/Components/UI/AppTextarea.vue';
+import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import FilterPanel from '@/Components/UI/FilterPanel.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { useI18n } from '@/Composables/useI18n.js';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, nextTick, ref } from 'vue';
+import { cleanQuery, getCurrency, numberFormat, showToast } from '@/Utils/Helper.js';
 
-defineProps({
-    filters: {
-        type: Object
-    },
-    employees: {
-        type: Object
-    },
+const props = defineProps({
+  filters: { type: Object, default: () => ({}) },
+  employees: { type: Object, required: true },
 });
 
+const { t } = useI18n();
 const selectedEmployee = ref(null);
-const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteModal = ref(false);
+const showFormModal = ref(false);
+const showDeleteDialog = ref(false);
+const formMode = ref('create');
 const nameInput = ref(null);
-const tableHeads = ref([
-  '#',
-  'Nombre',
-  'Cargo',
-  'Correo',
-  'Teléfono',
-  'Salario',
-  'Fecha de ingreso',
-  'Acción',
-]);
+
+const filterForm = useForm({
+  name: props.filters?.name?.value || '',
+  email: props.filters?.email?.value || '',
+  phone: props.filters?.phone?.value || '',
+  nid: props.filters?.nid?.value || '',
+});
 
 const form = useForm({
-    name: null,
-    email: null,
-    phone: null,
-    designation: null,
-    address: null,
-    salary: null,
-    nid: null,
-    joining_date: null,
-    photo: null,
-    password: null,
-
+  name: '',
+  email: '',
+  phone: '',
+  designation: '',
+  address: '',
+  salary: '',
+  nid: '',
+  joining_date: '',
+  photo: null,
+  password: '',
+  _method: '',
 });
 
-const createEmployeeModal = () => {
-    showCreateModal.value = true;
+const title = computed(() => formMode.value === 'create' ? t('admin.employees.create') : t('admin.employees.edit'));
+const items = computed(() => props.employees?.data || []);
 
-    nextTick(() => nameInput.value.focus());
-};
+function money(value) {
+  return `${getCurrency()}${numberFormat(Number(value || 0))}`;
+}
 
-const editEmployeeModal = (employee) => {
-    selectedEmployee.value = employee;
+function applyFilters() {
+  router.get(route('employees.index'), cleanQuery(filterForm.data()), { preserveState: true, replace: true });
+}
 
-    form.name = employee.name;
-    form.email = employee.email;
-    form.phone = employee.phone;
-    form.designation = employee.designation;
-    form.address = employee.address;
-    form.salary = employee.salary;
-    form.nid = employee.nid;
-    form.joining_date = employee.joining_date;
-    form.photo = null;
+function clearFilters() {
+  filterForm.name = '';
+  filterForm.email = '';
+  filterForm.phone = '';
+  filterForm.nid = '';
+  router.get(route('employees.index'), {}, { preserveState: true, replace: true });
+}
 
-    showEditModal.value = true;
+function fillForm(employee = null) {
+  Object.assign(form, {
+    name: employee?.name || '',
+    email: employee?.email || '',
+    phone: employee?.phone || '',
+    designation: employee?.designation || '',
+    address: employee?.address || '',
+    salary: employee?.salary || '',
+    nid: employee?.nid || '',
+    joining_date: employee?.joining_date || '',
+    photo: null,
+    password: '',
+    _method: '',
+  });
+}
 
-    nextTick(() => nameInput.value.focus());
-};
+function openCreateModal() {
+  formMode.value = 'create';
+  selectedEmployee.value = null;
+  form.reset();
+  fillForm();
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-const deleteEmployeeModal = (employee) => {
-    selectedEmployee.value = employee;
-    showDeleteModal.value = true;
-};
+function openEditModal(employee) {
+  formMode.value = 'edit';
+  selectedEmployee.value = employee;
+  fillForm(employee);
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-const createEmployee = () => {
-    form.post(route('employees.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function submitForm() {
+  const options = {
+    preserveScroll: true,
+    forceFormData: true,
+    onSuccess: () => {
+      showFormModal.value = false;
+      showToast();
+      form.reset();
+    },
+  };
 
-const updateEmployee = () => {
-    form.transform((data) => ({
-        ...data,
-        _method: "put"
-    }))
-        .post(route('employees.update', selectedEmployee.value.id), {
-            preserveScroll: true,
-            onSuccess: () => {
-                closeModal();
-                showToast();
-            },
-            onError: () => nameInput.value.focus(),
-        });
-};
+  if (formMode.value === 'create') {
+    form._method = '';
+    form.post(route('employees.store'), options);
+    return;
+  }
 
-const deleteEmployee = () => {
-    form.delete(route('employees.destroy', selectedEmployee.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-    });
-};
+  form._method = 'put';
+  form.post(route('employees.update', selectedEmployee.value.id), options);
+}
 
-const closeModal = () => {
-    showCreateModal.value = false;
-    showEditModal.value = false;
-    showDeleteModal.value = false;
-    form.reset();
-};
+function openDeleteDialog(employee) {
+  selectedEmployee.value = employee;
+  showDeleteDialog.value = true;
+}
+
+function deleteEmployee() {
+  form.delete(route('employees.destroy', selectedEmployee.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showDeleteDialog.value = false;
+      selectedEmployee.value = null;
+      showToast();
+    },
+  });
+}
 </script>
 
 <template>
-    <Head title="Employee"/>
+  <Head :title="t('admin.employees.title')" />
 
-    <AuthenticatedLayout>
-        <template #breadcrumb>
-            Employees
+  <AuthenticatedLayout>
+    <template #breadcrumb>{{ t('admin.employees.title') }}</template>
+
+    <div class="space-y-5 px-4">
+      <PageHeader :title="t('admin.employees.title')" :description="t('admin.employees.description')" :count="employees.total">
+        <template #actions>
+          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.employees.create') }}</AppButton>
         </template>
+      </PageHeader>
 
-        <div class="flex flex-wrap">
-            <div class="w-full px-4">
-                <CardTable
-                    indexRoute="employees.index"
-                    :paginatedData="employees"
-                    :filters="filters"
-                    :tableHeads="tableHeads"
-                >
-                    <template #cardHeader>
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-2xl">Apply filters({{employees.total}})</h4>
-                            <Button @click="createEmployeeModal">Create Employee</Button>
-                        </div>
-                    </template>
+      <AppAlert variant="info" :title="t('admin.sections.role')" :message="t('admin.employees.role_help')" />
 
-                    <tr v-for="(employee, index) in employees.data" :key="employee.id">
-                        <TableData>
-                            {{ (employees.current_page * employees.per_page) - (employees.per_page - (index + 1)) }}
-                        </TableData>
-                        <TableData class="text-left flex items-center">
-                            <img
-                                :src="employee.photo"
-                                class="h-12 w-12 bg-white rounded-full border"
-                                alt="Inventory management system"
-                            />
-                            <span class="ml-3 font-bold text-blueGray-600">{{ employee.name }}</span>
-                        </TableData>
-                        <TableData>{{ employee.designation }}</TableData>
-                        <TableData>{{ employee.email }}</TableData>
-                        <TableData>{{ employee.phone }}</TableData>
-                        <TableData>{{ employee.salary }}</TableData>
-                        <TableData>{{ employee.joining_date }}</TableData>
-                        <TableData>
-                            <Button @click="editEmployeeModal(employee)">
-                                <i class="fa fa-edit"></i>
-                            </Button>
-                            <Button
-                                @click="deleteEmployeeModal(employee)"
-                                type="red"
-                            >
-                                <i class="fa fa-trash-alt"></i>
-                            </Button>
-                        </TableData>
-                    </tr>
-                </CardTable>
+      <FilterPanel>
+        <form class="ihc-filter-grid" @submit.prevent="applyFilters">
+          <AppInput v-model="filterForm.name" :label="t('admin.filters.search')" :placeholder="t('admin.employees.search_placeholder')" />
+          <AppInput v-model="filterForm.email" :label="t('admin.fields.email')" placeholder="cajero@empresa.com" />
+          <AppInput v-model="filterForm.phone" :label="t('admin.fields.phone')" placeholder="999999999" />
+          <AppInput v-model="filterForm.nid" :label="t('admin.fields.document_number')" placeholder="DNI" />
+          <div class="flex items-end gap-2">
+            <AppButton type="submit" icon="fa-filter" :loading="filterForm.processing">{{ t('actions.apply_filters') }}</AppButton>
+            <AppButton type="button" variant="secondary" icon="fa-eraser" @click="clearFilters">{{ t('actions.clear_filters') }}</AppButton>
+          </div>
+        </form>
+      </FilterPanel>
+
+      <section class="ihc-panel overflow-hidden">
+        <div v-if="items.length" class="hidden overflow-x-auto xl:block">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase">
+              <tr>
+                <th scope="col" class="px-4 py-3">{{ t('admin.employees.title') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.role') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.sections.contact') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.salary') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('common.status') }}</th>
+                <th scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="employee in items" :key="employee.id">
+                <td class="px-4 py-3">
+                  <strong class="block text-[var(--color-text-primary)]">{{ employee.name }}</strong>
+                  <span class="app-ui-help">{{ employee.nid || t('admin.employees.no_document') }} · {{ employee.joining_date || '-' }}</span>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="block font-semibold">{{ employee.designation || t('roles.cajero') }}</span>
+                  <span class="app-ui-help">{{ t('roles.cajero') }}</span>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="block">{{ employee.phone || '-' }}</span>
+                  <span class="app-ui-help">{{ employee.email || '-' }}</span>
+                </td>
+                <td class="px-4 py-3 font-black">{{ money(employee.salary) }}</td>
+                <td class="px-4 py-3"><AppBadge variant="success" icon="fa-user-check">{{ t('admin.status.enabled') }}</AppBadge></td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-2">
+                    <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${employee.name}`" @click="openEditModal(employee)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
+                    <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${employee.name}`" @click="openDeleteDialog(employee)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="items.length" class="divide-y divide-[var(--color-border)] xl:hidden">
+          <article v-for="employee in items" :key="employee.id" class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="break-words font-black text-[var(--color-text-primary)]">{{ employee.name }}</h2>
+                <p class="app-ui-help">{{ employee.designation || t('roles.cajero') }} · {{ employee.nid || t('admin.employees.no_document') }}</p>
+              </div>
+              <AppBadge variant="success" icon="fa-user-check">{{ t('admin.status.enabled') }}</AppBadge>
             </div>
+            <p class="mt-2 text-sm text-[var(--color-text-secondary)]">{{ employee.phone || '-' }} · {{ employee.email || '-' }}</p>
+            <p class="mt-1 text-sm font-black">{{ money(employee.salary) }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${employee.name}`" @click="openEditModal(employee)">{{ t('actions.edit') }}</AppButton>
+              <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${employee.name}`" @click="openDeleteDialog(employee)">{{ t('actions.delete') }}</AppButton>
+            </div>
+          </article>
         </div>
 
-       <!--Create data-->
-<Modal
-    title="Create"
-    :show="showCreateModal"
-    :formProcessing="form.processing"
-    @close="closeModal"
-    @submitAction="createEmployee"
->
-    <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Name"
-                name="name"
-                v-model="form.name"
-                placeholder="Enter name"
-                :errorMessage="form.errors.name"
-                @keyupEnter="createEmployee"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Email"
-                name="email"
-                v-model="form.email"
-                placeholder="Enter email"
-                :errorMessage="form.errors.email"
-                @keyupEnter="createEmployee"
-                type="email"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Phone"
-                name="phone"
-                v-model="form.phone"
-                placeholder="Enter phone"
-                :errorMessage="form.errors.phone"
-                @keyupEnter="createEmployee"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Password"
-                name="password"
-                v-model="form.password"
-                placeholder="Enter password"
-                :errorMessage="form.errors.password"
-                @keyupEnter="createEmployee"
-                type="password"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="NID"
-                name="nid"
-                v-model="form.nid"
-                placeholder="Enter nid"
-                :errorMessage="form.errors.nid"
-                @keyupEnter="createEmployee"
-            />
-        </div>
+        <AppEmptyState v-if="!items.length" icon="fa-id-badge" :title="t('admin.employees.empty')" :description="t('admin.employees.description')" />
+      </section>
+
+      <AppPagination :links="employees.links" :label="t('pagination.label')" />
     </div>
 
-    <div class="my-3 grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Designation"
-                name="designation"
-                v-model="form.designation"
-                placeholder="Enter designation"
-                :errorMessage="form.errors.designation"
-                @keyupEnter="createEmployee"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Salary"
-                name="salary"
-                v-model="form.salary"
-                placeholder="Enter salary"
-                :errorMessage="form.errors.salary"
-                @keyupEnter="createEmployee"
-                type="number"
-            />
-        </div>
-        <div class="flex flex-col">
-            <DashboardInputGroup
-                label="Joining Date"
-                name="joining_date"
-                v-model="form.joining_date"
-                placeholder="Enter joining_date"
-                :errorMessage="form.errors.joining_date"
-                @keyupEnter="createEmployee"
-                type="date"
-            />
-        </div>
-    </div>
+    <AppModal :show="showFormModal" :title="title" size="xl" :initial-focus="nameInput" @close="showFormModal = false">
+      <div class="space-y-5">
+        <AppAlert variant="info" :title="t('admin.sections.access')" :message="t('admin.employees.access_help')" />
 
-    <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        <div class="flex flex-col">
-            <label
-                class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
-                <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path
-                        d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
-                </svg>
-                <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
-                        form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
-                    }}</span>
-                <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
-                <input
-                    @input="form.photo = $event.target.files[0]"
-                    type='file'
-                    class="hidden"
-                    accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
-                />
-            </label>
-            <InputError :message="form.errors.photo"/>
-        </div>
-        <div class="flex flex-col">
-            <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
-            <textarea
-                id="address"
-                v-model="form.address"
-                type="text"
-                rows="3"
-                placeholder="Enter address"
-                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-            ></textarea>
-            <InputError :message="form.errors.address"/>
-        </div>
-    </div>
-</Modal>
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.personal') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput ref="nameInput" v-model="form.name" :label="t('admin.fields.full_name')" :placeholder="t('admin.fields.full_name')" :error="form.errors.name" required />
+            <AppInput v-model="form.nid" :label="t('admin.fields.document_number')" placeholder="DNI" :error="form.errors.nid" />
+          </div>
+        </section>
 
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.access') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput v-model="form.email" :label="t('admin.fields.email')" type="email" placeholder="cajero@empresa.com" :error="form.errors.email" required />
+            <AppInput v-model="form.password" :label="t('admin.fields.password')" type="password" :placeholder="formMode === 'create' ? t('admin.fields.password') : t('admin.employees.optional_password')" :help-text="formMode === 'edit' ? t('admin.employees.optional_password') : null" :error="form.errors.password" :required="formMode === 'create'" />
+          </div>
+        </section>
 
-        <!--Edit data-->
-        <Modal
-            title="Edit"
-            :show="showEditModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="updateEmployee"
-        >
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Name"
-                        name="name"
-                        v-model="form.name"
-                        placeholder="Enter name"
-                        :errorMessage="form.errors.name"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Email"
-                        name="email"
-                        v-model="form.email"
-                        placeholder="Enter email"
-                        :errorMessage="form.errors.email"
-                        @keyupEnter="createEmployee"
-                        type="email"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Phone"
-                        name="phone"
-                        v-model="form.phone"
-                        placeholder="Enter phone"
-                        :errorMessage="form.errors.phone"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="NID"
-                        name="nid"
-                        v-model="form.nid"
-                        placeholder="Enter nid"
-                        :errorMessage="form.errors.nid"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-            </div>
-            <div class="my-3 grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Designation"
-                        name="designation"
-                        v-model="form.designation"
-                        placeholder="Enter designation"
-                        :errorMessage="form.errors.designation"
-                        @keyupEnter="createEmployee"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Salary"
-                        name="salary"
-                        v-model="form.salary"
-                        placeholder="Enter salary"
-                        :errorMessage="form.errors.salary"
-                        @keyupEnter="createEmployee"
-                        type="number"
-                    />
-                </div>
-                <div class="flex flex-col">
-                    <DashboardInputGroup
-                        label="Joining Date"
-                        name="joining_date"
-                        v-model="form.joining_date"
-                        placeholder="Enter joining_date"
-                        :errorMessage="form.errors.joining_date"
-                        @keyupEnter="createEmployee"
-                        type="date"
-                    />
-                </div>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <label
-                        class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
-                        <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
-                        </svg>
-                        <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
-                                form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
-                            }}</span>
-                        <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
-                        <input
-                            @input="form.photo = $event.target.files[0]"
-                            type='file'
-                            class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
-                        />
-                    </label>
-                    <InputError :message="form.errors.photo"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
-                    <textarea
-                        id="address"
-                        v-model="form.address"
-                        type="text"
-                        rows="3"
-                        placeholder="Enter address"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    ></textarea>
-                    <InputError :message="form.errors.address"/>
-                </div>
-            </div>
-        </Modal>
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.role') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput :model-value="t('roles.cajero')" :label="t('admin.fields.role')" readonly :help-text="t('admin.employees.role_help')" />
+            <AppInput v-model="form.designation" :label="t('admin.fields.work_position')" :placeholder="t('admin.fields.work_position')" :error="form.errors.designation" required />
+          </div>
+        </section>
 
-        <!--Delete data-->
-        <Modal
-            title="Delete"
-            :show="showDeleteModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="deleteEmployee"
-            maxWidth="sm"
-            submitButtonText="Yes, delete it!"
-        >
-            Are you sure you want to delete this employee?
-        </Modal>
-    </AuthenticatedLayout>
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.employment') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput v-model="form.salary" :label="t('admin.fields.salary')" type="number" min="0" step="0.01" :error="form.errors.salary" required />
+            <AppInput v-model="form.joining_date" :label="t('admin.fields.joining_date')" type="date" :error="form.errors.joining_date" required />
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.contact') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput v-model="form.phone" :label="t('admin.fields.phone')" placeholder="999999999" :error="form.errors.phone" required />
+            <AppTextarea v-model="form.address" :label="t('admin.fields.address')" :placeholder="t('admin.fields.address')" :error="form.errors.address" required />
+          </div>
+        </section>
+      </div>
+      <template #footer>
+        <AppButton variant="secondary" :disabled="form.processing" @click="showFormModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" :loading="form.processing" :loading-text="t('common.loading')" @click="submitForm">{{ t('admin.employees.save') }}</AppButton>
+      </template>
+    </AppModal>
+
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      :title="t('admin.employees.delete_title')"
+      :action="t('admin.employees.delete_action', { name: selectedEmployee?.name || t('admin.employees.title') })"
+      :consequence="t('admin.employees.delete_consequence')"
+      :confirm-text="t('actions.delete')"
+      :cancel-text="t('actions.cancel')"
+      :loading="form.processing"
+      @cancel="showDeleteDialog = false"
+      @confirm="deleteEmployee"
+    />
+  </AuthenticatedLayout>
 </template>

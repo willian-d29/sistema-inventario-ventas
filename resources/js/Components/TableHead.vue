@@ -2,7 +2,7 @@
 </script>
 
 <template>
-    <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-center bg-blueGray-50 text-blueGray-500 border-blueGray-100">
+    <th class="px-4 align-middle border-b border-solid py-3 text-xs whitespace-nowrap font-semibold text-center bg-slate-50 text-slate-600 border-slate-200">
         <slot/>
     </th>
 </template>

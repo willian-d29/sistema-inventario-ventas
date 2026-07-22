@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,34 +14,26 @@ class RedirectIfAuthenticated
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-   
+    public function handle(Request $request, Closure $next, string ...$guards): Response
+    {
+        $guards = empty($guards) ? [null] : $guards;
 
-   
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                $user = Auth::user();
 
+                if (! $user) {
+                    abort(403, 'No autorizado');
+                }
 
-public function handle(Request $request, Closure $next, string ...$guards): Response
-{
-    $guards = empty($guards) ? [null] : $guards;
-
-    foreach ($guards as $guard) {
-        if (Auth::guard($guard)->check()) {
-            $user = Auth::user();
-
-            if (!$user) {
-                abort(403, 'No autorizado');
+                return match ($user->role) {
+                    'admin' => redirect('/sistema/dashboard'),
+                    'cajero' => redirect('/sistema/pos'),
+                    default => abort(403),
+                };
             }
-
-            return match ($user->role) {
-                'admin'    => redirect('/sistema/dashboard'),
-                'vendedor' => redirect('/sistema/pos'),
-                'cliente'  => redirect('/'),
-                default    => abort(403),
-            };
         }
+
+        return $next($request);
     }
-
-    return $next($request);
-}
-
-
 }

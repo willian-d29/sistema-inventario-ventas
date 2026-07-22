@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Setting\SettingFieldsEnum;
-use App\Helpers\BaseHelper;
 use App\Http\Requests\Profile\ProfileUpdateImageRequest;
 use App\Http\Requests\Profile\ProfileUpdateRequest;
+use App\Http\Requests\Profile\PreferenceUpdateRequest;
 use App\Models\User;
 use App\Services\FileManagerService;
+use App\Services\UserPreferenceService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,10 +27,6 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'settings' => [
-                "fields" => BaseHelper::convertKeyValueToLabelValueArray(SettingFieldsEnum::choices()),
-                "data" => settings()->all()
-            ],
         ]);
     }
 
@@ -85,6 +81,17 @@ class ProfileController extends Controller
         return redirect()
             ->route('profile.edit')
             ->with('flash', $flash);
+    }
+
+    public function updatePreferences(
+        PreferenceUpdateRequest $request,
+        UserPreferenceService $preferenceService
+    ): RedirectResponse {
+        $preferenceService->update($request->user(), $request->validated());
+
+        return Redirect::back()->with('flash', [
+            'message' => 'Preferencias guardadas correctamente.',
+        ]);
     }
 
     /**

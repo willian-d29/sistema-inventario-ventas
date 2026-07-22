@@ -1,361 +1,254 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import CardTable from "@/Components/Cards/CardTable.vue";
-import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
-import InputError from "@/Components/InputError.vue";
-import Modal from "@/Components/Modal.vue";
-import {useForm} from '@inertiajs/vue3';
-import {nextTick, ref} from 'vue';
-import {showToast} from "@/Utils/Helper.js";
+import AppBadge from '@/Components/UI/AppBadge.vue';
+import AppButton from '@/Components/UI/AppButton.vue';
+import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
+import AppInput from '@/Components/UI/AppInput.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
+import AppPagination from '@/Components/UI/AppPagination.vue';
+import AppTextarea from '@/Components/UI/AppTextarea.vue';
+import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import FilterPanel from '@/Components/UI/FilterPanel.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { useI18n } from '@/Composables/useI18n.js';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, nextTick, ref } from 'vue';
+import { cleanQuery, showToast } from '@/Utils/Helper.js';
 
-defineProps({
-    filters: {
-        type: Object
-    },
-    suppliers: {
-        type: Object
-    },
+const props = defineProps({
+  filters: { type: Object, default: () => ({}) },
+  suppliers: { type: Object, required: true },
 });
 
+const { t } = useI18n();
 const selectedSupplier = ref(null);
-const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteModal = ref(false);
+const showFormModal = ref(false);
+const showDeleteDialog = ref(false);
+const formMode = ref('create');
 const nameInput = ref(null);
-const tableHeads = ref(['#', "Name", "Email", "Phone", "Shop Name", "Action"]);
+
+const filterForm = useForm({
+  name: props.filters?.name?.value || '',
+  email: props.filters?.email?.value || '',
+  phone: props.filters?.phone?.value || '',
+  shop_name: props.filters?.shop_name?.value || '',
+});
 
 const form = useForm({
-    name: null,
-    email: null,
-    phone: null,
-    shop_name: null,
-    address: null,
-    photo: null,
+  name: '',
+  email: '',
+  phone: '',
+  shop_name: '',
+  address: '',
+  photo: null,
+  _method: '',
 });
 
-const createSupplierModal = () => {
-    showCreateModal.value = true;
+const title = computed(() => formMode.value === 'create' ? t('admin.suppliers.create') : t('admin.suppliers.edit'));
+const items = computed(() => props.suppliers?.data || []);
 
-    nextTick(() => nameInput.value.focus());
-};
+function applyFilters() {
+  router.get(route('suppliers.index'), cleanQuery(filterForm.data()), { preserveState: true, replace: true });
+}
 
-const editSupplierModal = (supplier) => {
-    selectedSupplier.value = supplier;
+function clearFilters() {
+  filterForm.name = '';
+  filterForm.email = '';
+  filterForm.phone = '';
+  filterForm.shop_name = '';
+  router.get(route('suppliers.index'), {}, { preserveState: true, replace: true });
+}
 
-    form.name = supplier.name;
-    form.email = supplier.email;
-    form.phone = supplier.phone;
-    form.shop_name = supplier.shop_name;
-    form.address = supplier.address;
-    form.photo = null;
+function fillForm(supplier = null) {
+  Object.assign(form, {
+    name: supplier?.name || '',
+    email: supplier?.email || '',
+    phone: supplier?.phone || '',
+    shop_name: supplier?.shop_name || '',
+    address: supplier?.address || '',
+    photo: null,
+    _method: '',
+  });
+}
 
-    showEditModal.value = true;
+function openCreateModal() {
+  formMode.value = 'create';
+  selectedSupplier.value = null;
+  form.reset();
+  fillForm();
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-    nextTick(() => nameInput.value.focus());
-};
+function openEditModal(supplier) {
+  formMode.value = 'edit';
+  selectedSupplier.value = supplier;
+  fillForm(supplier);
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-const deleteSupplierModal = (supplier) => {
-    selectedSupplier.value = supplier;
-    showDeleteModal.value = true;
-};
+function submitForm() {
+  const options = {
+    preserveScroll: true,
+    forceFormData: true,
+    onSuccess: () => {
+      showFormModal.value = false;
+      showToast();
+      form.reset();
+    },
+  };
 
-const createSupplier = () => {
-    form.post(route('suppliers.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+  if (formMode.value === 'create') {
+    form._method = '';
+    form.post(route('suppliers.store'), options);
+    return;
+  }
 
-const updateSupplier = () => {
-    form.transform((data) => ({
-        ...data,
-        _method: "put"
-    }))
-        .post(route('suppliers.update', selectedSupplier.value.id), {
-            preserveScroll: true,
-            onSuccess: () => {
-                closeModal();
-                showToast();
-            },
-            onError: () => nameInput.value.focus(),
-        });
-};
+  form._method = 'put';
+  form.post(route('suppliers.update', selectedSupplier.value.id), options);
+}
 
-const deleteSupplier = () => {
-    form.delete(route('suppliers.destroy', selectedSupplier.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-    });
-};
+function openDeleteDialog(supplier) {
+  selectedSupplier.value = supplier;
+  showDeleteDialog.value = true;
+}
 
-const closeModal = () => {
-    showCreateModal.value = false;
-    showEditModal.value = false;
-    showDeleteModal.value = false;
-    form.reset();
-};
+function deleteSupplier() {
+  form.delete(route('suppliers.destroy', selectedSupplier.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showDeleteDialog.value = false;
+      selectedSupplier.value = null;
+      showToast();
+    },
+  });
+}
 </script>
 
 <template>
-    <Head title="Supplier"/>
+  <Head :title="t('admin.suppliers.title')" />
 
-    <AuthenticatedLayout>
-        <template #breadcrumb>
-            Suppliers
+  <AuthenticatedLayout>
+    <template #breadcrumb>{{ t('admin.suppliers.title') }}</template>
+
+    <div class="space-y-5 px-4">
+      <PageHeader :title="t('admin.suppliers.title')" :description="t('admin.suppliers.description')" :count="suppliers.total">
+        <template #actions>
+          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.suppliers.create') }}</AppButton>
         </template>
+      </PageHeader>
 
-        <div class="flex flex-wrap">
-            <div class="w-full px-4">
-                <CardTable
-                    indexRoute="suppliers.index"
-                    :paginatedData="suppliers"
-                    :filters="filters"
-                    :tableHeads="tableHeads"
-                >
-                    <template #cardHeader>
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-2xl">Apply filters({{suppliers.total}})</h4>
-                            <Button @click="createSupplierModal">Create Supplier</Button>
-                        </div>
-                    </template>
+      <FilterPanel>
+        <form class="ihc-filter-grid" @submit.prevent="applyFilters">
+          <AppInput v-model="filterForm.name" :label="t('admin.filters.search')" :placeholder="t('admin.suppliers.search_placeholder')" />
+          <AppInput v-model="filterForm.email" :label="t('admin.fields.email')" placeholder="proveedor@empresa.com" />
+          <AppInput v-model="filterForm.phone" :label="t('admin.fields.phone')" placeholder="999999999" />
+          <AppInput v-model="filterForm.shop_name" :label="t('admin.fields.trade_name')" :placeholder="t('admin.fields.trade_name')" />
+          <div class="flex items-end gap-2">
+            <AppButton type="submit" icon="fa-filter" :loading="filterForm.processing">{{ t('actions.apply_filters') }}</AppButton>
+            <AppButton type="button" variant="secondary" icon="fa-eraser" @click="clearFilters">{{ t('actions.clear_filters') }}</AppButton>
+          </div>
+        </form>
+      </FilterPanel>
 
-                    <tr v-for="(supplier, index) in suppliers.data" :key="supplier.id">
-                        <TableData>
-                            {{ (suppliers.current_page * suppliers.per_page) - (suppliers.per_page - (index + 1)) }}
-                        </TableData>
-                        <TableData class="text-left flex items-center">
-                            <img
-                                :src="supplier.photo"
-                                class="h-12 w-12 bg-white rounded-full border"
-                                alt="Inventory management system"
-                            />
-                            <span class="ml-3 font-bold text-blueGray-600">{{ supplier.name }}</span>
-                        </TableData>
-                        <TableData>{{ supplier.email }}</TableData>
-                        <TableData>{{ supplier.phone }}</TableData>
-                        <TableData>{{ supplier.shop_name }}</TableData>
-                        <TableData>
-                            <Button @click="editSupplierModal(supplier)">
-                                <i class="fa fa-edit"></i>
-                            </Button>
-                            <Button
-                                @click="deleteSupplierModal(supplier)"
-                                type="red"
-                            >
-                                <i class="fa fa-trash-alt"></i>
-                            </Button>
-                        </TableData>
-                    </tr>
-                </CardTable>
-            </div>
+      <section class="ihc-panel overflow-hidden">
+        <div v-if="items.length" class="hidden overflow-x-auto xl:block">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase">
+              <tr>
+                <th scope="col" class="px-4 py-3">{{ t('admin.suppliers.title') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.document') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.sections.contact') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('common.status') }}</th>
+                <th scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="supplier in items" :key="supplier.id">
+                <td class="px-4 py-3">
+                  <strong class="block text-[var(--color-text-primary)]">{{ supplier.name }}</strong>
+                  <span class="app-ui-help">{{ supplier.shop_name || t('common.no_description') }}</span>
+                </td>
+                <td class="px-4 py-3">{{ t('admin.suppliers.no_document') }}</td>
+                <td class="px-4 py-3">
+                  <span class="block">{{ supplier.phone || '-' }}</span>
+                  <span class="app-ui-help">{{ supplier.email || '-' }}</span>
+                </td>
+                <td class="px-4 py-3"><AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge></td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-2">
+                    <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${supplier.name}`" @click="openEditModal(supplier)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
+                    <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${supplier.name}`" @click="openDeleteDialog(supplier)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!--Create data-->
-        <Modal
-            title="Create"
-            :show="showCreateModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="createSupplier"
-        >
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <label for="name" class="text-stone-600 text-sm font-medium">Name</label>
-                    <input
-                        id="name"
-                        ref="nameInput"
-                        v-model="form.name"
-                        @keyup.enter="createSupplier"
-                        type="text"
-                        placeholder="Enter name"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.name"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="email" class="text-stone-600 text-sm font-medium">Email</label>
-                    <input
-                        id="email"
-                        v-model="form.email"
-                        @keyup.enter="createSupplier"
-                        type="email"
-                        placeholder="Enter email"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.email"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="phone" class="text-stone-600 text-sm font-medium">Phone</label>
-                    <input
-                        id="phone"
-                        v-model="form.phone"
-                        @keyup.enter="createSupplier"
-                        type="text"
-                        placeholder="Enter phone"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.phone"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="shop_name" class="text-stone-600 text-sm font-medium">Shop Name</label>
-                    <input
-                        id="shop_name"
-                        v-model="form.shop_name"
-                        @keyup.enter="createSupplier"
-                        type="text"
-                        placeholder="Enter shop name"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.shop_name"/>
-                </div>
-                <div class="flex flex-col">
-                    <label
-                        class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
-                        <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
-                        </svg>
-                        <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
-                                form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
-                            }}</span>
-                        <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
-                        <input
-                            @input="form.photo = $event.target.files[0]"
-                            type='file'
-                            class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
-                        />
-                    </label>
-                    <InputError :message="form.errors.photo"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
-                    <textarea
-                        id="address"
-                        v-model="form.address"
-                        type="text"
-                        rows="3"
-                        placeholder="Enter address"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    ></textarea>
-                    <InputError :message="form.errors.address"/>
-                </div>
+        <div v-if="items.length" class="divide-y divide-[var(--color-border)] xl:hidden">
+          <article v-for="supplier in items" :key="supplier.id" class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="break-words font-black text-[var(--color-text-primary)]">{{ supplier.name }}</h2>
+                <p class="app-ui-help">{{ supplier.shop_name || t('admin.suppliers.no_document') }}</p>
+              </div>
+              <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
-        </Modal>
-
-        <!--Edit data-->
-        <Modal
-            title="Edit"
-            :show="showEditModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="updateSupplier"
-        >
-            <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col">
-                    <label for="name" class="text-stone-600 text-sm font-medium">Name</label>
-                    <input
-                        id="name"
-                        ref="nameInput"
-                        v-model="form.name"
-                        @keyup.enter="updateSupplier"
-                        type="text"
-                        placeholder="Enter name"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.name"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="email" class="text-stone-600 text-sm font-medium">Email</label>
-                    <input
-                        id="email"
-                        v-model="form.email"
-                        @keyup.enter="updateSupplier"
-                        type="email"
-                        placeholder="Enter email"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.email"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="phone" class="text-stone-600 text-sm font-medium">Phone</label>
-                    <input
-                        id="phone"
-                        v-model="form.phone"
-                        @keyup.enter="updateSupplier"
-                        type="text"
-                        placeholder="Enter phone"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.phone"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="shop_name" class="text-stone-600 text-sm font-medium">Shop Name</label>
-                    <input
-                        id="shop_name"
-                        v-model="form.shop_name"
-                        @keyup.enter="updateSupplier"
-                        type="text"
-                        placeholder="Enter shop name"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    />
-                    <InputError :message="form.errors.shop_name"/>
-                </div>
-                <div class="flex flex-col">
-                    <label
-                        class="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:bg-blue hover:text-emerald-600">
-                        <svg class="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path
-                                d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
-                        </svg>
-                        <span v-if="form.photo" class="mt-2 text-base leading-normal">{{
-                                form.photo.name.replace(/(^.{17}).*(\..+$)/, "$1...$2")
-                            }}</span>
-                        <span v-else class="mt-2 text-base leading-normal">Select a photo</span>
-                        <input
-                            @input="form.photo = $event.target.files[0]"
-                            type='file'
-                            class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/gif, image/svg"
-                        />
-                    </label>
-                    <InputError :message="form.errors.photo"/>
-                </div>
-                <div class="flex flex-col">
-                    <label for="address" class="text-stone-600 text-sm font-medium">Address</label>
-                    <textarea
-                        id="address"
-                        v-model="form.address"
-                        type="text"
-                        rows="3"
-                        placeholder="Enter address"
-                        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
-                    ></textarea>
-                    <InputError :message="form.errors.address"/>
-                </div>
+            <p class="mt-2 text-sm text-[var(--color-text-secondary)]">{{ supplier.phone || '-' }} · {{ supplier.email || '-' }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${supplier.name}`" @click="openEditModal(supplier)">{{ t('actions.edit') }}</AppButton>
+              <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${supplier.name}`" @click="openDeleteDialog(supplier)">{{ t('actions.delete') }}</AppButton>
             </div>
-        </Modal>
+          </article>
+        </div>
 
-        <!--Delete data-->
-        <Modal
-            title="Delete"
-            :show="showDeleteModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="deleteSupplier"
-            maxWidth="sm"
-            submitButtonText="Yes, delete it!"
-        >
-            Are you sure you want to delete this supplier?
-        </Modal>
-    </AuthenticatedLayout>
+        <AppEmptyState v-if="!items.length" icon="fa-truck" :title="t('admin.suppliers.empty')" :description="t('admin.suppliers.description')" />
+      </section>
+
+      <AppPagination :links="suppliers.links" :label="t('pagination.label')" />
+    </div>
+
+    <AppModal :show="showFormModal" :title="title" size="lg" :initial-focus="nameInput" @close="showFormModal = false">
+      <div class="space-y-5">
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.general') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput ref="nameInput" v-model="form.name" :label="t('admin.fields.name_or_business_name')" :placeholder="t('admin.fields.name_or_business_name')" :error="form.errors.name" required />
+            <AppInput v-model="form.shop_name" :label="t('admin.fields.trade_name')" :placeholder="t('admin.fields.trade_name')" :error="form.errors.shop_name" />
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.contact') }}</h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <AppInput v-model="form.phone" :label="t('admin.fields.phone')" placeholder="999999999" :error="form.errors.phone" required />
+            <AppInput v-model="form.email" :label="t('admin.fields.email')" type="email" placeholder="proveedor@empresa.com" :error="form.errors.email" required />
+          </div>
+        </section>
+        <section class="space-y-3">
+          <h3 class="ihc-section-title">{{ t('admin.sections.location') }}</h3>
+          <AppTextarea v-model="form.address" :label="t('admin.fields.address')" :placeholder="t('admin.fields.address')" :error="form.errors.address" />
+        </section>
+      </div>
+      <template #footer>
+        <AppButton variant="secondary" :disabled="form.processing" @click="showFormModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" :loading="form.processing" :loading-text="t('common.loading')" @click="submitForm">{{ t('admin.suppliers.save') }}</AppButton>
+      </template>
+    </AppModal>
+
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      :title="t('admin.suppliers.delete_title')"
+      :action="t('admin.suppliers.delete_action', { name: selectedSupplier?.name || t('admin.suppliers.title') })"
+      :consequence="t('admin.suppliers.delete_consequence')"
+      :confirm-text="t('actions.delete')"
+      :cancel-text="t('actions.cancel')"
+      :loading="form.processing"
+      @cancel="showDeleteDialog = false"
+      @confirm="deleteSupplier"
+    />
+  </AuthenticatedLayout>
 </template>

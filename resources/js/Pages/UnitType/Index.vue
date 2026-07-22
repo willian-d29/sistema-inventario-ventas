@@ -1,223 +1,202 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import CardTable from "@/Components/Cards/CardTable.vue";
-import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
-import InputError from "@/Components/InputError.vue";
-import Modal from "@/Components/Modal.vue";
+import AppBadge from '@/Components/UI/AppBadge.vue';
+import AppButton from '@/Components/UI/AppButton.vue';
+import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
+import AppInput from '@/Components/UI/AppInput.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
+import AppPagination from '@/Components/UI/AppPagination.vue';
+import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import FilterPanel from '@/Components/UI/FilterPanel.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { useI18n } from '@/Composables/useI18n.js';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, nextTick, ref } from 'vue';
+import { cleanQuery, showToast } from '@/Utils/Helper.js';
 
-defineProps({
-    filters: {
-        type: Object
-    },
-    unitTypes: {
-        type: Object
-    },
+const props = defineProps({
+  filters: { type: Object, default: () => ({}) },
+  unitTypes: { type: Object, required: true },
 });
 
-import {useForm} from '@inertiajs/vue3';
-import {nextTick, ref} from 'vue';
-import {showToast} from "@/Utils/Helper.js";
-
+const { t } = useI18n();
 const selectedUnitType = ref(null);
-const showCreateModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteModal = ref(false);
+const showFormModal = ref(false);
+const showDeleteDialog = ref(false);
+const formMode = ref('create');
 const nameInput = ref(null);
-const tableHeads = ref(['#', "Name", "Symbol", "Action"]);
+
+const filterForm = useForm({
+  name: props.filters?.name?.value || '',
+  symbol: props.filters?.symbol?.value || '',
+});
 
 const form = useForm({
-    name: null,
-    symbol: null,
+  name: '',
+  symbol: '',
 });
 
-const createUnitTypeModal = () => {
-    showCreateModal.value = true;
+const title = computed(() => formMode.value === 'create' ? t('admin.units.create') : t('admin.units.edit'));
+const items = computed(() => props.unitTypes?.data || []);
 
-    nextTick(() => nameInput.value.focus());
-};
+function applyFilters() {
+  router.get(route('unit-types.index'), cleanQuery(filterForm.data()), { preserveState: true, replace: true });
+}
 
-const editUnitTypeModal = (unitType) => {
-    selectedUnitType.value = unitType;
-    form.name = unitType.name
-    form.symbol = unitType.symbol
-    showEditModal.value = true;
+function clearFilters() {
+  filterForm.name = '';
+  filterForm.symbol = '';
+  router.get(route('unit-types.index'), {}, { preserveState: true, replace: true });
+}
 
-    nextTick(() => nameInput.value.focus());
-};
+function openCreateModal() {
+  formMode.value = 'create';
+  selectedUnitType.value = null;
+  form.reset();
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-const deleteUnitTypeModal = (unitType) => {
-    selectedUnitType.value = unitType;
-    showDeleteModal.value = true;
-};
+function openEditModal(unitType) {
+  formMode.value = 'edit';
+  selectedUnitType.value = unitType;
+  form.name = unitType.name;
+  form.symbol = unitType.symbol;
+  form.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => nameInput.value?.focus?.());
+}
 
-const createUnitType = () => {
-    form.post(route('unit-types.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function submitForm() {
+  const options = {
+    preserveScroll: true,
+    onSuccess: () => {
+      showFormModal.value = false;
+      showToast();
+      form.reset();
+    },
+  };
 
-const updateUnitType = () => {
-    form.put(route('unit-types.update', selectedUnitType.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+  if (formMode.value === 'create') {
+    form.post(route('unit-types.store'), options);
+    return;
+  }
 
-const deleteUnitType = () => {
-    form.delete(route('unit-types.destroy', selectedUnitType.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-    });
-};
+  form.put(route('unit-types.update', selectedUnitType.value.id), options);
+}
 
-const closeModal = () => {
-    showCreateModal.value = false;
-    showEditModal.value = false;
-    showDeleteModal.value = false;
-    form.reset();
-};
+function openDeleteDialog(unitType) {
+  selectedUnitType.value = unitType;
+  showDeleteDialog.value = true;
+}
+
+function deleteUnitType() {
+  form.delete(route('unit-types.destroy', selectedUnitType.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showDeleteDialog.value = false;
+      selectedUnitType.value = null;
+      showToast();
+    },
+  });
+}
 </script>
 
 <template>
-    <Head title="UnitType"/>
+  <Head :title="t('admin.units.title')" />
 
-    <AuthenticatedLayout>
-        <template #breadcrumb>
-            Unit Types
+  <AuthenticatedLayout>
+    <template #breadcrumb>{{ t('admin.units.title') }}</template>
+
+    <div class="space-y-5 px-4">
+      <PageHeader :title="t('admin.units.title')" :description="t('admin.units.description')" :count="unitTypes.total">
+        <template #actions>
+          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.units.create') }}</AppButton>
         </template>
+      </PageHeader>
 
-        <div class="flex flex-wrap">
-            <div class="w-full px-4">
-                <CardTable
-                    indexRoute="unit-types.index"
-                    :paginatedData="unitTypes"
-                    :filters="filters"
-                    :tableHeads="tableHeads"
-                >
-                    <template #cardHeader>
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-2xl">Apply filters({{unitTypes.total}})</h4>
-                            <Button @click="createUnitTypeModal">Create UnitType</Button>
-                        </div>
-                    </template>
+      <FilterPanel>
+        <form class="ihc-filter-grid" @submit.prevent="applyFilters">
+          <AppInput v-model="filterForm.name" :label="t('common.name')" :placeholder="t('admin.units.search_placeholder')" />
+          <AppInput v-model="filterForm.symbol" :label="t('admin.fields.symbol')" :placeholder="t('admin.units.symbol_placeholder')" />
+          <div class="flex items-end gap-2">
+            <AppButton type="submit" icon="fa-filter" :loading="filterForm.processing">{{ t('actions.apply_filters') }}</AppButton>
+            <AppButton type="button" variant="secondary" icon="fa-eraser" @click="clearFilters">{{ t('actions.clear_filters') }}</AppButton>
+          </div>
+        </form>
+      </FilterPanel>
 
-                    <tr v-for="(unitType, index) in unitTypes.data" :key="unitType.id">
-                        <TableData>
-                            {{ (unitTypes.current_page * unitTypes.per_page) - (unitTypes.per_page - (index + 1)) }}
-                        </TableData>
-                        <TableData>{{ unitType.name }}</TableData>
-                        <TableData>{{ unitType.symbol }}</TableData>
-                        <TableData>
-                            <Button @click="editUnitTypeModal(unitType)">
-                                <i class="fa fa-edit"></i>
-                            </Button>
-                            <Button
-                                @click="deleteUnitTypeModal(unitType)"
-                                type="red"
-                            >
-                                <i class="fa fa-trash-alt"></i>
-                            </Button>
-                        </TableData>
-                    </tr>
-                </CardTable>
-            </div>
+      <section class="ihc-panel overflow-hidden">
+        <div v-if="items.length" class="hidden overflow-x-auto lg:block">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase">
+              <tr>
+                <th scope="col" class="px-4 py-3">{{ t('common.name') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.symbol') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('common.status') }}</th>
+                <th scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="unitType in items" :key="unitType.id">
+                <td class="px-4 py-3 font-black text-[var(--color-text-primary)]">{{ unitType.name }}</td>
+                <td class="px-4 py-3"><AppBadge variant="info">{{ unitType.symbol }}</AppBadge></td>
+                <td class="px-4 py-3"><AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge></td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-2">
+                    <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${unitType.name}`" @click="openEditModal(unitType)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
+                    <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${unitType.name}`" @click="openDeleteDialog(unitType)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!--Create data-->
-        <Modal
-            title="Create"
-            :show="showCreateModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="createUnitType"
-        >
-            <div>
-                <label for="name">Name</label>
-                <input
-                    id="name"
-                    ref="nameInput"
-                    v-model="form.name"
-                    @keyup.enter="createUnitType"
-                    type="text"
-                    placeholder="Enter name"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.name"/>
+        <div v-if="items.length" class="divide-y divide-[var(--color-border)] lg:hidden">
+          <article v-for="unitType in items" :key="unitType.id" class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h2 class="font-black text-[var(--color-text-primary)]">{{ unitType.name }}</h2>
+                <p class="app-ui-help">{{ t('admin.fields.symbol') }}: {{ unitType.symbol }}</p>
+              </div>
+              <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
-            <div class="mt-2">
-                <label for="symbol">Symbol</label>
-                <input
-                    id="symbol"
-                    v-model="form.symbol"
-                    @keyup.enter="createUnitType"
-                    type="text"
-                    placeholder="Enter symbol"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.symbol"/>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${unitType.name}`" @click="openEditModal(unitType)">{{ t('actions.edit') }}</AppButton>
+              <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${unitType.name}`" @click="openDeleteDialog(unitType)">{{ t('actions.delete') }}</AppButton>
             </div>
-        </Modal>
+          </article>
+        </div>
 
-        <!--Edit data-->
-        <Modal
-            title="Edit"
-            :show="showEditModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="updateUnitType"
-        >
-            <div>
-                <label for="name">Name</label>
-                <input
-                    id="name"
-                    ref="nameInput"
-                    v-model="form.name"
-                    @keyup.enter="updateUnitType"
-                    type="text"
-                    placeholder="Enter name"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.name"/>
-            </div>
-            <div class="mt-2">
-                <label for="symbol">Symbol</label>
-                <input
-                    id="symbol"
-                    v-model="form.symbol"
-                    @keyup.enter="updateUnitType"
-                    type="text"
-                    placeholder="Enter symbol"
-                    class="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full"
-                />
-                <InputError :message="form.errors.symbol"/>
-            </div>
-        </Modal>
+        <AppEmptyState v-if="!items.length" icon="fa-balance-scale" :title="t('admin.units.empty')" :description="t('admin.units.description')" />
+      </section>
 
-        <!--Delete data-->
-        <Modal
-            title="Delete"
-            :show="showDeleteModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="deleteUnitType"
-            maxWidth="sm"
-            submitButtonText="Yes, delete it!"
-        >
-            Are you sure you want to delete this unit type?
-        </Modal>
-    </AuthenticatedLayout>
+      <AppPagination :links="unitTypes.links" :label="t('pagination.label')" />
+    </div>
+
+    <AppModal :show="showFormModal" :title="title" size="md" :initial-focus="nameInput" @close="showFormModal = false">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <AppInput ref="nameInput" v-model="form.name" :label="t('common.name')" :placeholder="t('admin.units.search_placeholder')" :error="form.errors.name" required @keyup.enter="submitForm" />
+        <AppInput v-model="form.symbol" :label="t('admin.fields.symbol')" :placeholder="t('admin.units.symbol_placeholder')" :error="form.errors.symbol" required @keyup.enter="submitForm" />
+      </div>
+      <template #footer>
+        <AppButton variant="secondary" :disabled="form.processing" @click="showFormModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" :loading="form.processing" :loading-text="t('common.loading')" @click="submitForm">{{ t('admin.units.save') }}</AppButton>
+      </template>
+    </AppModal>
+
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      :title="t('admin.units.delete_title')"
+      :action="t('admin.units.delete_action', { name: selectedUnitType?.name || t('admin.units.title') })"
+      :consequence="t('admin.units.delete_consequence')"
+      :confirm-text="t('actions.delete')"
+      :cancel-text="t('actions.cancel')"
+      :loading="form.processing"
+      @cancel="showDeleteDialog = false"
+      @confirm="deleteUnitType"
+    />
+  </AuthenticatedLayout>
 </template>

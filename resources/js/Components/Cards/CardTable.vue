@@ -1,12 +1,16 @@
 <template>
-    <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
+    <div class="ihc-panel relative flex flex-col min-w-0 break-words w-full mb-4 overflow-hidden">
         <div class="rounded-t mb-3 px-4 py-3 border-0">
             <div class="flex flex-wrap items-center">
                 <div class="relative w-full px-4 max-w-full flex-grow flex-1">
 
                     <slot name="cardHeader"/>
 
-                    <div class="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+                    <details v-if="Object.keys(filters || {}).length" class="mt-5 rounded-md border border-slate-200 bg-slate-50 p-3">
+                      <summary class="cursor-pointer select-none text-sm font-semibold text-slate-700">
+                        <i class="fas fa-filter mr-2 text-emerald-600"></i>Filtros de búsqueda
+                      </summary>
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         <div
                             v-for="(filter, key, index) in filters" :key="index"
                             class="flex flex-col"
@@ -98,21 +102,22 @@
                             <div>
                                 <button
                                     @click="reset"
-                                    class="active:scale-95 rounded-lg bg-gray-200 px-8 py-2 font-medium text-gray-600 outline-none focus:ring hover:opacity-90">
-                                    Restablecer
+                                    class="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 outline-none hover:bg-slate-100 focus:ring">
+                                    <i class="fas fa-undo"></i>Limpiar
                                 </button>
                             </div>
                         </div>
                     </div>
+                    </details>
                 </div>
             </div>
         </div>
-        <div class="block w-full overflow-x-auto">
+        <div class="block w-full overflow-x-auto border-t border-slate-200">
             <!-- Projects table -->
             <table class="items-center w-full bg-transparent border-collapse">
                 <thead>
                 <tr>
-                    <TableHead v-for="(tableHead, index) in tableHeads" :key="index" v-html="tableHead"></TableHead>
+                    <TableHead v-for="(tableHead, index) in tableHeads" :key="index">{{ tableHead }}</TableHead>
                 </tr>
                 </thead>
                 <tbody>
@@ -138,14 +143,12 @@
     </div>
 </template>
 <script>
-import TableDropdown from "@/Components/Dropdowns/TableDropdown.vue";
 import throttle from 'lodash/throttle'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import Pagination from "@/Components/Pagination.vue";
 import TableHead from "@/Components/TableHead.vue";
 import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
 import emptyData from "@/assets/img/emptyData.png"
 import {usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
@@ -156,11 +159,9 @@ import '@vuepic/vue-datepicker/dist/main.css';
 export default {
     components: {
         AsyncVueSelect,
-        Button,
         TableData,
         TableHead,
         Pagination,
-        TableDropdown,
         Datepicker,
     },
     props: {
@@ -193,8 +194,7 @@ export default {
                     this.$inertia.get(route(this.indexRoute), pickBy(this.form), {
                         preserveState: true,
                         onError: (e) => {
-                            console.log(Object.values(e)[0])
-                            this.showErrorToast(Object.values(e)[0])
+                            this.showErrorToast(Object.values(e)[0] || 'No se pudieron aplicar los filtros.')
                         }
                     });
                 }

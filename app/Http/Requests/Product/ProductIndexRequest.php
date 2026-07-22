@@ -35,6 +35,7 @@ class ProductIndexRequest extends BaseIndexRequest
             ProductFiltersEnum::NAME->value                 => ["nullable", "max:255"],
             ProductFiltersEnum::PRODUCT_NUMBER->value       => ["nullable", "max:255"],
             ProductFiltersEnum::PRODUCT_CODE->value         => ["nullable", "max:255"],
+            ProductFiltersEnum::BARCODE->value              => ["nullable", "max:255"],
             ProductFiltersEnum::BUYING_PRICE->value         => ["nullable", "array", "min:2", "max:2"],
             ProductFiltersEnum::BUYING_PRICE->value . ".*"  => ["required", "numeric", "min:0"],
             ProductFiltersEnum::SELLING_PRICE->value        => ["nullable", "array", "min:2", "max:2"],

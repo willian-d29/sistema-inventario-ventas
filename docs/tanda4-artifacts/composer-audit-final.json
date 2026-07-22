@@ -1,0 +1,96 @@
+{
+    "advisories": {
+        "laravel/framework": [
+            {
+                "advisoryId": "PKSA-m5cs-t1y6-qpcs",
+                "packageName": "laravel/framework",
+                "affectedVersions": "<12.61.1|>=13.0.0,<13.12.0",
+                "title": "Laravel Framework: Temporary Signed URL Path Confusion",
+                "cve": null,
+                "link": "https://github.com/advisories/GHSA-crmm-hgp2-wgrp",
+                "reportedAt": "2026-06-17T13:54:13+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-crmm-hgp2-wgrp"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-3r5d-mb8f-1qw9",
+                "packageName": "laravel/framework",
+                "affectedVersions": "<12.60.0|>=13.0.0,<=13.9.0",
+                "title": "Laravel Framework: CRLF injection in default email rule ",
+                "cve": null,
+                "link": "https://github.com/advisories/GHSA-5vg9-5847-vvmq",
+                "reportedAt": "2026-06-17T13:53:44+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-5vg9-5847-vvmq"
+                    }
+                ],
+                "severity": "high"
+            },
+            {
+                "advisoryId": "PKSA-mdq4-51ck-6kdq",
+                "packageName": "laravel/framework",
+                "affectedVersions": ">=9.0.0,<10.0.0|>=10.0.0,<11.0.0|>=11.0.0,<12.0.0|>=12.0.0,<12.60.0|>=13.0.0,<13.10.0",
+                "title": "Laravel CRLF injection in default email rule",
+                "cve": "CVE-2026-48019",
+                "link": "https://github.com/laravel/framework/security/advisories/GHSA-5vg9-5847-vvmq",
+                "reportedAt": "2026-05-19T18:13:00+00:00",
+                "sources": [
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "laravel/framework/CVE-2026-48019.yaml"
+                    }
+                ],
+                "severity": null
+            }
+        ],
+        "phpunit/phpunit": [
+            {
+                "advisoryId": "PKSA-z3gr-8qht-p93v",
+                "packageName": "phpunit/phpunit",
+                "affectedVersions": ">=0,<8.5.52|>=9.0.0,<9.6.33|>=10.0.0,<10.5.62|>=11.0.0,<11.5.50|>=12.0.0,<12.5.8",
+                "title": "Unsafe Deserialization in PHPT Code Coverage Handling",
+                "cve": "CVE-2026-24765",
+                "link": "https://github.com/sebastianbergmann/phpunit/security/advisories/GHSA-vvj3-c3rp-c85p",
+                "reportedAt": "2026-01-27T05:21:14+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-vvj3-c3rp-c85p"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "phpunit/phpunit/CVE-2026-24765.yaml"
+                    }
+                ],
+                "severity": "high"
+            }
+        ],
+        "psy/psysh": [
+            {
+                "advisoryId": "PKSA-4s4z-t146-6123",
+                "packageName": "psy/psysh",
+                "affectedVersions": "<=0.11.22|>=0.12.0,<=0.12.18",
+                "title": "PsySH has Local Privilege Escalation via CWD .psysh.php auto-load",
+                "cve": "CVE-2026-25129",
+                "link": "https://github.com/advisories/GHSA-4486-gxhx-5mg7",
+                "reportedAt": "2026-01-30T21:28:44+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-4486-gxhx-5mg7"
+                    }
+                ],
+                "severity": "medium"
+            }
+        ]
+    },
+    "abandoned": [],
+    "filter": []
+}

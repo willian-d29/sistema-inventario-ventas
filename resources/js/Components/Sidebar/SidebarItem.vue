@@ -1,21 +1,21 @@
 <template>
-    <li class="items-center">
+    <li class="items-center mb-1">
         <Link
             :href="route(routeName)"
-            class="text-xs uppercase py-3 font-bold block"
+            class="flex min-h-11 items-center rounded-md px-3 py-2.5 text-sm font-semibold transition-colors"
             :class="[
                   route().current(routeName)
-                    ? 'text-emerald-500 hover:text-emerald-600'
-                    : 'text-blueGray-700 hover:text-blueGray-500',
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900',
                 ]"
         >
             <i
                 v-if="route().current(routeName)"
-                class="mr-2 text-sm opacity-75"
+                class="mr-3 w-5 text-center text-sm opacity-75"
                 :class="icon"
             ></i>
             <i v-else
-                class="mr-2 text-sm text-blueGray-300"
+                class="mr-3 w-5 text-center text-sm text-slate-400"
                 :class="icon"
             ></i>
 

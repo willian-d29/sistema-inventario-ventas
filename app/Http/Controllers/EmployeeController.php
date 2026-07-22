@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Hash;
-
 use App\Enums\Core\FilterFieldTypeEnum;
 use App\Enums\Core\SortOrderEnum;
 use App\Enums\Employee\EmployeeFiltersEnum;
@@ -13,13 +11,14 @@ use App\Helpers\BaseHelper;
 use App\Http\Requests\Employee\EmployeeCreateRequest;
 use App\Http\Requests\Employee\EmployeeIndexRequest;
 use App\Http\Requests\Employee\EmployeeUpdateRequest;
+use App\Models\User;
 use App\Services\EmployeeService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Inertia\Response;
-
 
 class EmployeeController extends Controller
 {
@@ -29,9 +28,10 @@ class EmployeeController extends Controller
 
     public function index(EmployeeIndexRequest $request)
     {
-        if ($request->inertia == "disabled"){
+        if ($request->inertia == 'disabled') {
             $query = $request->validated();
-            $query["sort_by"] = EmployeeSortFieldsEnum::NAME->value;
+            $query['sort_by'] = EmployeeSortFieldsEnum::NAME->value;
+
             return $this->service->getAll($query);
         }
 
@@ -39,130 +39,120 @@ class EmployeeController extends Controller
             component: 'Employee/Index',
             props: [
                 'employees' => $this->service->getAll($request->validated()),
-                'filters'   => [
-                    EmployeeFiltersEnum::NAME->value         => [
-                        'label'       => EmployeeFiltersEnum::NAME->label(),
+                'filters' => [
+                    EmployeeFiltersEnum::NAME->value => [
+                        'label' => EmployeeFiltersEnum::NAME->label(),
                         'placeholder' => 'Enter name.',
-                        'type'        => FilterFieldTypeEnum::STRING->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::NAME->value] ?? "",
+                        'type' => FilterFieldTypeEnum::STRING->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::NAME->value] ?? '',
                     ],
-                    EmployeeFiltersEnum::EMAIL->value        => [
-                        'label'       => EmployeeFiltersEnum::EMAIL->label(),
+                    EmployeeFiltersEnum::EMAIL->value => [
+                        'label' => EmployeeFiltersEnum::EMAIL->label(),
                         'placeholder' => 'Enter email.',
-                        'type'        => FilterFieldTypeEnum::STRING->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::EMAIL->value] ?? "",
+                        'type' => FilterFieldTypeEnum::STRING->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::EMAIL->value] ?? '',
                     ],
-                    EmployeeFiltersEnum::PHONE->value        => [
-                        'label'       => EmployeeFiltersEnum::PHONE->label(),
+                    EmployeeFiltersEnum::PHONE->value => [
+                        'label' => EmployeeFiltersEnum::PHONE->label(),
                         'placeholder' => 'Enter phone.',
-                        'type'        => FilterFieldTypeEnum::STRING->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::PHONE->value] ?? "",
+                        'type' => FilterFieldTypeEnum::STRING->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::PHONE->value] ?? '',
                     ],
-                    EmployeeFiltersEnum::NID->value          => [
-                        'label'       => EmployeeFiltersEnum::NID->label(),
+                    EmployeeFiltersEnum::NID->value => [
+                        'label' => EmployeeFiltersEnum::NID->label(),
                         'placeholder' => 'Enter NID.',
-                        'type'        => FilterFieldTypeEnum::STRING->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::NID->value] ?? "",
+                        'type' => FilterFieldTypeEnum::STRING->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::NID->value] ?? '',
                     ],
-                    EmployeeFiltersEnum::SALARY->value       => [
-                        'label'       => EmployeeFiltersEnum::SALARY->label(),
+                    EmployeeFiltersEnum::SALARY->value => [
+                        'label' => EmployeeFiltersEnum::SALARY->label(),
                         'placeholder' => 'Enter salary.',
-                        'type'        => FilterFieldTypeEnum::NUMBER_RANGE->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::SALARY->value] ?? "",
+                        'type' => FilterFieldTypeEnum::NUMBER_RANGE->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::SALARY->value] ?? '',
                     ],
                     EmployeeFiltersEnum::JOINING_DATE->value => [
-                        'label'       => EmployeeFiltersEnum::JOINING_DATE->label(),
+                        'label' => EmployeeFiltersEnum::JOINING_DATE->label(),
                         'placeholder' => 'Enter joining date.',
-                        'type'        => FilterFieldTypeEnum::DATE_RANGE->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::JOINING_DATE->value] ?? "",
+                        'type' => FilterFieldTypeEnum::DATE_RANGE->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::JOINING_DATE->value] ?? '',
                     ],
-                    "sort_by"                                => [
-                        'label'       => 'Sort By',
+                    'sort_by' => [
+                        'label' => 'Sort By',
                         'placeholder' => 'Select a sort field',
-                        'type'        => FilterFieldTypeEnum::SELECT_STATIC->value,
-                        'value'       => $request->validated()['sort_by'] ?? "",
-                        'options'     => BaseHelper::convertKeyValueToLabelValueArray(EmployeeSortFieldsEnum::choices()),
+                        'type' => FilterFieldTypeEnum::SELECT_STATIC->value,
+                        'value' => $request->validated()['sort_by'] ?? '',
+                        'options' => BaseHelper::convertKeyValueToLabelValueArray(EmployeeSortFieldsEnum::choices()),
                     ],
-                    "sort_order"                             => [
-                        'label'       => 'Sort order',
+                    'sort_order' => [
+                        'label' => 'Sort order',
                         'placeholder' => 'Select a sort order',
-                        'type'        => FilterFieldTypeEnum::SELECT_STATIC->value,
-                        'value'       => $request->validated()['sort_order'] ?? "",
-                        'options'     => BaseHelper::convertKeyValueToLabelValueArray(SortOrderEnum::choices()),
+                        'type' => FilterFieldTypeEnum::SELECT_STATIC->value,
+                        'value' => $request->validated()['sort_order'] ?? '',
+                        'options' => BaseHelper::convertKeyValueToLabelValueArray(SortOrderEnum::choices()),
                     ],
-                    EmployeeFiltersEnum::CREATED_AT->value   => [
-                        'label'       => EmployeeFiltersEnum::CREATED_AT->label(),
+                    EmployeeFiltersEnum::CREATED_AT->value => [
+                        'label' => EmployeeFiltersEnum::CREATED_AT->label(),
                         'placeholder' => 'Enter created at.',
-                        'type'        => FilterFieldTypeEnum::DATETIME_RANGE->value,
-                        'value'       => $request->validated()[EmployeeFiltersEnum::CREATED_AT->value] ?? "",
+                        'type' => FilterFieldTypeEnum::DATETIME_RANGE->value,
+                        'value' => $request->validated()[EmployeeFiltersEnum::CREATED_AT->value] ?? '',
                     ],
                 ],
             ]);
     }
 
-   
-public function store(EmployeeCreateRequest $request): RedirectResponse
-{
-    try {
-        $data = $request->validated();
+    public function store(EmployeeCreateRequest $request): RedirectResponse
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                $data = $request->validated();
+                $user = User::create([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'role' => 'cajero',
+                    'password' => Hash::make($data['password']),
+                ]);
 
-        // 1. Crear el usuario con rol vendedor
-        $user = \App\Models\User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-            'role' => 'vendedor',
-            'password' => Hash::make($data['password']),
-            'photo' => $data['photo'] ?? null,
-        ]);
+                $this->service->create($data + ['user_id' => $user->id]);
+            });
+            $flash = ['message' => __('messages.employees.created')];
+        } catch (Exception $e) {
+            Log::error('Employee creation failed!', ['exception' => $e]);
+            $flash = ['isSuccess' => false, 'message' => __('messages.employees.create_failed')];
+        }
 
-        // 2. Crear el empleado
-        $this->service->create(payload: $data);
-
-        $flash = [
-            "message" => 'Empleado y usuario creados correctamente.'
-        ];
-    } catch (Exception $e) {
-        $flash = [
-            "isSuccess" => false,
-            "message"   => "¡Falló la creación del empleado!",
-        ];
-
-        Log::error("Employee creation failed!", [
-            "message" => $e->getMessage(),
-            "traces"  => $e->getTrace()
-        ]);
+        return redirect()->route('employees.index')->with('flash', $flash);
     }
-
-    return redirect()
-        ->route('employees.index')
-        ->with('flash', $flash);
-}
 
     public function update(EmployeeUpdateRequest $request, $id): RedirectResponse
     {
         try {
-            $this->service->update(
-                id: $id,
-                payload: $request->validated()
-            );
+            DB::transaction(function () use ($request, $id) {
+                $employee = $this->service->findByIdOrFail($id);
+                $data = $request->validated();
+                $employee->user?->update(array_filter([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'password' => ! empty($data['password']) ? Hash::make($data['password']) : null,
+                ], fn ($value) => $value !== null));
+                $this->service->update($id, $data);
+            });
             $flash = [
-                "message" => 'Employee updated successfully.'
+                'message' => __('messages.employees.updated'),
             ];
         } catch (EmployeeNotFoundException $e) {
             $flash = [
-                "isSuccess" => false,
-                "message"   => $e->getMessage(),
+                'isSuccess' => false,
+                'message' => $e->getMessage(),
             ];
         } catch (Exception $e) {
             $flash = [
-                "isSuccess" => false,
-                "message"   => "Employee update failed!",
+                'isSuccess' => false,
+                'message' => __('messages.employees.update_failed'),
             ];
 
-            Log::error("Employee update failed!", [
-                "message" => $e->getMessage(),
-                "traces"  => $e->getTrace()
+            Log::error('Employee update failed!', [
+                'message' => $e->getMessage(),
+                'traces' => $e->getTrace(),
             ]);
         }
 
@@ -174,24 +164,29 @@ public function store(EmployeeCreateRequest $request): RedirectResponse
     public function destroy($id): RedirectResponse
     {
         try {
-            $this->service->delete(id: $id);
+            DB::transaction(function () use ($id) {
+                $employee = $this->service->findByIdOrFail($id);
+                $user = $employee->user;
+                $this->service->delete($id);
+                $user?->delete();
+            });
             $flash = [
-                "message" => 'Employee deleted successfully.'
+                'message' => __('messages.employees.deleted'),
             ];
         } catch (EmployeeNotFoundException $e) {
             $flash = [
-                "isSuccess" => false,
-                "message"   => $e->getMessage(),
+                'isSuccess' => false,
+                'message' => $e->getMessage(),
             ];
         } catch (Exception $e) {
             $flash = [
-                "isSuccess" => false,
-                "message"   => "Employee deletion failed!",
+                'isSuccess' => false,
+                'message' => __('messages.employees.delete_failed'),
             ];
 
-            Log::error("Employee deletion failed!", [
-                "message" => $e->getMessage(),
-                "traces"  => $e->getTrace()
+            Log::error('Employee deletion failed!', [
+                'message' => $e->getMessage(),
+                'traces' => $e->getTrace(),
             ]);
         }
 

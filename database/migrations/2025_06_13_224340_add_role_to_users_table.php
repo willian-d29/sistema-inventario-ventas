@@ -4,11 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'vendedor', 'cliente'])->default('cliente')->after('photo');
+            $table->enum('role', ['admin', 'cajero'])->default('cajero')->after('photo');
         });
     }
 

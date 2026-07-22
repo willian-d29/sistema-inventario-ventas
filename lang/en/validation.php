@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'accepted' => 'The :attribute field must be accepted.',
+    'array' => 'The :attribute field must be a valid list.',
+    'boolean' => 'The :attribute field must be true or false.',
+    'confirmed' => 'The :attribute confirmation does not match.',
+    'date' => 'The :attribute field must be a valid date.',
+    'email' => 'The :attribute field must be a valid email address.',
+    'exists' => 'The selected :attribute is invalid.',
+    'image' => 'The :attribute field must be an image.',
+    'in' => 'The selected :attribute is invalid.',
+    'integer' => 'The :attribute field must be an integer.',
+    'max' => [
+        'file' => 'The :attribute file must not be greater than :max kilobytes.',
+        'numeric' => 'The :attribute field must not be greater than :max.',
+        'string' => 'The :attribute field must not be greater than :max characters.',
+    ],
+    'min' => [
+        'numeric' => 'The :attribute field must be at least :min.',
+        'string' => 'The :attribute field must be at least :min characters.',
+    ],
+    'mimes' => 'The :attribute field must be a file of type: :values.',
+    'numeric' => 'The :attribute field must be numeric.',
+    'required' => 'The :attribute field is required.',
+    'required_if' => 'The :attribute field is required when :other is :value.',
+    'string' => 'The :attribute field must be a string.',
+    'unique' => 'The :attribute has already been taken.',
+    'url' => 'The :attribute field must be a valid URL.',
+    'custom' => [
+        'document_number' => [
+            'required_for_document' => 'Enter the document number.',
+            'dni_size' => 'The DNI must have exactly 8 digits.',
+            'ruc_size' => 'The RUC must have exactly 11 digits.',
+        ],
+    ],
+    'attributes' => [
+        'email' => 'email',
+        'password' => 'password',
+        'name' => 'name',
+        'amount' => 'amount',
+        'description' => 'description',
+        'document_number' => 'document number',
+        'document_type' => 'document type',
+        'payment_method' => 'payment method',
+        'opening_amount' => 'opening amount',
+        'closing_notes' => 'closing note',
+        'locale' => 'language',
+        'theme' => 'theme',
+    ],
+];

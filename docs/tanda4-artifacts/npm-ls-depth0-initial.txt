@@ -1,0 +1,27 @@
+sistema-inventario-ventas@ /Users/willan/Documents/sistema-inventario-ventas
+├── @fortawesome/fontawesome-free@5.15.3
+├── @heroicons/vue@2.2.0
+├── @inertiajs/progress@0.2.7
+├── @inertiajs/vue3@1.0.15
+├── @popperjs/core@2.9.1
+├── @tailwindcss/forms@0.5.7
+├── @vitejs/plugin-vue@5.0.4
+├── @vue/cli-plugin-babel@5.0.0-alpha.7
+├── @vue/server-renderer@3.4.21
+├── @vuepic/vue-datepicker@9.0.2
+├── autoprefixer@10.4.19
+├── axios@1.9.0
+├── chart.js@2.9.4
+├── core-js@3.9.1
+├── gulp-append-prepend@1.0.8
+├── gulp@4.0.2
+├── laravel-vite-plugin@1.0.2
+├── lodash@4.17.21
+├── notivue@2.4.4
+├── playwright@1.61.1
+├── postcss@8.5.5
+├── tailwindcss@3.4.3
+├── vite@5.4.19
+├── vue-select@4.0.0-beta.6
+└── vue@3.4.21
+

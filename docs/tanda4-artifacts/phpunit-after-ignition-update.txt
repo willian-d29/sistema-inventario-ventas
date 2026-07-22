@@ -1,0 +1,170 @@
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ login screen can be rendered                                         0.15s  
+  ✓ users can authenticate using the login screen                        0.03s  
+  ✓ users can not authenticate with invalid password                     0.22s  
+  ✓ users can logout                                                     0.04s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ email verification screen can be rendered                            0.03s  
+  ✓ email can be verified                                                0.02s  
+  ✓ email is not verified with invalid hash                              0.02s  
+
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ confirm password screen can be rendered                              0.02s  
+  ✓ password can be confirmed                                            0.02s  
+  ✓ password is not confirmed with invalid password                      0.22s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link screen can be rendered                           0.04s  
+  ✓ reset password link can be requested                                 0.03s  
+  ✓ reset password screen can be rendered                                0.02s  
+  ✓ password can be reset with valid token                               0.03s  
+
+   PASS  Tests\Feature\Auth\PasswordUpdateTest
+  ✓ password can be updated                                              0.02s  
+  ✓ correct password must be provided to update password                 0.02s  
+
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ public registration is disabled                                      0.02s  
+  ✓ new users cannot register publicly                                   0.02s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ it returns a successful response                                     0.02s  
+
+   PASS  Tests\Feature\LegacyCleanupTanda3Test
+  ✓ rutas principales cargan despues de la limpieza legacy               0.05s  
+  ✓ archivos legacy eliminados no tienen referencias ni imports activos  0.07s  
+  ✓ manifest de vite no incluye welcome ni assets demo eliminados        0.02s  
+  ✓ frontend no conserva storage ni patrones inseguros heredados         0.06s  
+  ✓ usuario global de inertia expone solo campos minimos                 0.02s  
+  ✓ cajero no recibe listas administrativas por inertia                  0.03s  
+  ✓ sidebar oficial y auth layout permanecen sin navegacion demo         0.02s  
+  ✓ cardtable queda justificado y sin html o dropdowns inseguros         0.02s  
+
+   PASS  Tests\Feature\PointOfSaleTest
+  ✓ a sale cannot be registered without an open cash register            0.02s  
+  ✓ a mixed payment sale updates inventory and creates an audit trail    0.03s  
+  ✓ the scanner adds a product by its exact barcode                      0.02s  
+  ✓ a non exact scan becomes a product search                            0.02s  
+  ✓ cashiers can only list their own sales through the backend           0.03s  
+  ✓ sale payments are stored in payments instead of legacy transactions  0.02s  
+  ✓ a sale note creates a sale with sequence, payments and stock moveme… 0.02s  
+  ✓ an invoice requires a customer with ruc                              0.02s  
+  ✓ sale notes support every configured non cash payment method with ('… 0.02s  
+  ✓ sale notes support every configured non cash payment method with ('… 0.02s  
+  ✓ sale notes support every configured non cash payment method with ('… 0.02s  
+  ✓ sale notes support every configured non cash payment method with ('… 0.02s  
+  ✓ a mixed payment sale can include cash and a digital method           0.02s  
+  ✓ sale validation rejects duplicate payment methods and more than two… 0.02s  
+  ✓ a discount sale stores discounted totals                             0.02s  
+  ✓ sale items store historical cost and gross profit                    0.02s  
+  ✓ general discount is allocated to sale items and reduces gross profi… 0.02s  
+  ✓ product without cost does not block sale and marks estimated cost    0.02s  
+  ✓ a sale can include multiple products and exact stock                 0.02s  
+  ✓ receipt and invoice use independent sequences and issue status pend… 0.02s  
+  ✓ receipt supports optional customers and invoice rejects non ruc cus… 0.02s  
+  ✓ customers can store dni and ruc and duplicate document numbers are…  0.02s  
+  ✓ customers can be searched quickly by dni ruc or name                 0.02s  
+  ✓ quick customer creation returns json and rejects duplicate document… 0.02s  
+  ✓ quick customer document validation enforces dni and ruc length       0.02s  
+  ✓ invoice accepts only customers with valid ruc documents              0.02s  
+  ✓ dashboard metrics use sales payments and sale items as the source    0.02s  
+  ✓ dashboard keeps gross profit separate from expenses and operating r… 0.02s  
+  ✓ dashboard excludes cancelled sales from income cost and gross profi… 0.02s  
+  ✓ sales report export uses sales costs profits and supports payment m… 0.02s  
+  ✓ reports page accepts product cashier payment and document filters    0.03s  
+  ✓ sales report pdf view shows income cost profit and margin            0.02s  
+  ✓ cash register cannot be opened twice by the same cashier             0.03s  
+  ✓ opening creates a cash movement and is not counted twice             0.03s  
+  ✓ mixed sale creates one cash movement per payment without duplicates  0.02s  
+  ✓ manual income withdrawal and adjustments change expected cash        0.03s  
+  ✓ withdrawal requires explicit confirmation                            0.03s  
+  ✓ cashier cannot withdraw more cash than available or create adjustme… 0.03s  
+  ✓ digital payments do not change physical cash expected                0.02s  
+  ✓ closing requires explicit confirmation                               0.02s  
+  ✓ closing a cash register includes cash sales but not digital sales    0.03s  
+  ✓ closing with differences requires notes and does not create a finan… 0.02s  
+  ✓ closing supports shortage and denomination validation                0.02s  
+  ✓ register cannot be closed twice and closed registers reject sales a… 0.02s  
+  ✓ admin review preserves cashier declared amounts                      0.02s  
+  ✓ cashier cannot access or close another cashier register but admin c… 0.02s  
+  ✓ cash register report detects payment and cash movement discrepancie… 0.02s  
+  ✓ expense only creates cash movement when paid from current register   0.02s  
+  ✓ stock failures and duplicate submits do not create invalid sales     0.02s  
+  ✓ failed sale creation rolls back sequence, stock and cart             0.02s  
+  ✓ legacy order and transaction urls redirect to the new sales domain   0.03s  
+  ✓ dashboard and main reports no longer import orders                   0.02s  
+  ✓ cashier permissions apply to sale detail, thermal and pdf documents  0.04s  
+  ✓ thermal reprint and pdf download are available for a completed sale  0.14s  
+  ✓ a new sale after a completed sale gets the next number               0.03s  
+  ✓ cash register has exactly one opening movement and ticket uses that… 0.03s  
+  ✓ cash register document permissions protect foreign boxes and admin…  0.13s  
+  ✓ movement document returns not found when it does not belong to the…  0.02s  
+  ✓ closing thermal is summarized and administrative pdf includes detai… 0.16s  
+  ✓ cash register timeline is paginated                                  0.03s  
+  ✓ cash reconciliation detects missing movement and missing payment     0.02s  
+  ✓ cash reconciliation filters by cashier and method                    0.02s  
+  ✓ cash documents keep internal message and movement impact texts       0.03s  
+  ✓ adjustment document shows related movement and administrator respon… 0.10s  
+  ✓ cash register documents do not expose another cashier information    0.02s  
+  ✓ admin can open and update business settings but cashier cannot       0.03s  
+  ✓ business settings validation rejects invalid timezone and paper wid… 0.02s  
+  ✓ business settings defaults are idempotent and do not overwrite exis… 0.02s  
+  ✓ valid logo is stored and replacing it removes previous logo safely   0.04s  
+  ✓ invalid logo files are rejected and deleting logo keeps text fallba… 0.03s  
+  ✓ sale documents use business settings, currency symbol and configure… 0.12s  
+  ✓ cash documents use central business settings and configured cash re… 0.02s  
+  ✓ sale post sale screen shows complete actions and respects confirmat… 0.03s  
+  ✓ print requests create original and reprint logs without logging doc… 0.02s  
+  ✓ cashier cannot request print for another cashier document and admin… 0.03s  
+  ✓ printer test is admin only, uses current settings and does not crea… 0.02s  
+  ✓ advanced sales history filters by customer document cashier method…  0.02s  
+  ✓ dashboard returns role specific data and cashier does not receive a… 0.02s  
+  ✓ cashier dashboard route is available but administrative routes rema… 0.02s  
+  ✓ navigation is centralized by role and does not expose legacy module… 0.02s  
+  ✓ pos and navigation include keyboard and accessibility affordances    0.02s  
+
+   PASS  Tests\Feature\ProfileTest
+  ✓ profile page is displayed                                            0.04s  
+  ✓ profile information can be updated                                   0.02s  
+  ✓ email verification status is unchanged when the email address is un… 0.02s  
+  ✓ user can delete their account                                        0.02s  
+  ✓ correct password must be provided to delete account                  0.02s  
+
+   PASS  Tests\Feature\UiComponentTanda2Test
+  ✓ paginacion no usa html inseguro                                      0.02s  
+  ✓ no quedan usos de v-html en frontend                                 0.03s  
+  ✓ enlaces target blank incluyen rel seguro                             0.03s  
+  ✓ componentes base declaran estados accesibles                         0.02s  
+  ✓ perfil conserva datos si falla validacion                            0.02s  
+  ✓ configuracion conserva datos si falla validacion                     0.02s  
+  ✓ producto muestra etiqueta nueva y no raiz                            0.02s  
+  ✓ cliente valida documento duplicado                                   0.02s  
+  ✓ proveedor conserva datos si falla validacion                         0.02s  
+  ✓ empleado respeta permisos de administrador                           0.02s  
+  ✓ gasto desde caja muestra validaciones cuando no hay caja abierta     0.02s  
+  ✓ tablas prioritarias usan patron comun y estados textuales            0.02s  
+  ✓ gastos pagina correctamente                                          0.03s  
+
+   PASS  Tests\Feature\UserPreferencesTest
+  ✓ preferences nullable no rompe usuarios existentes y aplica defaults  0.02s  
+  ✓ usuario actualiza sus preferencias personales                        0.02s  
+  ✓ usuario no modifica preferencias ajenas                              0.03s  
+  ✓ theme invalido es rechazado                                          0.03s  
+  ✓ font scale invalido es rechazado                                     0.02s  
+  ✓ claves desconocidas no se guardan                                    0.02s  
+  ✓ preferencias se comparten por inertia                                0.02s  
+  ✓ tema se restaura al iniciar sesion desde el html inicial             0.02s  
+  ✓ sidebar colapsado persiste                                           0.02s  
+  ✓ reduced motion alto contraste y tema accesible se aplican en el htm… 0.03s  
+  ✓ configuracion global del negocio no cambia al guardar preferencias   0.02s  
+  ✓ cajero puede cambiar sus preferencias personales                     0.02s  
+  ✓ pdf y termico no reciben tema oscuro de la app                       0.02s  
+
+  Tests:    140 passed (1490 assertions)
+  Duration: 4.54s
+

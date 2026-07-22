@@ -24,7 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'photo',
-        'role' 
+        'role',
     ];
 
     /**
@@ -45,9 +45,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'preferences' => 'array',
     ];
 
-    const PHOTO_PATH = "users";
+    const PHOTO_PATH = 'users';
+
+    public function cashRegisters()
+    {
+        return $this->hasMany(CashRegister::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class, 'cashier_id');
+    }
+
     protected function photo(): Attribute
     {
         return Attribute::make(

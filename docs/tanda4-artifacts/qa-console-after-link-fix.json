@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "label": "sales",
+      "status": 200,
+      "metrics": {
+        "title": "Ventas - LaraTory",
+        "scrollW": 1366,
+        "clientW": 1366,
+        "text": "LARATORY\n\nWILLAIN\n\nADMINISTRADOR\n\nOPERACIÓN\nDashboard\nPunto de venta\nVentas\nCaja\nClientes\nINVENTARIO\nProductos\nCategorías\nUnidades\nProveedores\nMovimientos de st"
+      }
+    },
+    {
+      "label": "products",
+      "status": 200,
+      "metrics": {
+        "title": "Productos - LaraTory",
+        "scrollW": 1366,
+        "clientW": 1366,
+        "text": "LARATORY\n\nWILLAIN\n\nADMINISTRADOR\n\nOPERACIÓN\nDashboard\nPunto de venta\nVentas\nCaja\nClientes\nINVENTARIO\nProductos\nCategorías\nUnidades\nProveedores\nMovimientos de st"
+      }
+    },
+    {
+      "label": "pos",
+      "status": 200,
+      "metrics": {
+        "title": "Punto de venta - LaraTory",
+        "scrollW": 1366,
+        "clientW": 1366,
+        "text": "LARATORY\n\nWILLAIN\n\nADMINISTRADOR\n\nOPERACIÓN\nDashboard\nPunto de venta\nVentas\nCaja\nClientes\nINVENTARIO\nProductos\nCategorías\nUnidades\nProveedores\nMovimientos de st"
+      }
+    }
+  ],
+  "errors": []
+}

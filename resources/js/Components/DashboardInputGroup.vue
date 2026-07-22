@@ -32,14 +32,16 @@ const keyupEnter = () => {
 </script>
 
 <template>
-    <label :for="name" class="text-stone-600 text-sm font-medium" v-html="label"></label>
+    <label :for="name" class="ihc-label">{{ label }}</label>
     <input
         :id="name"
         v-model="model"
         @keyup.enter="keyupEnter"
         :type="type"
         :placeholder="placeholder"
-        class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+        class="ihc-field"
+        :aria-invalid="errorMessage ? 'true' : 'false'"
+        :aria-describedby="errorMessage ? `${name}-error` : null"
     />
-    <InputError :message="errorMessage"/>
+    <InputError :id="`${name}-error`" :message="errorMessage"/>
 </template>

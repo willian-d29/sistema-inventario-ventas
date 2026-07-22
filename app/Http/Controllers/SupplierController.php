@@ -86,12 +86,12 @@ class SupplierController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Supplier created successfully.'
+                "message" => __('messages.suppliers.created'),
             ];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Supplier creation failed!",
+                "message"   => __('messages.suppliers.create_failed'),
             ];
 
             Log::error("Supplier creation failed!", [
@@ -113,7 +113,7 @@ class SupplierController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Supplier updated successfully.'
+                "message" => __('messages.suppliers.updated'),
             ];
         } catch (SupplierNotFoundException $e) {
             $flash = [
@@ -123,7 +123,7 @@ class SupplierController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Supplier update failed!",
+                "message"   => __('messages.suppliers.update_failed'),
             ];
 
             Log::error("Supplier update failed!", [
@@ -142,7 +142,7 @@ class SupplierController extends Controller
         try {
             $this->service->delete(id: $id);
             $flash = [
-                "message" => 'Supplier deleted successfully.'
+                "message" => __('messages.suppliers.deleted'),
             ];
         } catch (SupplierNotFoundException $e) {
             $flash = [
@@ -152,7 +152,7 @@ class SupplierController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Supplier deletion failed!",
+                "message"   => __('messages.suppliers.delete_failed'),
             ];
 
             Log::error("Supplier deletion failed!", [

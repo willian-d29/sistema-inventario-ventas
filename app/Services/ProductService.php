@@ -18,45 +18,37 @@ use Illuminate\Support\Str;
 class ProductService
 {
     public function __construct(
-        private readonly ProductRepository  $repository,
+        private readonly ProductRepository $repository,
         private readonly FileManagerService $fileManagerService
-    )
-    {
+    ) {
     }
 
-    /**
-     * @param array $queryParameters
-     * @return LengthAwarePaginator
-     */
     public function getAll(array $queryParameters): LengthAwarePaginator
     {
-        $page = $queryParameters["page"] ?? 1;
-        $perPage = BaseHelper::perPage($queryParameters["per_page"] ?? null);
+        $page = $queryParameters['page'] ?? 1;
+        $perPage = BaseHelper::perPage($queryParameters['per_page'] ?? null);
 
         return $this->repository->getAll(
             page: $page,
             perPage: $perPage,
             filters: ArrayHelper::getFiltersValues($queryParameters, ProductFiltersEnum::values()),
-            fields: $queryParameters["fields"] ?? [],
-            expand: $queryParameters["expand"] ?? [],
-            sortBy: $queryParameters["sort_by"] ?? ProductFieldsEnum::CREATED_AT->value,
-            sortOrder: $queryParameters["sort_order"] ?? SortOrderEnum::DESC->value,
+            fields: $queryParameters['fields'] ?? [],
+            expand: $queryParameters['expand'] ?? [],
+            sortBy: $queryParameters['sort_by'] ?? ProductFieldsEnum::CREATED_AT->value,
+            sortOrder: $queryParameters['sort_order'] ?? SortOrderEnum::DESC->value,
         );
     }
 
     /**
-     * @param int $id
-     * @param array $expands
-     * @return Product|null
      * @throws ProductNotFoundException
      */
     public function findByIdOrFail(int $id, array $expands = []): ?Product
     {
         $product = $this->repository->find([
-            ProductFiltersEnum::ID->value => $id
+            ProductFiltersEnum::ID->value => $id,
         ], $expands);
 
-        if (!$product) {
+        if (! $product) {
             throw new ProductNotFoundException('Product not found by the given id.');
         }
 
@@ -64,8 +56,6 @@ class ProductService
     }
 
     /**
-     * @param array $payload
-     * @return mixed
      * @throws DBCommitException
      */
     public function create(array $payload): mixed
@@ -76,29 +66,27 @@ class ProductService
         );
 
         $processPayload = [
-            ProductFieldsEnum::CATEGORY_ID->value    => $payload[ProductFieldsEnum::CATEGORY_ID->value],
-            ProductFieldsEnum::SUPPLIER_ID->value    => $payload[ProductFieldsEnum::SUPPLIER_ID->value],
-            ProductFieldsEnum::NAME->value           => $payload[ProductFieldsEnum::NAME->value],
-            ProductFieldsEnum::DESCRIPTION->value    => $payload[ProductFieldsEnum::DESCRIPTION->value],
-            ProductFieldsEnum::PRODUCT_NUMBER->value => 'P-' . Str::random(5),
-            ProductFieldsEnum::PRODUCT_CODE->value   => $payload[ProductFieldsEnum::PRODUCT_CODE->value],
-            ProductFieldsEnum::ROOT->value           => $payload[ProductFieldsEnum::ROOT->value],
-            ProductFieldsEnum::BUYING_PRICE->value   => $payload[ProductFieldsEnum::BUYING_PRICE->value],
-            ProductFieldsEnum::SELLING_PRICE->value  => $payload[ProductFieldsEnum::SELLING_PRICE->value],
-            ProductFieldsEnum::BUYING_DATE->value    => $payload[ProductFieldsEnum::BUYING_DATE->value],
-            ProductFieldsEnum::UNIT_TYPE_ID->value   => $payload[ProductFieldsEnum::UNIT_TYPE_ID->value],
-            ProductFieldsEnum::QUANTITY->value       => $payload[ProductFieldsEnum::QUANTITY->value],
-            ProductFieldsEnum::PHOTO->value          => $photo,
-            ProductFieldsEnum::STATUS->value         => $payload[ProductFieldsEnum::STATUS->value],
+            ProductFieldsEnum::CATEGORY_ID->value => $payload[ProductFieldsEnum::CATEGORY_ID->value],
+            ProductFieldsEnum::SUPPLIER_ID->value => $payload[ProductFieldsEnum::SUPPLIER_ID->value],
+            ProductFieldsEnum::NAME->value => $payload[ProductFieldsEnum::NAME->value],
+            ProductFieldsEnum::DESCRIPTION->value => $payload[ProductFieldsEnum::DESCRIPTION->value],
+            ProductFieldsEnum::PRODUCT_NUMBER->value => 'P-'.Str::random(5),
+            ProductFieldsEnum::PRODUCT_CODE->value => $payload[ProductFieldsEnum::PRODUCT_CODE->value],
+            ProductFieldsEnum::BARCODE->value => $payload[ProductFieldsEnum::BARCODE->value] ?? null,
+            ProductFieldsEnum::ROOT->value => $payload[ProductFieldsEnum::ROOT->value],
+            ProductFieldsEnum::BUYING_PRICE->value => $payload[ProductFieldsEnum::BUYING_PRICE->value],
+            ProductFieldsEnum::SELLING_PRICE->value => $payload[ProductFieldsEnum::SELLING_PRICE->value],
+            ProductFieldsEnum::BUYING_DATE->value => $payload[ProductFieldsEnum::BUYING_DATE->value],
+            ProductFieldsEnum::UNIT_TYPE_ID->value => $payload[ProductFieldsEnum::UNIT_TYPE_ID->value],
+            ProductFieldsEnum::QUANTITY->value => $payload[ProductFieldsEnum::QUANTITY->value],
+            ProductFieldsEnum::PHOTO->value => $photo,
+            ProductFieldsEnum::STATUS->value => $payload[ProductFieldsEnum::STATUS->value],
         ];
 
         return $this->repository->create($processPayload);
     }
 
     /**
-     * @param int $id
-     * @param array $payload
-     * @return Product
      * @throws ProductNotFoundException
      * @throws Exception
      */
@@ -116,27 +104,26 @@ class ProductService
         }
 
         $processPayload = [
-            ProductFieldsEnum::CATEGORY_ID->value   => $payload[ProductFieldsEnum::CATEGORY_ID->value] ?? $product->category_id,
-            ProductFieldsEnum::SUPPLIER_ID->value   => $payload[ProductFieldsEnum::SUPPLIER_ID->value] ?? $product->supplier_id,
-            ProductFieldsEnum::NAME->value          => $payload[ProductFieldsEnum::NAME->value] ?? $product->name,
-            ProductFieldsEnum::DESCRIPTION->value   => $payload[ProductFieldsEnum::DESCRIPTION->value] ?? $product->description,
-            ProductFieldsEnum::PRODUCT_CODE->value  => $payload[ProductFieldsEnum::PRODUCT_CODE->value] ?? $product->product_code,
-            ProductFieldsEnum::ROOT->value          => $payload[ProductFieldsEnum::ROOT->value] ?? $product->root,
-            ProductFieldsEnum::BUYING_PRICE->value  => $payload[ProductFieldsEnum::BUYING_PRICE->value] ?? $product->buying_price,
+            ProductFieldsEnum::CATEGORY_ID->value => $payload[ProductFieldsEnum::CATEGORY_ID->value] ?? $product->category_id,
+            ProductFieldsEnum::SUPPLIER_ID->value => $payload[ProductFieldsEnum::SUPPLIER_ID->value] ?? $product->supplier_id,
+            ProductFieldsEnum::NAME->value => $payload[ProductFieldsEnum::NAME->value] ?? $product->name,
+            ProductFieldsEnum::DESCRIPTION->value => $payload[ProductFieldsEnum::DESCRIPTION->value] ?? $product->description,
+            ProductFieldsEnum::PRODUCT_CODE->value => $payload[ProductFieldsEnum::PRODUCT_CODE->value] ?? $product->product_code,
+            ProductFieldsEnum::BARCODE->value => $payload[ProductFieldsEnum::BARCODE->value] ?? $product->barcode,
+            ProductFieldsEnum::ROOT->value => $payload[ProductFieldsEnum::ROOT->value] ?? $product->root,
+            ProductFieldsEnum::BUYING_PRICE->value => $payload[ProductFieldsEnum::BUYING_PRICE->value] ?? $product->buying_price,
             ProductFieldsEnum::SELLING_PRICE->value => $payload[ProductFieldsEnum::SELLING_PRICE->value] ?? $product->selling_price,
-            ProductFieldsEnum::BUYING_DATE->value   => $payload[ProductFieldsEnum::BUYING_DATE->value] ?? $product->buying_date,
-            ProductFieldsEnum::UNIT_TYPE_ID->value  => $payload[ProductFieldsEnum::UNIT_TYPE_ID->value] ?? $product->unit_type_id,
-            ProductFieldsEnum::QUANTITY->value      => $payload[ProductFieldsEnum::QUANTITY->value] ?? $product->quantity,
-            ProductFieldsEnum::PHOTO->value         => $photo,
-            ProductFieldsEnum::STATUS->value        => $payload[ProductFieldsEnum::STATUS->value] ?? $product->status,
+            ProductFieldsEnum::BUYING_DATE->value => $payload[ProductFieldsEnum::BUYING_DATE->value] ?? $product->buying_date,
+            ProductFieldsEnum::UNIT_TYPE_ID->value => $payload[ProductFieldsEnum::UNIT_TYPE_ID->value] ?? $product->unit_type_id,
+            ProductFieldsEnum::QUANTITY->value => $payload[ProductFieldsEnum::QUANTITY->value] ?? $product->quantity,
+            ProductFieldsEnum::PHOTO->value => $photo,
+            ProductFieldsEnum::STATUS->value => $payload[ProductFieldsEnum::STATUS->value] ?? $product->status,
         ];
 
         return $this->repository->update($product, $processPayload);
     }
 
     /**
-     * @param int $id
-     * @return bool|null
      * @throws ProductNotFoundException
      */
     public function delete(int $id): ?bool

@@ -13,7 +13,9 @@ class Transaction extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        "amount" => "double",
+        'amount' => 'decimal:2',
+        'received_amount' => 'decimal:2',
+        'change_amount' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

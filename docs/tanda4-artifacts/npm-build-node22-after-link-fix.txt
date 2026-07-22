@@ -1,0 +1,152 @@
+
+> build
+> vite build && vite build --ssr
+
+vite v5.4.21 building for production...
+transforming...
+
+warn - Your `content` configuration includes a pattern which looks like it's accidentally matching all of `node_modules` and can cause serious performance issues.
+warn - Pattern: `./**/*.js`
+warn - See our documentation for recommendations:
+warn - https://tailwindcss.com/docs/content-configuration#pattern-recommendations
+✓ 817 modules transformed.
+rendering chunks...
+computing gzip size...
+public/build/assets/default-image-C-yGWlgr.jpg                  1.96 kB
+public/build/assets/laratory-favicon-jwYhLsXC.png               6.06 kB
+public/build/assets/laratory-black-B27iwXqj.png                 8.84 kB
+public/build/assets/laratory-white-jDcOfVJj.png                 9.22 kB
+public/build/assets/fa-regular-400-CeL5tBMC.woff2              13.28 kB
+public/build/assets/fa-regular-400-ypGq6Ymr.woff               16.28 kB
+public/build/manifest.json                                     28.11 kB │ gzip:   2.85 kB
+public/build/assets/fa-regular-400-D6psiunw.ttf                33.74 kB
+public/build/assets/fa-regular-400-DC-0mCsK.eot                34.03 kB
+public/build/assets/emptyData-CcIuLVzj.png                     51.00 kB
+public/build/assets/register_bg_2-AH3mfCwx.png                 63.68 kB
+public/build/assets/fa-brands-400-CQ9wNAI5.woff2               76.76 kB
+public/build/assets/fa-solid-900-ClZaRJOS.woff2                78.20 kB
+public/build/assets/avatar-ODXnI4nQ.jpg                        79.61 kB
+public/build/assets/fa-brands-400-BrNqf9Ps.woff                90.06 kB
+public/build/assets/fa-solid-900-Ch--Nxnh.woff                101.65 kB
+public/build/assets/fa-brands-400-GzH33SHB.ttf                134.04 kB
+public/build/assets/fa-brands-400-D3wvMVi2.eot                134.35 kB
+public/build/assets/fa-regular-400-C6K8o2wy.svg               144.71 kB │ gzip:  36.98 kB
+public/build/assets/fa-solid-900-BttSODt4.ttf                 202.74 kB
+public/build/assets/fa-solid-900-Dqbwa24Z.eot                 203.03 kB
+public/build/assets/fa-brands-400-B2fI82dS.svg                747.55 kB │ gzip: 253.26 kB
+public/build/assets/fa-solid-900-BzItJ-zV.svg                 918.99 kB │ gzip: 254.77 kB
+public/build/assets/Pos-ClToIp6n.css                            0.24 kB │ gzip:   0.15 kB
+public/build/assets/AsyncVueSelect-C8JTMd0w.css                 7.44 kB │ gzip:   1.88 kB
+public/build/assets/CardTable-BNhod56V.css                     24.05 kB │ gzip:   4.52 kB
+public/build/assets/app-BVLjy2Yp.css                          180.68 kB │ gzip:  33.57 kB
+public/build/assets/default-image-CEsE-qlK.js                   0.07 kB │ gzip:   0.09 kB
+public/build/assets/_plugin-vue_export-helper-DlAUqK2U.js       0.09 kB │ gzip:   0.10 kB
+public/build/assets/InputError-CRS25bJR.js                      0.27 kB │ gzip:   0.23 kB
+public/build/assets/SubmitButton-BCu5X94a.js                    0.45 kB │ gzip:   0.30 kB
+public/build/assets/ApplicationLogo-NBwcufWD.js                 0.47 kB │ gzip:   0.32 kB
+public/build/assets/TextInput-CZSLqBS_.js                       0.76 kB │ gzip:   0.46 kB
+public/build/assets/AppEmptyState-CALntSFG.js                   0.81 kB │ gzip:   0.47 kB
+public/build/assets/Button-BzYbNjpq.js                          0.81 kB │ gzip:   0.38 kB
+public/build/assets/PageHeader-DRPZCngT.js                      1.02 kB │ gzip:   0.55 kB
+public/build/assets/Helper-39cXc3YI.js                          1.04 kB │ gzip:   0.62 kB
+public/build/assets/DashboardInputGroup-DWAhW63k.js             1.05 kB │ gzip:   0.58 kB
+public/build/assets/AppPagination-CpbSBJWl.js                   1.57 kB │ gzip:   0.80 kB
+public/build/assets/useAppearance-md2Xmbaj.js                   1.69 kB │ gzip:   0.74 kB
+public/build/assets/AuthLayout-DafLuxGx.js                      1.91 kB │ gzip:   1.03 kB
+public/build/assets/Index-b0V_xupy.js                           1.97 kB │ gzip:   1.01 kB
+public/build/assets/UpdateSettingsForm-BeRtIkrB.js              1.99 kB │ gzip:   1.04 kB
+public/build/assets/UpdatePasswordForm-CGBlEmmo.js              2.07 kB │ gzip:   0.91 kB
+public/build/assets/UpdateProfileInformationForm-BIA8gxiG.js    2.12 kB │ gzip:   1.13 kB
+public/build/assets/VerifyEmail-DuNO9bku.js                     2.21 kB │ gzip:   1.16 kB
+public/build/assets/ConfirmPassword-DRnjcMcX.js                 2.27 kB │ gzip:   1.10 kB
+public/build/assets/AppInput-BH6_5Fig.js                        2.41 kB │ gzip:   1.04 kB
+public/build/assets/AppButton-CNYQWqce.js                       2.54 kB │ gzip:   0.89 kB
+public/build/assets/ForgotPassword-DUTIr0qA.js                  2.84 kB │ gzip:   1.35 kB
+public/build/assets/DeleteUserForm-D5hPD6g5.js                  3.18 kB │ gzip:   1.43 kB
+public/build/assets/Edit-DBNRgSiN.js                            3.47 kB │ gzip:   1.72 kB
+public/build/assets/ResetPassword-CUI-X__k.js                   3.58 kB │ gzip:   1.23 kB
+public/build/assets/Modal-C1eeZ9Vo.js                           3.92 kB │ gzip:   1.65 kB
+public/build/assets/Index-_ctZwoS9.js                           4.23 kB │ gzip:   1.65 kB
+public/build/assets/Login-D8ZKUH_J.js                           4.49 kB │ gzip:   1.87 kB
+public/build/assets/Index-nKWKTt8M.js                           5.02 kB │ gzip:   1.70 kB
+public/build/assets/ConfirmDialog-DBmf3FuN.js                   5.06 kB │ gzip:   2.05 kB
+public/build/assets/Index-omyDjIBv.js                           5.15 kB │ gzip:   1.83 kB
+public/build/assets/Reconciliation-CWsYHMq0.js                  6.00 kB │ gzip:   2.12 kB
+public/build/assets/Index-CupZ54vh.js                           6.10 kB │ gzip:   2.34 kB
+public/build/assets/AppearancePanel-wzC-cpMd.js                 6.30 kB │ gzip:   2.45 kB
+public/build/assets/Create-wL5DHznd.js                          9.26 kB │ gzip:   2.71 kB
+public/build/assets/Edit-hLlHqDOJ.js                            9.66 kB │ gzip:   2.78 kB
+public/build/assets/Index-D6Acbdp8.js                          10.31 kB │ gzip:   2.80 kB
+public/build/assets/Index-DlDbEhSp.js                          10.92 kB │ gzip:   2.80 kB
+public/build/assets/Index-DBPFzfST.js                          11.26 kB │ gzip:   3.27 kB
+public/build/assets/AuthenticatedLayout-2PedkfNn.js            11.46 kB │ gzip:   3.91 kB
+public/build/assets/Index-DqSAvMXi.js                          11.72 kB │ gzip:   3.09 kB
+public/build/assets/Index-BcXn5PRt.js                          11.87 kB │ gzip:   3.97 kB
+public/build/assets/Index-B01MQDaP.js                          12.27 kB │ gzip:   3.70 kB
+public/build/assets/Show-CI83YOGL.js                           12.32 kB │ gzip:   4.31 kB
+public/build/assets/Dashboard-DPtOhwff.js                      12.75 kB │ gzip:   3.62 kB
+public/build/assets/Business-XwtX3UGo.js                       12.81 kB │ gzip:   3.65 kB
+public/build/assets/pickBy-o3GFjV5W.js                         18.24 kB │ gzip:   7.44 kB
+public/build/assets/AsyncVueSelect-DFUWelOL.js                 19.23 kB │ gzip:   6.44 kB
+public/build/assets/Index-C4F313aB.js                          21.94 kB │ gzip:   6.19 kB
+public/build/assets/Pos-CtKDEHfE.js                            30.28 kB │ gzip:   9.38 kB
+public/build/assets/CardTable-DpE9JazJ.js                     197.02 kB │ gzip:  56.77 kB
+public/build/assets/app-Bd7WTKBN.js                           274.69 kB │ gzip:  98.35 kB
+✓ built in 12.61s
+vite v5.4.21 building SSR bundle for production...
+transforming...
+✓ 86 modules transformed.
+rendering chunks...
+bootstrap/ssr/ssr-manifest.json                                 10.22 kB
+bootstrap/ssr/assets/default-image-BsTyGE_5.js                   0.10 kB
+bootstrap/ssr/assets/_plugin-vue_export-helper-1tPrXgE0.js       0.19 kB
+bootstrap/ssr/assets/InputError-C5ky-J1T.js                      0.85 kB
+bootstrap/ssr/assets/SubmitButton-BKWXZkU-.js                    1.20 kB
+bootstrap/ssr/assets/ApplicationLogo-Vd94dOm6.js                 1.27 kB
+bootstrap/ssr/assets/Helper-RvPYp0xJ.js                          1.74 kB
+bootstrap/ssr/assets/DashboardInputGroup-Dw3kSVgI.js             1.92 kB
+bootstrap/ssr/assets/Button-BCC_GhGI.js                          2.06 kB
+bootstrap/ssr/assets/TextInput--Bmh7Z3C.js                       2.19 kB
+bootstrap/ssr/assets/PageHeader-BFH0Qjce.js                      2.46 kB
+bootstrap/ssr/assets/useAppearance-pRk1YIzh.js                   2.92 kB
+bootstrap/ssr/assets/UpdatePasswordForm-DwWU0rj-.js              3.31 kB
+bootstrap/ssr/assets/UpdateSettingsForm-CXAqXZcM.js              3.56 kB
+bootstrap/ssr/assets/AsyncVueSelect-pWCig60f.js                  3.77 kB
+bootstrap/ssr/assets/UpdateProfileInformationForm-BO84IZje.js    3.89 kB
+bootstrap/ssr/assets/AppInput-pSkJ-oIj.js                        4.18 kB
+bootstrap/ssr/assets/AuthLayout-DoCNG4ui.js                      4.34 kB
+bootstrap/ssr/assets/AppPagination-DWNRpDBF.js                   5.65 kB
+bootstrap/ssr/assets/Modal-B3XCgt5v.js                           6.00 kB
+bootstrap/ssr/assets/AppButton-4jzf2dlS.js                       6.57 kB
+bootstrap/ssr/assets/Edit-BjUBdmJ4.js                            6.93 kB
+bootstrap/ssr/assets/VerifyEmail-B-vhYO-V.js                     7.42 kB
+bootstrap/ssr/assets/ConfirmPassword-CB4qqukI.js                 7.66 kB
+bootstrap/ssr/assets/AppearancePanel-CHy1BPGt.js                 8.48 kB
+bootstrap/ssr/assets/DeleteUserForm-Ce0Do3mn.js                  9.45 kB
+bootstrap/ssr/assets/ForgotPassword-DdvuwLza.js                 10.75 kB
+bootstrap/ssr/assets/ConfirmDialog-DlKGgvIX.js                  12.27 kB
+bootstrap/ssr/assets/ResetPassword-BUc97eID.js                  12.75 kB
+bootstrap/ssr/assets/Index-C6JPNvYX.js                          13.38 kB
+bootstrap/ssr/assets/CardTable-DmPXXd9e.js                      14.48 kB
+bootstrap/ssr/assets/Login-DPEaTwxr.js                          15.73 kB
+bootstrap/ssr/assets/AuthenticatedLayout-Bjzkhsti.js            19.04 kB
+bootstrap/ssr/assets/Reconciliation-MkR5mqnO.js                 19.70 kB
+bootstrap/ssr/assets/Index-CcY92NZo.js                          25.19 kB
+bootstrap/ssr/ssr.js                                            25.89 kB
+bootstrap/ssr/assets/Index-BKIegYVF.js                          27.19 kB
+bootstrap/ssr/assets/Index-CbhHu052.js                          30.47 kB
+bootstrap/ssr/assets/Create-CrhrRRVu.js                         32.38 kB
+bootstrap/ssr/assets/Edit-COyH8__6.js                           32.68 kB
+bootstrap/ssr/assets/Index-CMJnlXUX.js                          32.82 kB
+bootstrap/ssr/assets/Index-o9O6d21T.js                          33.11 kB
+bootstrap/ssr/assets/Show-D5sMif_t.js                           40.75 kB
+bootstrap/ssr/assets/Index-BsH7jJuL.js                          42.65 kB
+bootstrap/ssr/assets/Business-qz8x4bLE.js                       44.76 kB
+bootstrap/ssr/assets/Dashboard-DcUlz65y.js                      47.13 kB
+bootstrap/ssr/assets/Index-DniAVLvy.js                          53.86 kB
+bootstrap/ssr/assets/Index--bW9kQrK.js                          63.62 kB
+bootstrap/ssr/assets/Index-Dqi6cUu0.js                          70.07 kB
+bootstrap/ssr/assets/Index-Z9Z258HB.js                          73.59 kB
+bootstrap/ssr/assets/Index-DWKbqldC.js                          89.69 kB
+bootstrap/ssr/assets/Pos-zqDxfvnA.js                           100.88 kB
+✓ built in 567ms

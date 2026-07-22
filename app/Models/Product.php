@@ -14,12 +14,12 @@ class Product extends Model
 
     protected $guarded = ['id'];
 
-    const PHOTO_PATH = "products";
+    const PHOTO_PATH = 'products';
 
     protected $casts = [
-        "buying_price"  => "double",
-        "selling_price" => "double",
-        "quantity"      => "double",
+        'buying_price' => 'double',
+        'selling_price' => 'double',
+        'quantity' => 'double',
     ];
 
     protected function photo(): Attribute
@@ -45,5 +45,10 @@ class Product extends Model
     public function unitType(): BelongsTo
     {
         return $this->belongsTo(UnitType::class, 'unit_type_id');
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
     }
 }

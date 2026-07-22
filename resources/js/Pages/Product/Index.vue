@@ -1,172 +1,368 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
-import CardTable from "@/Components/Cards/CardTable.vue";
-import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
-import Modal from "@/Components/Modal.vue";
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { numberFormat, showToast, truncateString } from "@/Utils/Helper.js";
-import default_image from "@/assets/img/default-image.jpg";
+import AppBadge from '@/Components/UI/AppBadge.vue';
+import AppButton from '@/Components/UI/AppButton.vue';
+import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
+import AppInput from '@/Components/UI/AppInput.vue';
+import AppPagination from '@/Components/UI/AppPagination.vue';
+import AppSelect from '@/Components/UI/AppSelect.vue';
+import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import FilterPanel from '@/Components/UI/FilterPanel.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import StatCard from '@/Components/UI/StatCard.vue';
+import { useI18n } from '@/Composables/useI18n.js';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { cleanQuery, numberFormat, showToast, truncateString } from '@/Utils/Helper.js';
 
-
-defineProps({
-  filters:  { type: Object },
-  products: { type: Object },
+const props = defineProps({
+  filters: { type: Object, default: () => ({}) },
+  products: { type: Object, required: true },
+  categoryOptions: { type: Array, default: () => [] },
+  canManageProducts: { type: Boolean, default: false },
 });
 
 const selectedProduct = ref(null);
-const showDeleteModal  = ref(false);
+const showDeleteDialog = ref(false);
+const filterProcessing = ref(false);
+const deleteForm = useForm({});
+const { t } = useI18n();
 
-// Encabezados de tabla en español
-const tableHeads = ref([
-  '#',
-  'Nombre',
-  'Número de producto',
-  'Código de producto',
-  'Categoría',
-  'Proveedor',
-  'Cantidad',
-  'Estado',
-  'Acción',
+const stockRangeByStatus = {
+  available: [10, 999999999],
+  low: [1, 9],
+  out: [0, 0],
+};
+
+function filterValue(key, fallback = '') {
+  return props.filters?.[key]?.value ?? fallback;
+}
+
+function resolveStockStatus(value) {
+  const range = Array.isArray(value) ? value.map((item) => Number(item)) : [];
+  if (range[0] === 10) return 'available';
+  if (range[0] === 1 && range[1] === 9) return 'low';
+  if (range[0] === 0 && range[1] === 0) return 'out';
+
+  return '';
+}
+
+const filterForm = useForm({
+  keyword: filterValue('keyword'),
+  barcode: filterValue('barcode'),
+  category_id: filterValue('category_id'),
+  status: filterValue('status'),
+  stock_status: resolveStockStatus(filterValue('quantities', [])),
+});
+
+const statusOptions = computed(() => [
+  { value: 'active', label: t('states.active') },
+  { value: 'inactive', label: t('states.inactive') },
 ]);
 
-const form = useForm({});
+const stockOptions = computed(() => [
+  { value: 'available', label: t('products.available') },
+  { value: 'low', label: t('products.low_stock') },
+  { value: 'out', label: t('products.out_of_stock') },
+]);
+
+function stockState(product) {
+  const quantity = Number(product.quantity || 0);
+  if (quantity <= 0) return { label: t('common.exhausted'), variant: 'danger', icon: 'fa-circle-xmark' };
+  if (quantity < 10) return { label: t('common.low_stock'), variant: 'warning', icon: 'fa-triangle-exclamation' };
+  return { label: t('common.available'), variant: 'success', icon: 'fa-check-circle' };
+}
+
+function statusState(product) {
+  return product.status === 'active'
+    ? { label: t('states.active'), variant: 'success', icon: 'fa-check-circle' }
+    : { label: t('states.inactive'), variant: 'danger', icon: 'fa-ban' };
+}
 
 function deleteProductModal(product) {
   selectedProduct.value = product;
-  showDeleteModal.value = true;
+  showDeleteDialog.value = true;
 }
 
-function deleteProduct() {
-  form.delete(route('products.destroy', selectedProduct.value.id), {
+function applyFilters() {
+  const payload = filterForm.data();
+  const stockStatus = payload.stock_status;
+
+  delete payload.stock_status;
+
+  if (stockStatus && stockRangeByStatus[stockStatus]) {
+    payload.quantities = stockRangeByStatus[stockStatus];
+  }
+
+  router.get(route('products.index'), cleanQuery(payload), {
     preserveScroll: true,
-    onSuccess: () => { closeModal(); showToast(); },
+    preserveState: true,
+    replace: true,
+    onStart: () => {
+      filterProcessing.value = true;
+    },
+    onFinish: () => {
+      filterProcessing.value = false;
+    },
   });
 }
 
-function closeModal() {
-  showDeleteModal.value = false;
-  form.reset();
+function clearFilters() {
+  filterForm.keyword = '';
+  filterForm.barcode = '';
+  filterForm.category_id = '';
+  filterForm.status = '';
+  filterForm.stock_status = '';
+  applyFilters();
 }
+
+function deleteProduct() {
+  deleteForm.delete(route('products.destroy', selectedProduct.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showDeleteDialog.value = false;
+      selectedProduct.value = null;
+      showToast();
+    },
+  });
+}
+
+const hasProducts = computed(() => props.products?.data?.length > 0);
+const visibleProducts = computed(() => props.products?.data || []);
+const summary = computed(() => {
+  const items = visibleProducts.value;
+
+  return {
+    total: props.products?.total || items.length,
+    available: items.filter((product) => Number(product.quantity || 0) >= 10).length,
+    lowStock: items.filter((product) => Number(product.quantity || 0) > 0 && Number(product.quantity || 0) < 10).length,
+    outOfStock: items.filter((product) => Number(product.quantity || 0) <= 0).length,
+    withoutCost: props.canManageProducts ? items.filter((product) => Number(product.buying_price || 0) <= 0).length : 0,
+  };
+});
+
+const activeFilterCount = computed(() => [
+  filterForm.keyword,
+  filterForm.barcode,
+  filterForm.category_id,
+  filterForm.status,
+  filterForm.stock_status,
+].filter(Boolean).length);
 </script>
 
 <template>
-  <Head title="Productos" />
+  <Head :title="t('products.title')" />
 
   <AuthenticatedLayout>
-    <template #breadcrumb>
-      Productos
-    </template>
+    <template #breadcrumb>{{ t('products.title') }}</template>
 
-    <div class="flex flex-wrap">
-      <div class="w-full px-4">
-        <CardTable
-          indexRoute="products.index"
-          :paginatedData="products"
-          :filters="filters"
-          :tableHeads="tableHeads"
-        >
-          <template #cardHeader>
-            <div class="flex justify-between items-center">
-              <h4 class="text-2xl">
-                Aplicar filtros ({{ products.total }})
-              </h4>
-              <Button
-                :href="route('products.create')"
-                buttonType="link"
-              >
-                Crear producto
-              </Button>
-            </div>
-          </template>
+    <div class="space-y-5">
+      <PageHeader
+        :title="t('products.title')"
+        :description="t('products.description')"
+        :count="products.total"
+      >
+        <template v-if="canManageProducts" #actions>
+          <AppButton :href="route('products.create')" icon="fa-plus">{{ t('actions.new_product') }}</AppButton>
+        </template>
+      </PageHeader>
 
-          <tr
-            v-for="(product, index) in products.data"
-            :key="product.id"
-          >
-            <TableData>
-              {{ (products.current_page - 1) * products.per_page + index + 1 }}
-            </TableData>
-            <TableData class="flex items-center" :title="product.name">
-              
-
-              <span class="font-bold">
-                {{ truncateString(product.name, 15) }}
-              </span>
-            </TableData>
-            <TableData>{{ product.product_number }}</TableData>
-            <TableData>{{ product.product_code }}</TableData>
-            <TableData :title="product.category.name">
-              {{ truncateString(product.category.name) }}
-            </TableData>
-            <TableData :title="product.supplier?.name">
-              {{ truncateString(product.supplier?.name ?? '-') }}
-            </TableData>
-            <TableData>
-              {{ numberFormat(product.quantity) }}
-              {{ product.unit_type?.symbol }}
-              <span
-                v-if="product.quantity > 0 && product.quantity < 10"
-                class="text-xs font-semibold inline-block py-1 px-2 rounded text-amber-600 bg-amber-200"
-              >
-                Poco stock
-              </span>
-              <span
-                v-if="product.quantity < 1"
-                class="text-xs font-semibold inline-block py-1 px-2 rounded text-red-600 bg-red-200"
-              >
-                Sin stock
-              </span>
-            </TableData>
-            <TableData>
-              <span
-                v-if="product.status === 'active'"
-                class="text-xs font-semibold inline-block py-1 px-2 rounded text-emerald-600 bg-emerald-200"
-              >
-                Activo
-              </span>
-              <span
-                v-else
-                class="text-xs font-semibold inline-block py-1 px-2 rounded text-red-600 bg-red-200"
-              >
-                Inactivo
-              </span>
-            </TableData>
-            <TableData>
-              <Button
-                :href="route('products.edit', product.id)"
-                buttonType="link"
-                preserveScroll
-                class="mr-2"
-              >
-                <i class="fa fa-edit"></i>
-              </Button>
-              <Button
-                @click="deleteProductModal(product)"
-                type="red"
-              >
-                <i class="fa fa-trash-alt"></i>
-              </Button>
-            </TableData>
-          </tr>
-        </CardTable>
+      <div class="grid gap-3 sm:grid-cols-2" :class="canManageProducts ? 'xl:grid-cols-5' : 'xl:grid-cols-4'">
+        <StatCard :title="t('products.total')" :value="summary.total" icon="fa-boxes" variant="info" />
+        <StatCard :title="t('products.available')" :value="summary.available" icon="fa-check-circle" variant="success" />
+        <StatCard :title="t('products.low_stock')" :value="summary.lowStock" icon="fa-triangle-exclamation" variant="warning" />
+        <StatCard :title="t('products.out_of_stock')" :value="summary.outOfStock" icon="fa-circle-xmark" variant="danger" />
+        <StatCard v-if="canManageProducts" :title="t('products.without_cost')" :value="summary.withoutCost" icon="fa-tag" variant="analytics" />
       </div>
+
+      <FilterPanel>
+        <form class="contents" @submit.prevent="applyFilters">
+          <div class="sm:col-span-2 xl:col-span-2">
+            <AppInput
+              v-model="filterForm.keyword"
+              :label="t('products.filter_search')"
+              :placeholder="t('products.search_placeholder')"
+              autocomplete="off"
+            />
+          </div>
+          <AppInput
+            v-model="filterForm.barcode"
+            :label="t('common.barcode')"
+            :placeholder="t('products.barcode_placeholder')"
+            autocomplete="off"
+            inputmode="numeric"
+          />
+          <AppSelect
+            v-model="filterForm.category_id"
+            :label="t('common.category')"
+            :placeholder="t('products.all_categories')"
+            :options="categoryOptions"
+          />
+          <AppSelect
+            v-model="filterForm.stock_status"
+            :label="t('products.stock_filter')"
+            :placeholder="t('products.all_stock')"
+            :options="stockOptions"
+          />
+          <AppSelect
+            v-model="filterForm.status"
+            :label="t('common.status')"
+            :placeholder="t('common.all')"
+            :options="statusOptions"
+          />
+          <div class="flex items-end gap-2 sm:col-span-2 xl:col-span-2">
+            <AppButton class="is-nowrap" type="submit" icon="fa-filter" :loading="filterProcessing">{{ t('actions.apply_filters') }}</AppButton>
+            <AppButton class="is-nowrap" type="button" variant="secondary" icon="fa-eraser" @click="clearFilters">{{ t('actions.clear_filters') }}</AppButton>
+          </div>
+          <div class="flex items-end sm:col-span-2 xl:col-span-4">
+            <span class="app-ui-help">
+              {{ t('products.results_summary', { count: products.total, active: activeFilterCount }) }}
+            </span>
+          </div>
+        </form>
+      </FilterPanel>
+
+      <section class="product-inventory-shell overflow-hidden">
+        <div class="hidden overflow-x-auto xl:block">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase">
+              <tr>
+                <th scope="col" class="px-4 py-3">{{ t('products.table_product') }}</th>
+                <th scope="col" class="px-3 py-3">{{ t('products.code_barcode') }}</th>
+                <th scope="col" class="px-3 py-3">{{ t('common.category') }}</th>
+                <th scope="col" class="px-3 py-3">Stock</th>
+                <th v-if="canManageProducts" scope="col" class="px-3 py-3 text-right">{{ t('common.cost') }}</th>
+                <th scope="col" class="px-3 py-3 text-right">{{ t('common.price') }}</th>
+                <th scope="col" class="px-3 py-3">{{ t('common.status') }}</th>
+                <th v-if="canManageProducts" scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="product in visibleProducts" :key="product.id">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="product-thumb">
+                      <img v-if="product.photo" :src="product.photo" :alt="product.name" />
+                      <i v-else class="fas fa-box-open" aria-hidden="true"></i>
+                    </div>
+                    <div class="min-w-0">
+                      <strong class="block truncate text-[var(--color-text-primary)]">{{ product.name }}</strong>
+                      <span class="app-ui-help">{{ t('products.supplier') }}: {{ product.supplier?.name || '-' }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3">
+                  <span class="block font-semibold">{{ product.product_code || product.product_number || '-' }}</span>
+                  <span class="app-ui-help">{{ product.barcode || t('products.no_barcode') }}</span>
+                </td>
+                <td class="px-3 py-3">{{ product.category?.name || '-' }}</td>
+                <td class="px-3 py-3">
+                  <span class="block font-black">{{ numberFormat(product.quantity) }} {{ product.unit_type?.symbol }}</span>
+                  <AppBadge :variant="stockState(product).variant" :icon="stockState(product).icon">
+                    {{ stockState(product).label }}
+                  </AppBadge>
+                </td>
+                <td v-if="canManageProducts" class="px-3 py-3 text-right">S/ {{ numberFormat(product.buying_price || 0) }}</td>
+                <td class="px-3 py-3 text-right font-black">S/ {{ numberFormat(product.selling_price || 0) }}</td>
+                <td class="px-3 py-3">
+                  <AppBadge :variant="statusState(product).variant" :icon="statusState(product).icon">
+                    {{ statusState(product).label }}
+                  </AppBadge>
+                </td>
+                <td v-if="canManageProducts" class="px-4 py-3 text-right">
+                  <div class="flex justify-end gap-2">
+                    <AppButton
+                      :href="route('products.edit', product.id)"
+                      class="h-9 w-9 px-0"
+                      variant="success"
+                      size="sm"
+                      icon="fa-pencil-alt"
+                      :aria-label="`${t('actions.edit')} ${product.name}`"
+                      :title="t('actions.edit')"
+                    >
+                      <span class="sr-only">{{ t('actions.edit') }}</span>
+                    </AppButton>
+                    <AppButton
+                      class="h-9 w-9 px-0"
+                      variant="danger"
+                      size="sm"
+                      icon="fa-trash-alt"
+                      :aria-label="`${t('actions.delete')} ${product.name}`"
+                      :title="t('actions.delete')"
+                      @click="deleteProductModal(product)"
+                    >
+                      <span class="sr-only">{{ t('actions.delete') }}</span>
+                    </AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="divide-y divide-[var(--color-border)] xl:hidden">
+          <article v-for="product in visibleProducts" :key="product.id" class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex min-w-0 gap-3">
+                <div class="product-thumb">
+                  <img v-if="product.photo" :src="product.photo" :alt="product.name" />
+                  <i v-else class="fas fa-box-open" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0">
+                  <h2 class="truncate font-black text-[var(--color-text-primary)]">{{ product.name }}</h2>
+                  <p class="app-ui-help">{{ product.product_code || product.product_number || '-' }} · {{ product.barcode || t('products.no_barcode') }}</p>
+                </div>
+              </div>
+              <strong class="shrink-0">S/ {{ numberFormat(product.selling_price || 0) }}</strong>
+            </div>
+            <div class="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+              <p>
+                <span class="app-ui-help">{{ t('common.category') }}</span>
+                <span class="block font-semibold text-[var(--color-text-secondary)]">{{ truncateString(product.category?.name || t('products.no_category'), 32) }}</span>
+              </p>
+              <p v-if="canManageProducts">
+                <span class="app-ui-help">{{ t('common.cost') }}</span>
+                <span class="block font-semibold text-[var(--color-text-secondary)]">S/ {{ numberFormat(product.buying_price || 0) }}</span>
+              </p>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <AppBadge :variant="stockState(product).variant" :icon="stockState(product).icon">
+                {{ stockState(product).label }} · {{ numberFormat(product.quantity) }} {{ product.unit_type?.symbol }}
+              </AppBadge>
+              <AppBadge :variant="statusState(product).variant" :icon="statusState(product).icon">
+                {{ statusState(product).label }}
+              </AppBadge>
+            </div>
+            <div v-if="canManageProducts" class="mt-3 flex flex-wrap gap-2">
+              <AppButton :href="route('products.edit', product.id)" variant="success" size="sm" icon="fa-pencil-alt">{{ t('actions.edit') }}</AppButton>
+              <AppButton variant="danger" size="sm" icon="fa-trash-alt" @click="deleteProductModal(product)">{{ t('actions.delete') }}</AppButton>
+            </div>
+          </article>
+        </div>
+
+        <AppEmptyState
+          v-if="!hasProducts"
+          :title="t('empty.no_products')"
+          :description="t('products.create_first')"
+          icon="fa-box"
+          :action-label="canManageProducts ? t('actions.new_product') : null"
+          :action-href="canManageProducts ? route('products.create') : null"
+        />
+      </section>
+
+      <AppPagination :links="products.links" :label="t('pagination.label')" />
     </div>
 
-    <!-- Modal: Eliminar producto -->
-    <Modal
-      title="Eliminar producto"
-      cancelButtonText="Cancelar"
-      submitButtonText="¡Sí, eliminar!"
-      :show="showDeleteModal"
-      :formProcessing="form.processing"
-      @close="closeModal"
-      @submitAction="deleteProduct"
-      maxWidth="sm"
-    >
-      ¿Está seguro de que desea eliminar este producto?
-    </Modal>
+    <ConfirmDialog
+      v-if="canManageProducts"
+      :show="showDeleteDialog"
+      :title="t('products.delete_title')"
+      :action="t('products.delete_action', { name: selectedProduct?.name || t('products.title') })"
+      :consequence="t('products.delete_consequence')"
+      :confirm-text="t('products.confirm_delete')"
+      :loading="deleteForm.processing"
+      @cancel="showDeleteDialog = false"
+      @confirm="deleteProduct"
+    />
   </AuthenticatedLayout>
 </template>

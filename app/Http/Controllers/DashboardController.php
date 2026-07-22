@@ -17,10 +17,7 @@ class DashboardController extends Controller
 
         return Inertia::render(
             component: 'Dashboard',
-            props: [
-                ...$this->service->getData($date),
-                "date" => $date ?? date("Y") . '-' . date("m"),
-            ]
+            props: $this->service->getForUser(request()->user(), $date)
         );
     }
 }

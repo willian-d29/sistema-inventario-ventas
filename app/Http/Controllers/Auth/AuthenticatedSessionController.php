@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,39 +19,33 @@ class AuthenticatedSessionController extends Controller
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [
-            'pageTitle'        => "Log in",
+            'pageTitle' => 'Log in',
             'canResetPassword' => Route::has('password.request'),
-            'canRegister'      => Route::has('register'),
-            'status'           => session('status'),
+            'canRegister' => Route::has('register'),
+            'status' => session('status'),
         ]);
     }
 
     /**
      * Handle an incoming authentication request.
      */
-    
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
 
-    
+        $user = Auth::user();
 
-public function store(LoginRequest $request): RedirectResponse
-{
-    $request->authenticate();
-    $request->session()->regenerate();
+        if (! $user) {
+            abort(403, 'No autorizado');
+        }
 
-    $user = Auth::user();
-
-    if (!$user) {
-        abort(403, 'No autorizado');
+        return match ($user->role) {
+            'admin' => redirect()->to('/sistema/dashboard'),
+            'cajero' => redirect()->to('/sistema/dashboard'),
+            default => abort(403),
+        };
     }
-
-    return match ($user->role) {
-        'admin'    => redirect()->to('/sistema/dashboard'),
-        'vendedor' => redirect()->to('/sistema/pos'),
-        'cliente'  => redirect()->to('/'),
-        default    => abort(403),
-    };
-}
-
 
     /**
      * Destroy an authenticated session.

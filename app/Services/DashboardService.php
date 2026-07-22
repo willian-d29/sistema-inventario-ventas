@@ -3,145 +3,345 @@
 namespace App\Services;
 
 use App\Enums\Expense\ExpenseFieldsEnum;
-use App\Enums\Order\OrderFieldsEnum;
+use App\Enums\Product\ProductStatusEnum;
+use App\Enums\Transaction\PaymentMethodEnum;
 use App\Helpers\BaseHelper;
+use App\Models\CashRegister;
 use App\Models\Expense;
-use App\Models\Order;
-use Carbon\Carbon;
+use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
+use App\Models\User;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 
 class DashboardService
 {
+    public function getForUser(User $user, ?string $date = null): array
+    {
+        $selectedDate = $date ?? date('Y-m');
+
+        if ($user->role === 'cajero') {
+            return [
+                'dashboardRole' => 'cajero',
+                'date' => $selectedDate,
+                'cashierDashboard' => $this->cashierData($user),
+            ];
+        }
+
+        return [
+            ...$this->getData($date),
+            'dashboardRole' => 'admin',
+            'date' => $selectedDate,
+        ];
+    }
+
     public function getData(?string $date = null): array
     {
-        $date = $date ? Carbon::parse($date) : Carbon::now();
+        $selectedDate = $date ? CarbonImmutable::parse($date) : CarbonImmutable::now();
+        $monthStart = $selectedDate->startOfMonth();
+        $monthEnd = $selectedDate->endOfMonth();
+        $lastMonthStart = $monthStart->subMonth()->startOfMonth();
+        $lastMonthEnd = $lastMonthStart->endOfMonth();
+        $todayStart = CarbonImmutable::now()->startOfDay();
+        $todayEnd = CarbonImmutable::now()->endOfDay();
 
-        // Get total order count, total profit, and total loss for the current month
-        $selectedMonthOrders = Order::query()
-            ->when($date, function ($query, $date) {
-                $query->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year);
-            })
-            ->get();
-        $selectedMonthTotalOrders = $selectedMonthOrders->count();
-        $selectedMonthTotalProfit = $selectedMonthOrders->sum(OrderFieldsEnum::PROFIT->value);
-        $selectedMonthTotalLoss = $selectedMonthOrders->sum(OrderFieldsEnum::LOSS->value);
+        $selectedSales = $this->salesBetween($monthStart, $monthEnd);
+        $lastMonthSales = $this->salesBetween($lastMonthStart, $lastMonthEnd);
 
-        $lastMonthOrders = Order::query()
-            ->when($date, function ($query, $date) {
-                $query->whereMonth('created_at', $date->subMonth()->month)
-                    ->whereYear('created_at', $date->subMonth()->year);
-            })
-            ->get();
-        $lastMonthTotalOrders = $lastMonthOrders->count();
-        $lastMonthTotalProfit = $lastMonthOrders->sum(OrderFieldsEnum::PROFIT->value);
-        $lastMonthTotalLoss = $lastMonthOrders->sum(OrderFieldsEnum::LOSS->value);
+        $selectedMonthTotalSales = (clone $selectedSales)->count();
+        $selectedMonthTotalRevenue = (float) (clone $selectedSales)->sum('total');
+        $selectedMonthTotalDiscounts = (float) (clone $selectedSales)->sum('discount_total');
+        $selectedMonthSaleItems = $this->saleItemsBetween($monthStart, $monthEnd);
+        $selectedMonthCostOfGoodsSold = (float) (clone $selectedMonthSaleItems)->sum('cost_subtotal');
+        $selectedMonthGrossProfit = (float) (clone $selectedMonthSaleItems)->sum('gross_profit');
 
-        // Calculate percentage change for total orders, profit, and loss
-        $orderPercentageChange = ($lastMonthTotalOrders != 0) ? (($selectedMonthTotalOrders - $lastMonthTotalOrders) / $lastMonthTotalOrders) * 100 : 0;
-        $profitPercentageChange = ($lastMonthTotalProfit != 0) ? (($selectedMonthTotalProfit - $lastMonthTotalProfit) / $lastMonthTotalProfit) * 100 : 0;
-        $lossPercentageChange = ($lastMonthTotalLoss != 0) ? (($selectedMonthTotalLoss - $lastMonthTotalLoss) / $lastMonthTotalLoss) * 100 : 0;
+        $lastMonthTotalSales = (clone $lastMonthSales)->count();
+        $lastMonthTotalRevenue = (float) (clone $lastMonthSales)->sum('total');
+        $lastMonthTotalDiscounts = (float) (clone $lastMonthSales)->sum('discount_total');
+        $lastMonthSaleItems = $this->saleItemsBetween($lastMonthStart, $lastMonthEnd);
+        $lastMonthCostOfGoodsSold = (float) (clone $lastMonthSaleItems)->sum('cost_subtotal');
+        $lastMonthGrossProfit = (float) (clone $lastMonthSaleItems)->sum('gross_profit');
 
-        $selectedMonthTotalExpenses = Expense::query()
-            ->when($date, function ($query, $date) {
-                $query->whereMonth(ExpenseFieldsEnum::EXPENSE_DATE->value, $date->month)
-                    ->whereYear(ExpenseFieldsEnum::EXPENSE_DATE->value, $date->year);
-            })
+        $selectedMonthTotalExpenses = (float) Expense::query()
+            ->whereBetween(ExpenseFieldsEnum::EXPENSE_DATE->value, [$monthStart, $monthEnd])
             ->sum(ExpenseFieldsEnum::AMOUNT->value);
-        $lastMonthTotalExpenses = Expense::query()
-            ->when($date, function ($query, $date) {
-                $query->whereMonth(ExpenseFieldsEnum::EXPENSE_DATE->value, $date->subMonth()->month)
-                    ->whereYear(ExpenseFieldsEnum::EXPENSE_DATE->value, $date->subMonth()->year);
-            })
+
+        $lastMonthTotalExpenses = (float) Expense::query()
+            ->whereBetween(ExpenseFieldsEnum::EXPENSE_DATE->value, [$lastMonthStart, $lastMonthEnd])
             ->sum(ExpenseFieldsEnum::AMOUNT->value);
-        $expensePercentageChange = ($lastMonthTotalExpenses != 0) ? (($selectedMonthTotalExpenses - $lastMonthTotalExpenses) / $lastMonthTotalExpenses) * 100 : 0;
 
         return [
-            "total_orders"      => [
-                "selected"          => $selectedMonthTotalOrders,
-                "percentage_change" => abs(BaseHelper::numberFormat($orderPercentageChange)),
-                "stateArray"        => $orderPercentageChange < 0 ? "down" : "up"
+            'total_orders' => $this->metric($selectedMonthTotalSales, $lastMonthTotalSales),
+            'total_profit' => $this->metric($selectedMonthTotalRevenue, $lastMonthTotalRevenue),
+            'total_loss' => $this->metric($selectedMonthGrossProfit, $lastMonthGrossProfit),
+            'total_expense' => $this->metric($selectedMonthTotalExpenses, $lastMonthTotalExpenses),
+            'cost_of_goods_sold' => $this->metric($selectedMonthCostOfGoodsSold, $lastMonthCostOfGoodsSold),
+            'month_discounts' => $this->metric($selectedMonthTotalDiscounts, $lastMonthTotalDiscounts),
+            'operating_result' => [
+                'selected' => BaseHelper::numberFormat($selectedMonthGrossProfit - $selectedMonthTotalExpenses),
+                'description' => 'Utilidad bruta menos gastos registrados.',
             ],
-            "total_profit"      => [
-                "selected"          => (double) $selectedMonthTotalProfit,
-                "percentage_change" => abs(BaseHelper::numberFormat($profitPercentageChange)),
-                "stateArray"        => $profitPercentageChange < 0 ? "down" : "up"
+            'cost_warnings' => [
+                'estimated_items' => (clone $selectedMonthSaleItems)->where('cost_is_estimated', true)->count(),
             ],
-            "total_loss"        => [
-                "selected"          => (double) $selectedMonthTotalLoss,
-                "percentage_change" => abs(BaseHelper::numberFormat($lossPercentageChange)),
-                "stateArray"        => $lossPercentageChange < 0 ? "down" : "up"
+            'today_sales' => [
+                'count' => $this->salesBetween($todayStart, $todayEnd)->count(),
+                'total' => (float) $this->salesBetween($todayStart, $todayEnd)->sum('total'),
+                'cost' => (float) $this->saleItemsBetween($todayStart, $todayEnd)->sum('cost_subtotal'),
+                'gross_profit' => (float) $this->saleItemsBetween($todayStart, $todayEnd)->sum('gross_profit'),
             ],
-            "total_expense"     => [
-                "selected"          => (double) $selectedMonthTotalExpenses,
-                "percentage_change" => abs(BaseHelper::numberFormat($expensePercentageChange)),
-                "stateArray"        => $expensePercentageChange < 0 ? "down" : "up"
-            ],
-            "profit_line_chart" => $this->prepareProfitLineChart(),
-            "orders_bar_chart"  => $this->prepareOrderBarChart(),
+            'payments_by_method' => $this->paymentsByMethod($monthStart, $monthEnd),
+            'top_products' => $this->topProducts($monthStart, $monthEnd),
+            'products_with_highest_profit' => $this->productsWithHighestProfit($monthStart, $monthEnd),
+            'low_stock_products' => $this->lowStockProducts(),
+            'recent_sales' => $this->recentSales(),
+            'current_cash_registers' => $this->currentCashRegisters(),
+            'open_cash_registers_count' => CashRegister::query()->where('status', 'open')->count(),
+            'pending_differences_count' => CashRegister::query()
+                ->where('status', 'closed')
+                ->whereNotNull('total_difference')
+                ->where('total_difference', '!=', 0)
+                ->count(),
+            'products_without_cost_count' => Product::query()
+                ->where('status', ProductStatusEnum::ACTIVE->value)
+                ->where(function (Builder $query) {
+                    $query->whereNull('buying_price')->orWhere('buying_price', '<=', 0);
+                })
+                ->count(),
+            'active_products_count' => Product::query()
+                ->where('status', ProductStatusEnum::ACTIVE->value)
+                ->count(),
+            'profit_line_chart' => $this->prepareRevenueLineChart(),
+            'orders_bar_chart' => $this->prepareSalesBarChart(),
         ];
     }
 
-    private function prepareProfitLineChart(): array
+    private function cashierData(User $user): array
     {
-        $currentYearProfit = Order::selectRaw('MONTH(created_at) as month, SUM(profit) as total_profit')
-            ->whereYear('created_at', Carbon::now()->year)
-            ->where('created_at', '>=', Carbon::now()->subMonths(7))
-            ->groupBy('month')
-            ->pluck('total_profit', 'month');
+        $cashRegister = CashRegister::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'open')
+            ->latest('opened_at')
+            ->first();
 
-        $lastYearProfit = Order::selectRaw('MONTH(created_at) as month, SUM(profit) as total_profit')
-            ->whereYear('created_at', Carbon::now()->subYear()->year)
-            ->where('created_at', '>=', Carbon::now()->subYear()->subMonths(7))
-            ->groupBy('month')
-            ->pluck('total_profit', 'month');
+        $salesQuery = Sale::query()
+            ->with(['payments'])
+            ->where('cashier_id', $user->id)
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->when(
+                $cashRegister,
+                fn (Builder $query) => $query->where('cash_register_id', $cashRegister->id),
+                fn (Builder $query) => $query->whereBetween('sold_at', [now()->startOfDay(), now()->endOfDay()])
+            );
 
-        // Loop to get the last 7 months
-        $months = [];
-        $currentYearProfitValues = [];
-        $lastYearProfitValues = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $carbon = Carbon::now()->subMonths($i);
-            $months[] = $carbon->format('F');
-            $currentYearProfitValues[] = (double) ($currentYearProfit[$carbon->month] ?? 0);
-            $lastYearProfitValues[] = (double) ($lastYearProfit[$carbon->month] ?? 0);
-        }
+        $sales = (clone $salesQuery)->latest('sold_at')->limit(5)->get();
+        $summary = $cashRegister ? app(CashRegisterService::class)->summary($cashRegister) : null;
+        $movements = $cashRegister
+            ? app(CashRegisterService::class)->timelineItems($cashRegister)->take(6)->values()
+            : collect();
+
+        $pendingDifference = CashRegister::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'closed')
+            ->whereNotNull('total_difference')
+            ->where('total_difference', '!=', 0)
+            ->latest('closed_at')
+            ->first(['id', 'total_difference', 'closed_at']);
 
         return [
-            "months"       => $months,
-            "current_year" => $currentYearProfitValues,
-            "last_year"    => $lastYearProfitValues,
+            'cash_register' => $cashRegister,
+            'cash_summary' => $summary,
+            'is_open' => (bool) $cashRegister,
+            'opened_at' => $cashRegister?->opened_at?->format('d/m/Y H:i'),
+            'expected_cash' => $summary['expected_cash'] ?? 0,
+            'sales_count' => (clone $salesQuery)->count(),
+            'total_sold' => (float) (clone $salesQuery)->sum('total'),
+            'last_sale' => $sales->first(),
+            'recent_sales' => $sales->map(fn (Sale $sale) => [
+                'id' => $sale->id,
+                'document' => $sale->full_document_number,
+                'payments' => $sale->payments->pluck('payment_method')->join(' + '),
+                'total' => (float) $sale->total,
+                'sold_at' => $sale->sold_at?->format('d/m/Y H:i'),
+            ])->all(),
+            'movements' => $movements->all(),
+            'pending_difference' => $pendingDifference,
         ];
     }
 
-    private function prepareOrderBarChart(): array
+    private function salesBetween(CarbonImmutable $start, CarbonImmutable $end): Builder
     {
-        $currentYearOrders = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as total_orders')
-            ->whereYear('created_at', Carbon::now()->year)
-            ->where('created_at', '>=', Carbon::now()->subMonths(7))
-            ->groupBy('month')
-            ->pluck('total_orders', 'month');
+        return Sale::query()
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->whereBetween('sold_at', [$start, $end]);
+    }
 
-        $lastYearOrders = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as total_orders')
-            ->whereYear('created_at', Carbon::now()->subYear()->year)
-            ->where('created_at', '>=', Carbon::now()->subYear()->subMonths(7))
-            ->groupBy('month')
-            ->pluck('total_orders', 'month');
+    private function saleItemsBetween(CarbonImmutable $start, CarbonImmutable $end): Builder
+    {
+        return SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->whereNotIn('sales.status', ['cancelled', 'refunded'])
+            ->whereBetween('sales.sold_at', [$start, $end]);
+    }
 
-        // Loop to get the last 7 months
+    private function metric(float|int $current, float|int $previous): array
+    {
+        $percentageChange = $previous != 0
+            ? (($current - $previous) / $previous) * 100
+            : 0;
+
+        return [
+            'selected' => is_float($current) ? (float) BaseHelper::numberFormat($current) : $current,
+            'percentage_change' => abs(BaseHelper::numberFormat($percentageChange)),
+            'stateArray' => $percentageChange < 0 ? 'down' : 'up',
+        ];
+    }
+
+    private function paymentsByMethod(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        $labels = collect(PaymentMethodEnum::options())->pluck('label', 'value');
+
+        return Payment::query()
+            ->join('sales', 'payments.sale_id', '=', 'sales.id')
+            ->selectRaw('payments.payment_method, SUM(payments.amount) as total, COUNT(*) as count')
+            ->whereNotIn('sales.status', ['cancelled', 'refunded'])
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->groupBy('payments.payment_method')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($payment) => [
+                'method' => $payment->payment_method,
+                'label' => $labels[$payment->payment_method] ?? ucfirst($payment->payment_method),
+                'count' => (int) $payment->count,
+                'total' => (float) BaseHelper::numberFormat((float) $payment->total),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function topProducts(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('sale_items.product_name_snapshot as name, SUM(sale_items.quantity) as quantity, SUM(sale_items.subtotal - sale_items.discount) as total, SUM(sale_items.cost_subtotal) as cost, SUM(sale_items.gross_profit) as gross_profit')
+            ->whereNotIn('sales.status', ['cancelled', 'refunded'])
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->groupBy('sale_items.product_name_snapshot')
+            ->orderByDesc('quantity')
+            ->limit(5)
+            ->get()
+            ->map(fn ($item) => [
+                'name' => $item->name,
+                'quantity' => (float) $item->quantity,
+                'total' => (float) BaseHelper::numberFormat((float) $item->total),
+                'cost' => (float) BaseHelper::numberFormat((float) $item->cost),
+                'gross_profit' => (float) BaseHelper::numberFormat((float) $item->gross_profit),
+            ])
+            ->all();
+    }
+
+    private function productsWithHighestProfit(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('sale_items.product_name_snapshot as name, SUM(sale_items.quantity) as quantity, SUM(sale_items.gross_profit) as gross_profit')
+            ->whereNotIn('sales.status', ['cancelled', 'refunded'])
+            ->whereBetween('sales.sold_at', [$start, $end])
+            ->groupBy('sale_items.product_name_snapshot')
+            ->orderByDesc('gross_profit')
+            ->limit(5)
+            ->get()
+            ->map(fn ($item) => [
+                'name' => $item->name,
+                'quantity' => (float) $item->quantity,
+                'gross_profit' => (float) BaseHelper::numberFormat((float) $item->gross_profit),
+            ])
+            ->all();
+    }
+
+    private function lowStockProducts(): array
+    {
+        return Product::query()
+            ->where('status', ProductStatusEnum::ACTIVE->value)
+            ->where('quantity', '<', 10)
+            ->orderBy('quantity')
+            ->limit(8)
+            ->get(['id', 'name', 'quantity'])
+            ->map(fn (Product $product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'quantity' => (float) $product->quantity,
+            ])
+            ->all();
+    }
+
+    private function recentSales(): array
+    {
+        return Sale::query()
+            ->with(['cashier:id,name', 'payments'])
+            ->whereNotIn('status', ['cancelled', 'refunded'])
+            ->latest('sold_at')
+            ->limit(6)
+            ->get()
+            ->map(fn (Sale $sale) => [
+                'id' => $sale->id,
+                'document' => $sale->full_document_number,
+                'cashier' => $sale->cashier?->name ?: 'Sin cajero',
+                'payments' => $sale->payments->pluck('payment_method')->join(' + '),
+                'total' => (float) $sale->total,
+                'sold_at' => $sale->sold_at?->format('d/m/Y H:i'),
+            ])
+            ->all();
+    }
+
+    private function currentCashRegisters(): array
+    {
+        return CashRegister::query()
+            ->with('user:id,name')
+            ->where('status', 'open')
+            ->latest('opened_at')
+            ->get()
+            ->map(fn (CashRegister $cashRegister) => [
+                'id' => $cashRegister->id,
+                'cashier' => $cashRegister->user?->name ?: 'Sin cajero',
+                'opening_amount' => (float) $cashRegister->opening_amount,
+                'opened_at' => $cashRegister->opened_at?->format('d/m/Y H:i'),
+            ])
+            ->all();
+    }
+
+    private function prepareRevenueLineChart(): array
+    {
+        return $this->monthlyChart(fn (CarbonImmutable $start, CarbonImmutable $end) => (float) $this->salesBetween($start, $end)->sum('total'));
+    }
+
+    private function prepareSalesBarChart(): array
+    {
+        return $this->monthlyChart(fn (CarbonImmutable $start, CarbonImmutable $end) => $this->salesBetween($start, $end)->count());
+    }
+
+    private function monthlyChart(callable $calculator): array
+    {
         $months = [];
-        $currentYearOrdersValues = [];
-        $lastYearOrdersValues = [];
+        $currentYearValues = [];
+        $lastYearValues = [];
+        $now = CarbonImmutable::now();
+
         for ($i = 6; $i >= 0; $i--) {
-            $carbon = Carbon::now()->subMonths($i);
-            $months[] = $carbon->format('F');
-            $currentYearOrdersValues[] = (double) ($currentYearOrders[$carbon->month] ?? 0);
-            $lastYearOrdersValues[] = (double) ($lastYearOrders[$carbon->month] ?? 0);
+            $month = $now->subMonths($i)->startOfMonth();
+            $lastYearMonth = $month->subYear();
+
+            $months[] = $month->format('F');
+            $currentYearValues[] = (float) BaseHelper::numberFormat($calculator($month, $month->endOfMonth()));
+            $lastYearValues[] = (float) BaseHelper::numberFormat($calculator($lastYearMonth, $lastYearMonth->endOfMonth()));
         }
 
         return [
-            "months"       => $months,
-            "current_year" => $currentYearOrdersValues,
-            "last_year"    => $lastYearOrdersValues,
+            'months' => $months,
+            'current_year' => $currentYearValues,
+            'last_year' => $lastYearValues,
         ];
     }
 }

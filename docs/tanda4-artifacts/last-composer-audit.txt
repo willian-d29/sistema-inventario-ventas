@@ -1,0 +1,32 @@
+Found 3 security vulnerability advisories affecting 1 package:
++-------------------+----------------------------------------------------------------------------------+
+| Package           | laravel/framework                                                                |
+| Severity          | medium                                                                           |
+| Advisory ID       | PKSA-m5cs-t1y6-qpcs                                                              |
+| CVE               | NO CVE                                                                           |
+| Title             | Laravel Framework: Temporary Signed URL Path Confusion                           |
+| URL               | https://github.com/advisories/GHSA-crmm-hgp2-wgrp                                |
+| Affected versions | <12.61.1|>=13.0.0,<13.12.0                                                       |
+| Reported at       | 2026-06-17T13:54:13+00:00                                                        |
++-------------------+----------------------------------------------------------------------------------+
++-------------------+----------------------------------------------------------------------------------+
+| Package           | laravel/framework                                                                |
+| Severity          | high                                                                             |
+| Advisory ID       | PKSA-3r5d-mb8f-1qw9                                                              |
+| CVE               | NO CVE                                                                           |
+| Title             | Laravel Framework: CRLF injection in default email rule                          |
+| URL               | https://github.com/advisories/GHSA-5vg9-5847-vvmq                                |
+| Affected versions | <12.60.0|>=13.0.0,<=13.9.0                                                       |
+| Reported at       | 2026-06-17T13:53:44+00:00                                                        |
++-------------------+----------------------------------------------------------------------------------+
++-------------------+----------------------------------------------------------------------------------+
+| Package           | laravel/framework                                                                |
+| Severity          |                                                                                  |
+| Advisory ID       | PKSA-mdq4-51ck-6kdq                                                              |
+| CVE               | CVE-2026-48019                                                                   |
+| Title             | Laravel CRLF injection in default email rule                                     |
+| URL               | https://github.com/laravel/framework/security/advisories/GHSA-5vg9-5847-vvmq     |
+| Affected versions | >=9.0.0,<10.0.0|>=10.0.0,<11.0.0|>=11.0.0,<12.0.0|>=12.0.0,<12.60.0|>=13.0.0,<13 |
+|                   | .10.0                                                                            |
+| Reported at       | 2026-05-19T18:13:00+00:00                                                        |
++-------------------+----------------------------------------------------------------------------------+

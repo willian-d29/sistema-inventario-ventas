@@ -1,0 +1,241 @@
+ M .env.example
+ M Dockerfile
+ M app/Enums/Core/FilterResourceEnum.php
+ M app/Enums/Customer/CustomerFieldsEnum.php
+ M app/Enums/Customer/CustomerFiltersEnum.php
+ M app/Enums/Order/OrderExpandEnum.php
+ M app/Enums/Order/OrderFieldsEnum.php
+ M app/Enums/Order/OrderFiltersEnum.php
+ M app/Enums/Product/ProductFieldsEnum.php
+ M app/Enums/Product/ProductFiltersEnum.php
+ M app/Enums/Setting/SettingFieldsEnum.php
+ M app/Enums/Transaction/TransactionFieldsEnum.php
+ M app/Enums/Transaction/TransactionFiltersEnum.php
+ M app/Exports/VentasExport.php
+ M app/Helpers/BaseHelper.php
+ M app/Http/Controllers/Auth/AuthenticatedSessionController.php
+ M app/Http/Controllers/Auth/RegisteredUserController.php
+ M app/Http/Controllers/CartController.php
+ M app/Http/Controllers/CustomerController.php
+ M app/Http/Controllers/DashboardController.php
+ M app/Http/Controllers/EmployeeController.php
+ D app/Http/Controllers/OrderController.php
+ M app/Http/Controllers/ProductController.php
+ M app/Http/Controllers/ProfileController.php
+ M app/Http/Controllers/ReportController.php
+ M app/Http/Controllers/SettingController.php
+ D app/Http/Controllers/TransactionController.php
+ M app/Http/Middleware/HandleInertiaRequests.php
+ M app/Http/Middleware/RedirectIfAuthenticated.php
+ M app/Http/Requests/Customer/CustomerCreateRequest.php
+ M app/Http/Requests/Customer/CustomerIndexRequest.php
+ M app/Http/Requests/Customer/CustomerUpdateRequest.php
+ M app/Http/Requests/Employee/EmployeeUpdateRequest.php
+ M app/Http/Requests/Expense/ExpenseCreateRequest.php
+ M app/Http/Requests/Expense/ExpenseUpdateRequest.php
+ D app/Http/Requests/Order/OrderCreateRequest.php
+ D app/Http/Requests/Order/OrderIndexRequest.php
+ D app/Http/Requests/Order/OrderPaymentRequest.php
+ M app/Http/Requests/Product/ProductCreateRequest.php
+ M app/Http/Requests/Product/ProductUpdateRequest.php
+ M app/Http/Requests/Setting/SettingUpdateRequest.php
+ D app/Http/Requests/Transaction/TransactionIndexRequest.php
+ M app/Models/Employee.php
+ M app/Models/Expense.php
+ M app/Models/Order.php
+ M app/Models/Product.php
+ M app/Models/Transaction.php
+ M app/Models/User.php
+ M app/Repositories/CustomerRepository.php
+ D app/Repositories/OrderItemRepository.php
+ D app/Repositories/OrderRepository.php
+ M app/Repositories/ProductRepository.php
+ D app/Repositories/TransactionRepository.php
+ M app/Services/CartService.php
+ M app/Services/CustomerService.php
+ M app/Services/DashboardService.php
+ M app/Services/EmployeeService.php
+ M app/Services/ExpenseService.php
+ D app/Services/OrderItemService.php
+ D app/Services/OrderService.php
+ M app/Services/ProductService.php
+ M app/Services/SettingService.php
+ D app/Services/TransactionService.php
+ M database/factories/UserFactory.php
+ M database/migrations/2014_10_12_000000_create_users_table.php
+ M database/migrations/2024_07_21_112837_create_customers_table.php
+ M database/migrations/2024_09_21_105318_create_transactions_table.php
+ M database/migrations/2025_06_13_224340_add_role_to_users_table.php
+ M database/migrations/2025_06_15_142409_make_password_nullable_in_users_table.php
+ M database/seeders/DatabaseSeeder.php
+ M database/seeders/ProductSeeder.php
+ M database/seeders/UserSeeder.php
+ M package-lock.json
+ M package.json
+ M phpunit.xml
+ M resources/css/app.css
+ M resources/js/Components/AsyncVueSelect.vue
+ M resources/js/Components/Button.vue
+ D resources/js/Components/BuyNow.vue
+ D resources/js/Components/Cards/CardBarChart.vue
+ D resources/js/Components/Cards/CardLineChart.vue
+ D resources/js/Components/Cards/CardPageVisits.vue
+ M resources/js/Components/Cards/CardProfile.vue
+ D resources/js/Components/Cards/CardSocialTraffic.vue
+ D resources/js/Components/Cards/CardStats.vue
+ M resources/js/Components/Cards/CardTable.vue
+ D resources/js/Components/ContactForm.vue
+ M resources/js/Components/DashboardInputGroup.vue
+ D resources/js/Components/Dropdown.vue
+ D resources/js/Components/DropdownLink.vue
+ D resources/js/Components/Dropdowns/IndexDropdown.vue
+ D resources/js/Components/Dropdowns/NotificationDropdown.vue
+ D resources/js/Components/Dropdowns/PagesDropdown.vue
+ D resources/js/Components/Dropdowns/TableDropdown.vue
+ D resources/js/Components/Dropdowns/UserDropdown.vue
+ M resources/js/Components/Footers/Footer.vue
+ M resources/js/Components/Footers/FooterAdmin.vue
+ M resources/js/Components/Footers/FooterSmall.vue
+ D resources/js/Components/Headers/HeaderStats.vue
+ D resources/js/Components/Maps/MapExample.vue
+ M resources/js/Components/Modal.vue
+ D resources/js/Components/NavLink.vue
+ D resources/js/Components/Navbars/AdminNavbar.vue
+ M resources/js/Components/Navbars/GuestNavbar.vue
+ D resources/js/Components/Navbars/IndexNavbar.vue
+ M resources/js/Components/Pagination.vue
+ M resources/js/Components/PrimaryButton.vue
+ D resources/js/Components/ResponsiveNavLink.vue
+ M resources/js/Components/Sidebar/Sidebar.vue
+ M resources/js/Components/Sidebar/SidebarItem.vue
+ D resources/js/Components/Sidebar/SidebarVendedor.vue
+ M resources/js/Components/SubmitButton.vue
+ M resources/js/Components/TableData.vue
+ M resources/js/Components/TableHead.vue
+ M resources/js/Layouts/AuthLayout.vue
+ M resources/js/Layouts/AuthenticatedLayout.vue
+ D resources/js/Layouts/GuestLayout.vue
+ M resources/js/Pages/Auth/ConfirmPassword.vue
+ M resources/js/Pages/Auth/ForgotPassword.vue
+ M resources/js/Pages/Auth/Login.vue
+ D resources/js/Pages/Auth/Register.vue
+ M resources/js/Pages/Auth/ResetPassword.vue
+ M resources/js/Pages/Auth/VerifyEmail.vue
+ M resources/js/Pages/Cart/Pos.vue
+ M resources/js/Pages/Customer/Index.vue
+ M resources/js/Pages/Dashboard.vue
+ M resources/js/Pages/Employee/Index.vue
+ M resources/js/Pages/Expense/Index.vue
+ D resources/js/Pages/Order/Index.vue
+ D resources/js/Pages/Panel.vue
+ M resources/js/Pages/Product/Create.vue
+ M resources/js/Pages/Product/Edit.vue
+ M resources/js/Pages/Product/Index.vue
+ M resources/js/Pages/Profile/Edit.vue
+ M resources/js/Pages/Profile/Partials/UpdatePasswordForm.vue
+ M resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.vue
+ M resources/js/Pages/Profile/Partials/UpdateSettingsForm.vue
+ M resources/js/Pages/Reports/Index.vue
+ M resources/js/Pages/Supplier/Index.vue
+ D resources/js/Pages/Transaction/Index.vue
+ M resources/js/Pages/UnitType/Index.vue
+ M resources/js/Pages/User/Index.vue
+ D resources/js/Pages/Welcome.vue
+ M resources/js/Utils/Helper.js
+ M resources/js/app.js
+ D resources/js/assets/img/4th-section.avif
+ D resources/js/assets/img/angular.jpg
+ D resources/js/assets/img/banner.avif
+ D resources/js/assets/img/bootstrap.jpg
+ D resources/js/assets/img/component-btn-pink.png
+ D resources/js/assets/img/component-btn.png
+ D resources/js/assets/img/component-info-2.png
+ D resources/js/assets/img/component-info-card.png
+ D resources/js/assets/img/component-menu.png
+ D resources/js/assets/img/component-profile-card.png
+ D resources/js/assets/img/documentation.png
+ D resources/js/assets/img/github.svg
+ D resources/js/assets/img/google.svg
+ D resources/js/assets/img/ill_header.png
+ D resources/js/assets/img/inventory-service.avif
+ D resources/js/assets/img/landing.jpg
+ D resources/js/assets/img/login.jpg
+ D resources/js/assets/img/pattern_vue.png
+ D resources/js/assets/img/profile.jpg
+ D resources/js/assets/img/react.jpg
+ D resources/js/assets/img/sketch.jpg
+ D resources/js/assets/img/team-1-800x800.jpg
+ D resources/js/assets/img/team-1-800x8000.jpg
+ D resources/js/assets/img/team-2-800x800.jpg
+ D resources/js/assets/img/team-3-800x800.jpg
+ D resources/js/assets/img/team-4-470x470.png
+ D resources/js/assets/img/team2.avif
+ D resources/js/assets/img/team3.jpg
+ D resources/js/assets/img/team4.jpg
+ D resources/js/assets/img/vue.jpg
+ D resources/js/assets/styles/index.css
+ D resources/js/assets/styles/tailwind.css
+ M resources/js/ssr.js
+ M resources/views/app.blade.php
+ M resources/views/reports/ventas-pdf.blade.php
+ M routes/auth.php
+ M routes/web.php
+ M tailwind.config.js
+ M tests/Feature/Auth/AuthenticationTest.php
+ M tests/Feature/Auth/RegistrationTest.php
+ M tests/Feature/ExampleTest.php
+ M tests/Feature/ProfileTest.php
+ M yarn.lock
+?? .nvmrc
+?? app/Enums/CashRegister/
+?? app/Enums/Product/StockMovementTypeEnum.php
+?? app/Enums/Transaction/PaymentMethodEnum.php
+?? app/Exceptions/SaleCreateException.php
+?? app/Http/Controllers/CashRegisterController.php
+?? app/Http/Controllers/CashRegisterDocumentController.php
+?? app/Http/Controllers/DocumentPrintLogController.php
+?? app/Http/Controllers/SaleController.php
+?? app/Http/Controllers/SaleDocumentController.php
+?? app/Http/Requests/CashRegister/
+?? app/Http/Requests/Profile/PreferenceUpdateRequest.php
+?? app/Http/Requests/Sale/
+?? app/Models/CashMovement.php
+?? app/Models/CashRegister.php
+?? app/Models/DocumentPrintLog.php
+?? app/Models/DocumentSequence.php
+?? app/Models/Payment.php
+?? app/Models/Sale.php
+?? app/Models/SaleItem.php
+?? app/Models/StockMovement.php
+?? app/Services/BusinessSettingsService.php
+?? app/Services/CashRegisterService.php
+?? app/Services/DocumentPrintLogService.php
+?? app/Services/DocumentSequenceService.php
+?? app/Services/SaleService.php
+?? app/Services/UserPreferenceService.php
+?? backups/
+?? database/migrations/2026_07_03_000000_rebuild_pos_domain.php
+?? database/migrations/2026_07_21_100000_create_sales_domain_tables.php
+?? database/migrations/2026_07_21_110000_add_historical_costs_to_sale_items.php
+?? database/migrations/2026_07_21_120000_create_cash_movements_and_arqueo_fields.php
+?? database/migrations/2026_07_21_130000_create_document_print_logs_table.php
+?? database/migrations/2026_07_21_140000_add_preferences_to_users_table.php
+?? database/seeders/BusinessSettingsSeeder.php
+?? docs/
+?? resources/js/Components/Customers/
+?? resources/js/Components/UI/
+?? resources/js/Composables/
+?? resources/js/Navigation/
+?? resources/js/Pages/CashRegister/
+?? resources/js/Pages/Profile/Partials/AppearancePanel.vue
+?? resources/js/Pages/Sale/
+?? resources/js/Pages/Settings/
+?? resources/views/cash-registers/
+?? resources/views/partials/
+?? resources/views/sales/
+?? resources/views/settings/
+?? scripts/
+?? tests/Feature/LegacyCleanupTanda3Test.php
+?? tests/Feature/PointOfSaleTest.php
+?? tests/Feature/UiComponentTanda2Test.php
+?? tests/Feature/UserPreferencesTest.php

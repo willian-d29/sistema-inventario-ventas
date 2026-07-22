@@ -1,0 +1,6 @@
+php: zsh:1: command not found: php
+zsh:1: command not found: php
+zsh:1: command not found: composer
+zsh:1: command not found: php
+node: v25.9.0
+npm: 11.12.1

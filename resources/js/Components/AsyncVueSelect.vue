@@ -15,6 +15,9 @@ export default {
             default: "name"
         },
         placeholder: String,
+        modelValue: {
+            default: null,
+        },
     },
     data: () => ({
         observer: null,
@@ -97,6 +100,8 @@ export default {
         :reduce="option => option.id"
         :label="resourceLabel"
         :placeholder="this.placeholder"
+        :model-value="modelValue"
+        @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #list-footer>
             <li v-show="hasNextPage" ref="load" class="loader">

@@ -74,12 +74,12 @@ class UnitTypeController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Unit type created successfully.'
+                "message" => __('messages.unit_types.created'),
             ];
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Unit type creation failed!",
+                "message"   => __('messages.unit_types.create_failed'),
             ];
 
             Log::error("Unit type creation failed!", [
@@ -101,7 +101,7 @@ class UnitTypeController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Unit type updated successfully.'
+                "message" => __('messages.unit_types.updated'),
             ];
         } catch (UnitTypeNotFoundException $e) {
             $flash = [
@@ -111,7 +111,7 @@ class UnitTypeController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Unit type update failed!",
+                "message"   => __('messages.unit_types.update_failed'),
             ];
 
             Log::error("Unit type update failed!", [
@@ -130,7 +130,7 @@ class UnitTypeController extends Controller
         try {
             $this->service->delete(id: $id);
             $flash = [
-                "message" => 'Unit type deleted successfully.'
+                "message" => __('messages.unit_types.deleted'),
             ];
         } catch (UnitTypeNotFoundException $e) {
             $flash = [
@@ -140,7 +140,7 @@ class UnitTypeController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Unit type deletion failed!",
+                "message"   => __('messages.unit_types.delete_failed'),
             ];
 
             Log::error("Unit type deletion failed!", [

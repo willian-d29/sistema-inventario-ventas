@@ -17,6 +17,7 @@ use App\Helpers\BaseHelper;
 use App\Http\Requests\Product\ProductCreateRequest;
 use App\Http\Requests\Product\ProductIndexRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
+use App\Models\Category;
 use App\Models\Product;
 use App\Services\ProductService;
 use Exception;
@@ -34,16 +35,43 @@ class ProductController extends Controller
     public function index(ProductIndexRequest $request): Response
     {
         $params = $request->validated();
+        $canManageProducts = $request->user()->role === 'admin';
+        if (! $canManageProducts) {
+            unset($params[ProductFiltersEnum::BUYING_PRICE->value], $params[ProductFiltersEnum::BUYING_DATE->value]);
+        }
+
         $params['expand'] = array_unique(array_merge($params['expand'] ?? [], [
             ProductExpandEnum::CATEGORY->value,
             ProductExpandEnum::SUPPLIER->value,
             ProductExpandEnum::UNIT_TYPE->value,
         ]));
 
+        $products = $this->service->getAll($params);
+        if (! $canManageProducts) {
+            $products->through(fn (Product $product) => [
+                'id' => $product->id,
+                'category_id' => $product->category_id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'product_number' => $product->product_number,
+                'product_code' => $product->product_code,
+                'barcode' => $product->barcode,
+                'selling_price' => $product->selling_price,
+                'unit_type_id' => $product->unit_type_id,
+                'quantity' => $product->quantity,
+                'photo' => $product->photo,
+                'status' => $product->status,
+                'category' => $product->category,
+                'supplier' => $product->supplier ? ['id' => $product->supplier->id, 'name' => $product->supplier->name] : null,
+                'unit_type' => $product->unitType,
+            ]);
+        }
+
         return Inertia::render(
             component: 'Product/Index',
             props: [
-                'products' => $this->service->getAll($params),
+                'products' => $products,
+                'canManageProducts' => $canManageProducts,
                 'filters'  => [
                     ProductFiltersEnum::KEYWORD->value        => [
                         'label'       => ProductFiltersEnum::KEYWORD->label(),
@@ -68,6 +96,12 @@ class ProductController extends Controller
                         'placeholder' => 'Enter product code.',
                         'type'        => FilterFieldTypeEnum::STRING->value,
                         'value'       => $request->validated()[ProductFiltersEnum::PRODUCT_CODE->value] ?? "",
+                    ],
+                    ProductFiltersEnum::BARCODE->value        => [
+                        'label'       => ProductFiltersEnum::BARCODE->label(),
+                        'placeholder' => 'Escanear o ingresar código de barras.',
+                        'type'        => FilterFieldTypeEnum::STRING->value,
+                        'value'       => $request->validated()[ProductFiltersEnum::BARCODE->value] ?? "",
                     ],
                     ProductFiltersEnum::CATEGORY_ID->value    => [
                         'label'         => ProductFiltersEnum::CATEGORY_ID->label(),
@@ -145,6 +179,13 @@ class ProductController extends Controller
                         'value'       => $request->validated()[ProductFiltersEnum::CREATED_AT->value] ?? "",
                     ],
                 ],
+                'categoryOptions' => Category::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name'])
+                    ->map(fn (Category $category) => [
+                        'value' => $category->id,
+                        'label' => $category->name,
+                    ]),
             ]);
     }
 
@@ -251,18 +292,5 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('flash', $flash);
     }
-
-    public function publicIndex(): Response
-{
-    // Productos con estado "activo" y campos esenciales
-    $products = Product::select('id', 'name', 'selling_price', 'photo', 'status')
-        ->where('status', 'activo')
-        ->latest()
-        ->paginate(20);
-
-    return Inertia::render('Public/Productos', [
-        'products' => $products
-    ]);
-}
 
 }

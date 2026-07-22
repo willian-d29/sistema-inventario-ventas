@@ -25,8 +25,9 @@ class ExpenseCreateRequest extends FormRequest
         return [
             ExpenseFieldsEnum::NAME->value         => ["required", "string", "max:255"],
             ExpenseFieldsEnum::DESCRIPTION->value  => ["nullable", "string"],
-            ExpenseFieldsEnum::AMOUNT->value       => ["required", "numeric"],
+            ExpenseFieldsEnum::AMOUNT->value       => ["required", "numeric", "gt:0"],
             ExpenseFieldsEnum::EXPENSE_DATE->value => ["required", "date"],
+            'paid_from_cash_register' => ['nullable', 'boolean'],
         ];
     }
 }

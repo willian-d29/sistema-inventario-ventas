@@ -1,0 +1,24 @@
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 5 packages, removed 4 packages, changed 18 packages, and audited 215 packages in 9s
+
+50 packages are looking for funding
+  run `npm fund` for details
+
+# npm audit report
+
+esbuild  <=0.24.2
+Severity: moderate
+esbuild enables any website to send any requests to the development server and read the response - https://github.com/advisories/GHSA-67mh-4wv8-2f99
+fix available via `npm audit fix --force`
+Will install vite@8.1.5, which is a breaking change
+node_modules/esbuild
+  vite  <=6.4.2
+  Depends on vulnerable versions of esbuild
+  node_modules/vite
+
+
+2 vulnerabilities (1 moderate, 1 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

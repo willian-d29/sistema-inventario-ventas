@@ -1,0 +1,29 @@
+
+  Migration name .............................................. Batch / Status  
+  2014_10_00_000000_create_settings_table ............................ [1] Ran  
+  2014_10_00_000001_add_group_column_on_settings_table ............... [1] Ran  
+  2014_10_12_000000_create_users_table ............................... [1] Ran  
+  2014_10_12_100000_create_password_reset_tokens_table ............... [1] Ran  
+  2019_08_19_000000_create_failed_jobs_table ......................... [1] Ran  
+  2019_12_14_000001_create_personal_access_tokens_table .............. [1] Ran  
+  2024_06_26_020636_create_categories_table .......................... [1] Ran  
+  2024_07_12_094131_create_suppliers_table ........................... [1] Ran  
+  2024_07_17_094527_create_unit_types_table .......................... [1] Ran  
+  2024_07_18_094528_create_products_table ............................ [1] Ran  
+  2024_07_21_014022_create_expenses_table ............................ [1] Ran  
+  2024_07_21_075714_create_employees_table ........................... [1] Ran  
+  2024_07_21_112837_create_customers_table ........................... [1] Ran  
+  2024_07_22_103204_create_salaries_table ............................ [1] Ran  
+  2024_09_05_013146_create_carts_table ............................... [1] Ran  
+  2024_09_13_101423_create_orders_table .............................. [1] Ran  
+  2024_09_13_102312_create_order_items_table ......................... [1] Ran  
+  2024_09_21_105318_create_transactions_table ........................ [1] Ran  
+  2025_06_13_224340_add_role_to_users_table .......................... [1] Ran  
+  2025_06_15_142409_make_password_nullable_in_users_table ............ [1] Ran  
+  2026_07_03_000000_rebuild_pos_domain ............................... [2] Ran  
+  2026_07_21_100000_create_sales_domain_tables ....................... [3] Ran  
+  2026_07_21_110000_add_historical_costs_to_sale_items ............... [4] Ran  
+  2026_07_21_120000_create_cash_movements_and_arqueo_fields .......... [5] Ran  
+  2026_07_21_130000_create_document_print_logs_table ................. [6] Ran  
+  2026_07_21_140000_add_preferences_to_users_table ................... [7] Ran  
+

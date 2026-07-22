@@ -28,33 +28,34 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            ProductFieldsEnum::CATEGORY_ID->value   => [
-                "bail",
-                "required",
-                "integer",
-                Rule::exists((new Category())->getTable(), 'id')
+            ProductFieldsEnum::CATEGORY_ID->value => [
+                'bail',
+                'required',
+                'integer',
+                Rule::exists((new Category())->getTable(), 'id'),
             ],
-            ProductFieldsEnum::SUPPLIER_ID->value   => [
-                "bail",
-                "required",
-                "integer",
-                Rule::exists((new Supplier())->getTable(), 'id')
+            ProductFieldsEnum::SUPPLIER_ID->value => [
+                'bail',
+                'required',
+                'integer',
+                Rule::exists((new Supplier())->getTable(), 'id'),
             ],
-            ProductFieldsEnum::NAME->value          => ["required", "string", "max:255"],
-            ProductFieldsEnum::DESCRIPTION->value   => ["nullable", "string"],
-            ProductFieldsEnum::PRODUCT_CODE->value  => ["required", "string", "max:255"],
-            ProductFieldsEnum::ROOT->value          => ["required", "string", "max:255"],
-            ProductFieldsEnum::BUYING_PRICE->value  => ["required", "numeric"],
-            ProductFieldsEnum::SELLING_PRICE->value => ["required", "numeric", "gt:0"],
-            ProductFieldsEnum::BUYING_DATE->value   => ["nullable", "date"],
-            ProductFieldsEnum::UNIT_TYPE_ID->value  => [
-                "required",
-                "integer",
-                Rule::exists((new UnitType())->getTable(), 'id')
+            ProductFieldsEnum::NAME->value => ['required', 'string', 'max:255'],
+            ProductFieldsEnum::DESCRIPTION->value => ['nullable', 'string'],
+            ProductFieldsEnum::PRODUCT_CODE->value => ['required', 'string', 'max:255'],
+            ProductFieldsEnum::BARCODE->value => ['nullable', 'string', 'max:255', Rule::unique('products', 'barcode')],
+            ProductFieldsEnum::ROOT->value => ['required', 'string', 'max:255'],
+            ProductFieldsEnum::BUYING_PRICE->value => ['required', 'numeric', 'gte:0'],
+            ProductFieldsEnum::SELLING_PRICE->value => ['required', 'numeric', 'gt:0'],
+            ProductFieldsEnum::BUYING_DATE->value => ['nullable', 'date'],
+            ProductFieldsEnum::UNIT_TYPE_ID->value => [
+                'required',
+                'integer',
+                Rule::exists((new UnitType())->getTable(), 'id'),
             ],
-            ProductFieldsEnum::QUANTITY->value      => ["required", "numeric", "gte:0"],
-            ProductFieldsEnum::PHOTO->value         => ["required", "file", "mimes:jpg,jpeg,png,gif,svg", "max:1024"],
-            ProductFieldsEnum::STATUS->value        => ["required", "string", Rule::in(ProductStatusEnum::values())],
+            ProductFieldsEnum::QUANTITY->value => ['required', 'numeric', 'gte:0'],
+            ProductFieldsEnum::PHOTO->value => ['required', 'file', 'mimes:jpg,jpeg,png,gif,svg', 'max:1024'],
+            ProductFieldsEnum::STATUS->value => ['required', 'string', Rule::in(ProductStatusEnum::values())],
         ];
     }
 }

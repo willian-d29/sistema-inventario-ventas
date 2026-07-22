@@ -93,7 +93,7 @@ class SalaryController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Salary created successfully.'
+                "message" => __('messages.salaries.created'),
             ];
         } catch (EmployeeNotFoundException|SalaryAlreadyPaidException $e) {
             $flash = [
@@ -103,7 +103,7 @@ class SalaryController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Salary creation failed!",
+                "message"   => __('messages.salaries.create_failed'),
             ];
 
             Log::error("Salary creation failed!", [
@@ -125,7 +125,7 @@ class SalaryController extends Controller
                 payload: $request->validated()
             );
             $flash = [
-                "message" => 'Salary updated successfully.'
+                "message" => __('messages.salaries.updated'),
             ];
         } catch (SalaryNotFoundException $e) {
             $flash = [
@@ -135,7 +135,7 @@ class SalaryController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Salary update failed!",
+                "message"   => __('messages.salaries.update_failed'),
             ];
 
             Log::error("Salary update failed!", [
@@ -154,7 +154,7 @@ class SalaryController extends Controller
         try {
             $this->service->delete(id: $id);
             $flash = [
-                "message" => 'Salary deleted successfully.'
+                "message" => __('messages.salaries.deleted'),
             ];
         } catch (SalaryNotFoundException $e) {
             $flash = [
@@ -164,7 +164,7 @@ class SalaryController extends Controller
         } catch (Exception $e) {
             $flash = [
                 "isSuccess" => false,
-                "message"   => "Salary deletion failed!",
+                "message"   => __('messages.salaries.delete_failed'),
             ];
 
             Log::error("Salary deletion failed!", [

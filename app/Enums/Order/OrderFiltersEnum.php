@@ -10,6 +10,7 @@ enum OrderFiltersEnum: string implements BaseEnumInterface
     use BaseEnumTrait;
 
     case ID           = 'id';
+    case CASHIER_ID   = 'cashier_id';
     case CUSTOMER_ID  = 'customer_id';
     case ORDER_NUMBER = 'order_number';
     case SUB_TOTAL    = 'sub_total';
@@ -24,6 +25,7 @@ enum OrderFiltersEnum: string implements BaseEnumInterface
     {
         return [
             self::ID->value           => "Id",
+            self::CASHIER_ID->value   => "Cashier",
             self::CUSTOMER_ID->value  => "Customer ID",
             self::ORDER_NUMBER->value => "Order Number",
             self::SUB_TOTAL->value    => "Sub Total",

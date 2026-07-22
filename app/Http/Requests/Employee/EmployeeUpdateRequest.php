@@ -24,20 +24,24 @@ class EmployeeUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $employee = Employee::find($this->route('employee'));
+
         return [
-            EmployeeFieldsEnum::NAME->value         => ["required", "string", "max:255"],
-            EmployeeFieldsEnum::EMAIL->value        => [
-                "required",
-                "email",
-                Rule::unique((new Employee())->getTable())->ignore($this->employee)
+            EmployeeFieldsEnum::NAME->value => ['required', 'string', 'max:255'],
+            EmployeeFieldsEnum::EMAIL->value => [
+                'required',
+                'email',
+                Rule::unique((new Employee())->getTable())->ignore($this->route('employee')),
+                Rule::unique('users', 'email')->ignore($employee?->user_id),
             ],
-            EmployeeFieldsEnum::PHONE->value        => ["required", "string", "max:255"],
-            EmployeeFieldsEnum::DESIGNATION->value  => ["nullable", "string", "max:255"],
-            EmployeeFieldsEnum::ADDRESS->value      => ["required", "string"],
-            EmployeeFieldsEnum::SALARY->value       => ["required", "numeric"],
-            EmployeeFieldsEnum::PHOTO->value        => ["nullable", "file", "mimes:jpg,jpeg,png,gif,svg", "max:1024"],
-            EmployeeFieldsEnum::NID->value          => ["nullable", "string", "max:255"],
-            EmployeeFieldsEnum::JOINING_DATE->value => ["required", "date", "max:255"],
+            EmployeeFieldsEnum::PHONE->value => ['required', 'string', 'max:255'],
+            EmployeeFieldsEnum::DESIGNATION->value => ['nullable', 'string', 'max:255'],
+            EmployeeFieldsEnum::ADDRESS->value => ['required', 'string'],
+            EmployeeFieldsEnum::SALARY->value => ['required', 'numeric'],
+            EmployeeFieldsEnum::PHOTO->value => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,svg', 'max:1024'],
+            EmployeeFieldsEnum::NID->value => ['nullable', 'string', 'max:255'],
+            EmployeeFieldsEnum::JOINING_DATE->value => ['required', 'date', 'max:255'],
+            'password' => ['nullable', 'string', 'min:6', 'max:100'],
         ];
     }
 }

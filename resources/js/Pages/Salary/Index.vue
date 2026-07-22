@@ -1,230 +1,234 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import CardTable from "@/Components/Cards/CardTable.vue";
-import TableData from "@/Components/TableData.vue";
-import Button from "@/Components/Button.vue";
-import InputError from "@/Components/InputError.vue";
-import Modal from "@/Components/Modal.vue";
+import AppAlert from '@/Components/UI/AppAlert.vue';
+import AppBadge from '@/Components/UI/AppBadge.vue';
+import AppButton from '@/Components/UI/AppButton.vue';
+import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
+import AppInput from '@/Components/UI/AppInput.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
+import AppPagination from '@/Components/UI/AppPagination.vue';
+import AsyncVueSelect from '@/Components/AsyncVueSelect.vue';
+import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import FilterPanel from '@/Components/UI/FilterPanel.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { useI18n } from '@/Composables/useI18n.js';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, nextTick, ref } from 'vue';
+import { cleanQuery, getCurrency, numberFormat, showToast } from '@/Utils/Helper.js';
 
-defineProps({
-    filters: {
-        type: Object
-    },
-    salaries: {
-        type: Object
-    },
+const props = defineProps({
+  filters: { type: Object, default: () => ({}) },
+  salaries: { type: Object, required: true },
 });
 
-import {useForm} from '@inertiajs/vue3';
-import {nextTick, ref} from 'vue';
-import DashboardInputGroup from "@/Components/DashboardInputGroup.vue";
-import AsyncVueSelect from "@/Components/AsyncVueSelect.vue";
-import {showToast} from "@/Utils/Helper.js";
-
+const { t } = useI18n();
 const selectedSalary = ref(null);
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
-const showDeleteModal = ref(false);
-const nameInput = ref(null);
-const tableHeads = ref(['#', "Employee", "Amount", "Salary Date", "Action"]);
+const showDeleteDialog = ref(false);
+const employeeSelect = ref(null);
 
-const form = useForm({
-    employee_id: "",
-    amount: "",
-    salary_date: "",
+const filterForm = useForm({
+  salary_date: props.filters?.salary_date?.value || '',
 });
 
-const editSalaryModal = (salary) => {
-    selectedSalary.value = salary;
+const form = useForm({
+  employee_id: '',
+  amount: '',
+  salary_date: '',
+});
 
-    form.employee_id = salary.employee_id;
-    form.amount = salary.amount;
-    form.salary_date = salary.salary_date;
+const items = computed(() => props.salaries?.data || []);
 
-    showEditModal.value = true;
-    nextTick(() => nameInput.value.focus());
-};
+function money(value) {
+  return `${getCurrency()}${numberFormat(Number(value || 0))}`;
+}
 
-const deleteSalaryModal = (salary) => {
-    selectedSalary.value = salary;
-    showDeleteModal.value = true;
-};
+function salaryEmployeeName(salary) {
+  return salary.employee?.name || t('common.unavailable');
+}
 
-const createSalary = () => {
-    form.post(route('salaries.store'), {
-        preserveScroll: true,
-        onSuccess: (e) => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function applyFilters() {
+  router.get(route('salaries.index'), cleanQuery(filterForm.data()), { preserveState: true, replace: true });
+}
 
-const updateSalary = () => {
-    form.put(route('salaries.update', selectedSalary.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-        onError: () => nameInput.value.focus(),
-    });
-};
+function clearFilters() {
+  filterForm.salary_date = '';
+  router.get(route('salaries.index'), {}, { preserveState: true, replace: true });
+}
 
-const deleteSalary = () => {
-    form.delete(route('salaries.destroy', selectedSalary.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeModal();
-            showToast();
-        },
-    });
-};
+function openCreateModal() {
+  selectedSalary.value = null;
+  form.reset();
+  form.clearErrors();
+  showCreateModal.value = true;
+  nextTick(() => employeeSelect.value?.$el?.querySelector('input')?.focus?.());
+}
 
-const closeModal = () => {
-    showCreateModal.value = false;
-    showEditModal.value = false;
-    showDeleteModal.value = false;
-    form.reset();
-};
+function openEditModal(salary) {
+  selectedSalary.value = salary;
+  form.employee_id = salary.employee_id;
+  form.amount = salary.amount;
+  form.salary_date = salary.salary_date;
+  form.clearErrors();
+  showEditModal.value = true;
+}
+
+function createSalary() {
+  form.post(route('salaries.store'), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showCreateModal.value = false;
+      showToast();
+      form.reset();
+    },
+  });
+}
+
+function updateSalary() {
+  form.put(route('salaries.update', selectedSalary.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showEditModal.value = false;
+      showToast();
+      form.reset();
+    },
+  });
+}
+
+function openDeleteDialog(salary) {
+  selectedSalary.value = salary;
+  showDeleteDialog.value = true;
+}
+
+function deleteSalary() {
+  form.delete(route('salaries.destroy', selectedSalary.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showDeleteDialog.value = false;
+      selectedSalary.value = null;
+      showToast();
+    },
+  });
+}
 </script>
 
 <template>
-    <Head title="Salary"/>
+  <Head :title="t('admin.salaries.title')" />
 
-    <AuthenticatedLayout>
-        <template #breadcrumb>
-            Salary
+  <AuthenticatedLayout>
+    <template #breadcrumb>{{ t('admin.salaries.title') }}</template>
+
+    <div class="space-y-5 px-4">
+      <PageHeader :title="t('admin.salaries.title')" :description="t('admin.salaries.description')" :count="salaries.total">
+        <template #actions>
+          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.salaries.create') }}</AppButton>
         </template>
+      </PageHeader>
 
-        <div class="flex flex-wrap">
-            <div class="w-full px-4">
-                <CardTable
-                    indexRoute="salaries.index"
-                    :paginatedData="salaries"
-                    :filters="filters"
-                    :tableHeads="tableHeads"
-                >
-                    <template #cardHeader>
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-2xl">Apply filters({{salaries.total}})</h4>
-                            <Button @click=" showCreateModal = true">Pay Salary</Button>
-                        </div>
-                    </template>
+      <AppAlert variant="info" :title="t('admin.salaries.title')" :message="t('admin.salaries.active_note')" />
 
-                    <tr v-for="(salary, index) in salaries.data" :key="salary.id">
-                        <TableData>
-                            {{ (salaries.current_page * salaries.per_page) - (salaries.per_page - (index + 1)) }}
-                        </TableData>
-                        <TableData>{{ salary.employee.name }} ({{ salary.employee.designation }})</TableData>
-                        <TableData>{{ salary.amount }}</TableData>
-                        <TableData>{{ salary.salary_date }}</TableData>
-                        <TableData>
-                            <Button @click="editSalaryModal(salary)">
-                                <i class="fa fa-edit"></i>
-                            </Button>
-                            <Button
-                                @click="deleteSalaryModal(salary)"
-                                type="red"
-                            >
-                                <i class="fa fa-trash-alt"></i>
-                            </Button>
-                        </TableData>
-                    </tr>
-                </CardTable>
-            </div>
+      <FilterPanel>
+        <form class="ihc-filter-grid" @submit.prevent="applyFilters">
+          <AppInput v-model="filterForm.salary_date" :label="t('admin.fields.salary_date')" type="month" :placeholder="t('admin.salaries.month_placeholder')" />
+          <div class="flex items-end gap-2">
+            <AppButton type="submit" icon="fa-filter" :loading="filterForm.processing">{{ t('actions.apply_filters') }}</AppButton>
+            <AppButton type="button" variant="secondary" icon="fa-eraser" @click="clearFilters">{{ t('actions.clear_filters') }}</AppButton>
+          </div>
+        </form>
+      </FilterPanel>
+
+      <section class="ihc-panel overflow-hidden">
+        <div v-if="items.length" class="hidden overflow-x-auto lg:block">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase">
+              <tr>
+                <th scope="col" class="px-4 py-3">{{ t('admin.salaries.employee') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.work_position') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('common.amount') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('admin.fields.salary_date') }}</th>
+                <th scope="col" class="px-4 py-3">{{ t('common.status') }}</th>
+                <th scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="salary in items" :key="salary.id">
+                <td class="px-4 py-3 font-black text-[var(--color-text-primary)]">{{ salaryEmployeeName(salary) }}</td>
+                <td class="px-4 py-3">{{ salary.employee?.designation || '-' }}</td>
+                <td class="px-4 py-3 font-black">{{ money(salary.amount) }}</td>
+                <td class="px-4 py-3">{{ salary.salary_date }}</td>
+                <td class="px-4 py-3"><AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge></td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-2">
+                    <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${salaryEmployeeName(salary)}`" @click="openEditModal(salary)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
+                    <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${salaryEmployeeName(salary)}`" @click="openDeleteDialog(salary)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!--Create data-->
-        <Modal
-            title="Pay Salary"
-            :show="showCreateModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="createSalary"
-        >
-            <div class="mt-2 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 min-h-32">
-                <div class="flex flex-col">
-                    <label for="employee" class="text-stone-600 text-sm font-medium">Select Employee</label>
-                    <AsyncVueSelect
-                        v-model="form.employee_id"
-                        resource="employees.index"
-                        placeholder="Select employee"
-                        class="mt-2"
-                    />
-                    <InputError :message="form.errors.employee_id"/>
-                </div>
-                <div class="flex flex-col overflow-auto">
-                    <DashboardInputGroup
-                        label="Salary Date"
-                        name="salary_date"
-                        v-model="form.salary_date"
-                        placeholder="Enter salary date"
-                        :errorMessage="form.errors.salary_date"
-                        @keyupEnter="createSalary"
-                        type="date"
-                    />
-                </div>
+        <div v-if="items.length" class="divide-y divide-[var(--color-border)] lg:hidden">
+          <article v-for="salary in items" :key="salary.id" class="p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="break-words font-black text-[var(--color-text-primary)]">{{ salaryEmployeeName(salary) }}</h2>
+                <p class="app-ui-help">{{ salary.employee?.designation || '-' }} · {{ salary.salary_date }}</p>
+              </div>
+              <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
-        </Modal>
+            <p class="mt-2 font-black">{{ money(salary.amount) }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${salaryEmployeeName(salary)}`" @click="openEditModal(salary)">{{ t('actions.edit') }}</AppButton>
+              <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${salaryEmployeeName(salary)}`" @click="openDeleteDialog(salary)">{{ t('actions.delete') }}</AppButton>
+            </div>
+          </article>
+        </div>
 
-        <!--Edit data-->
-        <Modal
-            title="Edit"
-            :show="showEditModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="updateSalary"
-        >
-            <div>
-                <DashboardInputGroup
-                    label="Employee"
-                    name="employee_id"
-                    v-model="form.employee_id"
-                    placeholder="Select employee"
-                    :errorMessage="form.errors.employee_id"
-                    @keyupEnter="createSalary"
-                />
-            </div>
-            <div class="mt-2 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                <div class="flex flex-col overflow-auto">
-                    <DashboardInputGroup
-                        label="Amount"
-                        name="amount"
-                        v-model="form.amount"
-                        placeholder="Enter amount"
-                        :errorMessage="form.errors.amount"
-                        @keyupEnter="createSalary"
-                        type="number"
-                    />
-                </div>
-                <div class="flex flex-col overflow-auto">
-                    <DashboardInputGroup
-                        label="Salary Date"
-                        name="salary_date"
-                        v-model="form.salary_date"
-                        placeholder="Enter salary date"
-                        :errorMessage="form.errors.salary_date"
-                        @keyupEnter="createSalary"
-                        type="date"
-                    />
-                </div>
-            </div>
-        </Modal>
+        <AppEmptyState v-if="!items.length" icon="fa-money-check-alt" :title="t('admin.salaries.empty')" :description="t('admin.salaries.description')" />
+      </section>
 
-        <!--Delete data-->
-        <Modal
-            title="Delete"
-            :show="showDeleteModal"
-            :formProcessing="form.processing"
-            @close="closeModal"
-            @submitAction="deleteSalary"
-            maxWidth="sm"
-            submitButtonText="Yes, delete it!"
-        >
-            Are you sure you want to delete this salary?
-        </Modal>
-    </AuthenticatedLayout>
+      <AppPagination :links="salaries.links" :label="t('pagination.label')" />
+    </div>
+
+    <AppModal :show="showCreateModal" :title="t('admin.salaries.create')" size="md" @close="showCreateModal = false">
+      <div class="space-y-4">
+        <label class="app-ui-field">
+          <span class="app-ui-label">{{ t('admin.salaries.employee') }} <span aria-hidden="true">*</span></span>
+          <AsyncVueSelect ref="employeeSelect" v-model="form.employee_id" resource="employees.index" resource-label="name" :placeholder="t('admin.salaries.search_placeholder')" />
+          <span v-if="form.errors.employee_id" class="app-ui-error"><i class="fas fa-circle-exclamation" aria-hidden="true"></i>{{ form.errors.employee_id }}</span>
+        </label>
+        <AppInput v-model="form.salary_date" :label="t('admin.fields.salary_date')" type="date" :error="form.errors.salary_date" required />
+      </div>
+      <template #footer>
+        <AppButton variant="secondary" :disabled="form.processing" @click="showCreateModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" :loading="form.processing" :loading-text="t('common.loading')" @click="createSalary">{{ t('admin.salaries.save') }}</AppButton>
+      </template>
+    </AppModal>
+
+    <AppModal :show="showEditModal" :title="t('admin.salaries.edit')" size="md" @close="showEditModal = false">
+      <div class="space-y-4">
+        <AppInput v-model="form.employee_id" :label="t('admin.salaries.employee')" :error="form.errors.employee_id" required />
+        <AppInput v-model="form.amount" :label="t('common.amount')" type="number" min="0" step="0.01" :error="form.errors.amount" required />
+        <AppInput v-model="form.salary_date" :label="t('admin.fields.salary_date')" type="date" :error="form.errors.salary_date" required />
+      </div>
+      <template #footer>
+        <AppButton variant="secondary" :disabled="form.processing" @click="showEditModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" :loading="form.processing" :loading-text="t('common.loading')" @click="updateSalary">{{ t('admin.salaries.save') }}</AppButton>
+      </template>
+    </AppModal>
+
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      :title="t('admin.salaries.delete_title')"
+      :action="t('admin.salaries.delete_action', { name: salaryEmployeeName(selectedSalary || {}) })"
+      :consequence="t('admin.salaries.delete_consequence')"
+      :confirm-text="t('actions.delete')"
+      :cancel-text="t('actions.cancel')"
+      :loading="form.processing"
+      @cancel="showDeleteDialog = false"
+      @confirm="deleteSalary"
+    />
+  </AuthenticatedLayout>
 </template>

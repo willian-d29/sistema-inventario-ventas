@@ -3,7 +3,6 @@ import '../css/app.css';
 
 // styles
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "@/assets/styles/tailwind.css";
 
 import 'notivue/notification.css'
 import 'notivue/animations.css'
@@ -13,14 +12,12 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createNotivue } from 'notivue'
-import axios from 'axios'; // ✅ asegúrate que axios esté presente
-import { InertiaProgress } from '@inertiajs/progress'
+import axios from 'axios';
 
-// ✅ CONFIGURAR axios para CSRF correctamente (esencial para evitar 403 en logout)
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.withCredentials = true;
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'LaraTory';
 const notivue = createNotivue()
 
 createInertiaApp({
@@ -38,5 +35,3 @@ createInertiaApp({
         showSpinner: true,
     },
 });
-
-InertiaProgress.init(); // opcional: progreso en navegación

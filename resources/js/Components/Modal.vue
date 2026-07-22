@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, onUnmounted, watch} from 'vue';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import Button from "@/Components/Button.vue";
 import SubmitButton from "@/Components/SubmitButton.vue";
 
@@ -27,21 +27,32 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    submitDisabled: {
+        type: Boolean,
+        default: false,
+    },
     submitButtonText: {
         type: String,
-        default: "Submit",
+        default: "Guardar",
     },
 });
 
 const emit = defineEmits(['close', 'submitAction']);
+const dialogRef = ref(null);
+let previouslyFocusedElement = null;
+
+const titleId = computed(() => `modal-title-${String(props.title || 'dialog').toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
 
 watch(
     () => props.show,
     () => {
         if (props.show) {
+            previouslyFocusedElement = document.activeElement;
             document.body.style.overflow = 'hidden';
+            nextTick(() => dialogRef.value?.focus());
         } else {
             document.body.style.overflow = null;
+            previouslyFocusedElement?.focus?.();
         }
     }
 );
@@ -96,7 +107,7 @@ const maxWidthClass = computed(() => {
                     leave-to-class="opacity-0"
                 >
                     <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-500 opacity-75"/>
+                        <div class="absolute inset-0 bg-[var(--color-overlay)]"/>
                     </div>
                 </Transition>
 
@@ -110,36 +121,45 @@ const maxWidthClass = computed(() => {
                 >
                     <div
                         v-show="show"
-                        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        ref="dialogRef"
+                        role="dialog"
+                        aria-modal="true"
+                        :aria-labelledby="titleId"
+                        tabindex="-1"
+                        class="mx-3 mb-6 max-h-[90vh] overflow-hidden bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-lg)] transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass"
+                        :style="{ borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }"
                     >
                         <div
-                            class="flex items-start justify-between p-3 border-b border-solid border-blueGray-200 rounded-t">
-                            <h6 class="text-2xl font-semibold">
+                            class="flex items-start justify-between border-b border-solid border-[var(--color-border)] p-3">
+                            <h6 :id="titleId" class="text-lg font-semibold text-[var(--color-text-primary)]">
                                 {{ title }}
                             </h6>
                             <button
-                                class="p-1 ml-auto bg-transparent border-0 text-black opacity-100 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                                class="ihc-icon-button ml-auto"
                                 @click="close"
+                                title="Cerrar"
+                                aria-label="Cerrar modal"
                             >
                                 <span
-                                    class="bg-transparent text-black opacity-100 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                                    ×
+                                    class="block h-6 w-6 bg-transparent text-2xl text-[var(--color-text-primary)] opacity-100 outline-none focus:outline-none">
+                                    <i class="fas fa-times text-base"></i>
                                 </span>
                             </button>
                         </div>
 
-                        <div class="p-6">
+                        <div class="max-h-[calc(90vh-4rem)] overflow-y-auto p-5">
 
                             <slot v-if="show"/>
 
                             <div class="mt-6 flex justify-end">
-                                <Button type="gray" @click="close">Cancel</Button>
+                                <Button type="gray" @click="close">Cancelar</Button>
                                 <SubmitButton
                                     v-if="showSubmitButton"
                                     :processing="formProcessing"
+                                    :disabled="submitDisabled"
                                     @click="submitAction"
-                                    class="text-white bg-emerald-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                                    class="app-button app-button-primary mr-1"
                                 >
                                     {{ submitButtonText }}
                                 </SubmitButton>
