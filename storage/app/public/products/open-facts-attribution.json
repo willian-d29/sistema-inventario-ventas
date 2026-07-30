@@ -1,0 +1,1892 @@
+[
+    {
+        "product_id": 1,
+        "product_name": "Costeno Arroz Extra 5 kg",
+        "file": "products/costeno-arroz-extra-5-kg-1.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7755139003448",
+        "matched_name": "Arroz costeño extra 3 kg",
+        "brand": "Costeño",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 2,
+        "product_name": "Paisana Azucar Rubia 1 kg",
+        "file": "products/paisana-azucar-rubia-1-kg-2.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 4,
+        "product_name": "Lavaggi Fideo Spaghetti 500 g",
+        "file": "products/lavaggi-fideo-spaghetti-500-g-4.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 5,
+        "product_name": "Nicolini Harina Preparada 1 kg",
+        "file": "products/nicolini-harina-preparada-1-kg-5.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 6,
+        "product_name": "Florida Atun Trozos en Aceite 170 g",
+        "file": "products/florida-atun-trozos-en-aceite-170-g-6.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7751158010443",
+        "matched_name": "Trozos De Atún En Aceite Vegetal x 140gr",
+        "brand": "Florida",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 7,
+        "product_name": "Gloria Leche Evaporada Entera 400 g",
+        "file": "products/gloria-leche-evaporada-entera-400-g-7.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 8,
+        "product_name": "Costeno Lenteja Bebita 500 g",
+        "file": "products/costeno-lenteja-bebita-500-g-8.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 10,
+        "product_name": "Bells Avena Tradicional 900 g",
+        "file": "products/bells-avena-tradicional-900-g-10.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/7501003301819",
+        "matched_name": "Mayonesa con jugo de Limones",
+        "brand": "McCormick",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 11,
+        "product_name": "Coca-Cola Original 1.5 L",
+        "file": "products/coca-cola-original-15-l-11.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7702354957537",
+        "matched_name": "AMPER",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 12,
+        "product_name": "Inca Kola 1.5 L",
+        "file": "products/inca-kola-15-l-12.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7503044233241",
+        "matched_name": "Six bud light 330ml",
+        "brand": "ANHEUSER-BUSCH. INC.",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 13,
+        "product_name": "San Luis Agua sin Gas 2.5 L",
+        "file": "products/san-luis-agua-sin-gas-25-l-13.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7790895640599",
+        "matched_name": "Coca Cola",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 14,
+        "product_name": "Cielo Agua Mineral 625 ml",
+        "file": "products/cielo-agua-mineral-625-ml-14.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7804651931903",
+        "matched_name": "SueroX Sabor a Arándano-Pomelo",
+        "brand": "SueroX",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 15,
+        "product_name": "Frugos Durazno 1 L",
+        "file": "products/frugos-durazno-1-l-15.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7809634100048",
+        "matched_name": "Cerveza Austral Calafate Ale",
+        "brand": "Austral",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 16,
+        "product_name": "Sporade Blueberry 500 ml",
+        "file": "products/sporade-blueberry-500-ml-16.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/8432286010138",
+        "matched_name": null,
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 17,
+        "product_name": "Volt Energy Drink 300 ml",
+        "file": "products/volt-energy-drink-300-ml-17.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7501055386666",
+        "matched_name": "FANTA BEETLEJUICE",
+        "brand": "Coca-Cola",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 18,
+        "product_name": "Cusquena Malta 330 ml",
+        "file": "products/cusquena-malta-330-ml-18.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/6736820700830",
+        "matched_name": "Pro Game",
+        "brand": "Stamina",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 19,
+        "product_name": "Free Tea Verde Limon 475 ml",
+        "file": "products/free-tea-verde-limon-475-ml-19.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7500462981006",
+        "matched_name": "Cuba Libre",
+        "brand": "Cuba Libre",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 20,
+        "product_name": "Laive Yogurt Bebible Fresa 1 L",
+        "file": "products/laive-yogurt-bebible-fresa-1-l-20.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/7707232091853",
+        "matched_name": "Esbelt",
+        "brand": "Natural",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 21,
+        "product_name": "Gloria Leche UHT Entera 1 L",
+        "file": "products/gloria-leche-uht-entera-1-l-21.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/9788897192008",
+        "matched_name": "Yogurt magro",
+        "brand": "Scaldasole",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 22,
+        "product_name": "Laive Yogurt Griego Natural 500 g",
+        "file": "products/laive-yogurt-griego-natural-500-g-22.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/9782940500512",
+        "matched_name": "Fromage blanc",
+        "brand": "",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 23,
+        "product_name": "Bonle Queso Edam Tajado 180 g",
+        "file": "products/bonle-queso-edam-tajado-180-g-23.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/9777777538449",
+        "matched_name": null,
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 24,
+        "product_name": "Manty Mantequilla con Sal 200 g",
+        "file": "products/manty-mantequilla-con-sal-200-g-24.jpg",
+        "source": "Open Openproductsfacts",
+        "source_url": "https://world.openproductsfacts.org/product/3133200062763",
+        "matched_name": "Yaourt",
+        "brand": "Belle France",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 25,
+        "product_name": "Laive Queso Fresco 400 g",
+        "file": "products/laive-queso-fresco-400-g-25.jpg",
+        "source": "Open Openbeautyfacts",
+        "source_url": "https://world.openbeautyfacts.org/product/8901396388159",
+        "matched_name": "Dettol",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 26,
+        "product_name": "Avinka Huevos Pardos Bandeja 15 und",
+        "file": "products/avinka-huevos-pardos-bandeja-15-und-26.jpg",
+        "source": "Open Openbeautyfacts",
+        "source_url": "https://world.openbeautyfacts.org/product/8594175100723",
+        "matched_name": "Čokoládovo-banánový nanuk",
+        "brand": "Soyka",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 27,
+        "product_name": "Gloria Yogurt Pro Fresa 1 kg",
+        "file": "products/gloria-yogurt-pro-fresa-1-kg-27.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/yogurt,bottle,dairy,product?lock=4227",
+        "matched_name": "Gloria Yogurt Pro Fresa 1 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 28,
+        "product_name": "Milkito Manjar Blanco 250 g",
+        "file": "products/milkito-manjar-blanco-250-g-28.jpg",
+        "source": "Open Openbeautyfacts",
+        "source_url": "https://world.openbeautyfacts.org/product/1298668328744",
+        "matched_name": "Calcium Vitamine D",
+        "brand": "SH",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 29,
+        "product_name": "Bonle Mozzarella Rallada 200 g",
+        "file": "products/bonle-mozzarella-rallada-200-g-29.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dairy,milk,cheese,eggs,yogurt?lock=4229",
+        "matched_name": "Bonle Mozzarella Rallada 200 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 30,
+        "product_name": "Laive Crema de Leche 200 ml",
+        "file": "products/laive-crema-de-leche-200-ml-30.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cream,carton,dairy,product?lock=4230",
+        "matched_name": "Laive Crema de Leche 200 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 31,
+        "product_name": "Platano de Seda por kg",
+        "file": "products/platano-de-seda-por-kg-31.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/20815394",
+        "matched_name": "Mix di frutta secca",
+        "brand": "Alesto",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 32,
+        "product_name": "Manzana Royal Gala por kg",
+        "file": "products/manzana-royal-gala-por-kg-32.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/apple,fruit,supermarket?lock=4232",
+        "matched_name": "Manzana Royal Gala por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 33,
+        "product_name": "Naranja de Jugo por kg",
+        "file": "products/naranja-de-jugo-por-kg-33.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/8480000171320",
+        "matched_name": "Tomate frito",
+        "brand": "Hacendado",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 34,
+        "product_name": "Palta Fuerte por kg",
+        "file": "products/palta-fuerte-por-kg-34.jpg",
+        "source": "Open Openfoodfacts",
+        "source_url": "https://world.openfoodfacts.org/product/8480000235794",
+        "matched_name": "Ketchup",
+        "brand": "Hacendado",
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 35,
+        "product_name": "Tomate Italiano por kg",
+        "file": "products/tomate-italiano-por-kg-35.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/tomato,vegetable,supermarket?lock=4235",
+        "matched_name": "Tomate Italiano por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 36,
+        "product_name": "Papa Blanca Seleccionada por kg",
+        "file": "products/papa-blanca-seleccionada-por-kg-36.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/potato,vegetable,supermarket?lock=4236",
+        "matched_name": "Papa Blanca Seleccionada por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 37,
+        "product_name": "Zanahoria Lavada por kg",
+        "file": "products/zanahoria-lavada-por-kg-37.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/carrot,vegetable,supermarket?lock=4237",
+        "matched_name": "Zanahoria Lavada por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 38,
+        "product_name": "Cebolla Roja por kg",
+        "file": "products/cebolla-roja-por-kg-38.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/red,onion,vegetable,supermarket?lock=4238",
+        "matched_name": "Cebolla Roja por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 39,
+        "product_name": "Lechuga Americana unidad",
+        "file": "products/lechuga-americana-unidad-39.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/lettuce,vegetable,supermarket?lock=4239",
+        "matched_name": "Lechuga Americana unidad",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 40,
+        "product_name": "Brocoli Fresco unidad",
+        "file": "products/brocoli-fresco-unidad-40.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/broccoli,vegetable,supermarket?lock=4240",
+        "matched_name": "Brocoli Fresco unidad",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 41,
+        "product_name": "Pechuga de Pollo Fresca por kg",
+        "file": "products/pechuga-de-pollo-fresca-por-kg-41.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chicken,breast,meat,supermarket?lock=4241",
+        "matched_name": "Pechuga de Pollo Fresca por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 42,
+        "product_name": "Pierna con Encuentro de Pollo por kg",
+        "file": "products/pierna-con-encuentro-de-pollo-por-kg-42.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chicken,legs,meat,supermarket?lock=4242",
+        "matched_name": "Pierna con Encuentro de Pollo por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 43,
+        "product_name": "Carne Molida Premium por kg",
+        "file": "products/carne-molida-premium-por-kg-43.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/ground,beef,meat,supermarket?lock=4243",
+        "matched_name": "Carne Molida Premium por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 44,
+        "product_name": "Bistec de Res Nacional por kg",
+        "file": "products/bistec-de-res-nacional-por-kg-44.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/beef,steak,meat,supermarket?lock=4244",
+        "matched_name": "Bistec de Res Nacional por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 45,
+        "product_name": "Chuleta de Cerdo por kg",
+        "file": "products/chuleta-de-cerdo-por-kg-45.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/pork,chop,meat,supermarket?lock=4245",
+        "matched_name": "Chuleta de Cerdo por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 46,
+        "product_name": "Filete de Tilapia por kg",
+        "file": "products/filete-de-tilapia-por-kg-46.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/fish,fillet,seafood,supermarket?lock=4246",
+        "matched_name": "Filete de Tilapia por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 47,
+        "product_name": "Trucha Entera Limpia por kg",
+        "file": "products/trucha-entera-limpia-por-kg-47.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/trout,fish,seafood,supermarket?lock=4247",
+        "matched_name": "Trucha Entera Limpia por kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 48,
+        "product_name": "Hamburguesa de Res Pack 4 und",
+        "file": "products/hamburguesa-de-res-pack-4-und-48.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/burger,patties,frozen,food,product?lock=4248",
+        "matched_name": "Hamburguesa de Res Pack 4 und",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 49,
+        "product_name": "Hot Dog Otto Kunz 500 g",
+        "file": "products/hot-dog-otto-kunz-500-g-49.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hot,dog,package,meat,product?lock=4249",
+        "matched_name": "Hot Dog Otto Kunz 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 50,
+        "product_name": "Chorizo Parrillero Braedt 500 g",
+        "file": "products/chorizo-parrillero-braedt-500-g-50.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chorizo,sausage,meat,product?lock=4250",
+        "matched_name": "Chorizo Parrillero Braedt 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 51,
+        "product_name": "Ariel Detergente Liquido 1.8 L",
+        "file": "products/ariel-detergente-liquido-18-l-51.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/laundry,detergent,cleaning,product?lock=4251",
+        "matched_name": "Ariel Detergente Liquido 1.8 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 52,
+        "product_name": "Bolivar Detergente en Polvo 2.6 kg",
+        "file": "products/bolivar-detergente-en-polvo-26-kg-52.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/laundry,detergent,cleaning,product?lock=4252",
+        "matched_name": "Bolivar Detergente en Polvo 2.6 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 53,
+        "product_name": "Sapolio Lavavajilla Limon 900 ml",
+        "file": "products/sapolio-lavavajilla-limon-900-ml-53.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dish,soap,cleaning,product?lock=4253",
+        "matched_name": "Sapolio Lavavajilla Limon 900 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 54,
+        "product_name": "Clorox Lejia Tradicional 1 L",
+        "file": "products/clorox-lejia-tradicional-1-l-54.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/bleach,bottle,cleaning,product?lock=4254",
+        "matched_name": "Clorox Lejia Tradicional 1 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 55,
+        "product_name": "Poett Limpiador Lavanda 900 ml",
+        "file": "products/poett-limpiador-lavanda-900-ml-55.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cleaner,bottle,cleaning,product?lock=4255",
+        "matched_name": "Poett Limpiador Lavanda 900 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 56,
+        "product_name": "Mr Musculo Limpia Vidrios 500 ml",
+        "file": "products/mr-musculo-limpia-vidrios-500-ml-56.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/glass,cleaner,spray,bottle,product?lock=4256",
+        "matched_name": "Mr Musculo Limpia Vidrios 500 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 57,
+        "product_name": "Suavitel Suavizante Primavera 850 ml",
+        "file": "products/suavitel-suavizante-primavera-850-ml-57.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/fabric,softener,bottle,product?lock=4257",
+        "matched_name": "Suavitel Suavizante Primavera 850 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 58,
+        "product_name": "Virutex Esponja Multiuso Pack 3",
+        "file": "products/virutex-esponja-multiuso-pack-3-58.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cleaning,sponge,package,product?lock=4258",
+        "matched_name": "Virutex Esponja Multiuso Pack 3",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 59,
+        "product_name": "Elite Papel Toalla Doble Hoja Pack 2",
+        "file": "products/elite-papel-toalla-doble-hoja-pack-2-59.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/paper,towel,roll,product?lock=4259",
+        "matched_name": "Elite Papel Toalla Doble Hoja Pack 2",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 60,
+        "product_name": "Bolsa de Basura Reforzada 75 L Pack 10",
+        "file": "products/bolsa-de-basura-reforzada-75-l-pack-10-60.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/trash,bags,package,product?lock=4260",
+        "matched_name": "Bolsa de Basura Reforzada 75 L Pack 10",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 61,
+        "product_name": "Colgate Triple Accion 90 g",
+        "file": "products/colgate-triple-accion-90-g-61.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/toothpaste,tube,product?lock=4261",
+        "matched_name": "Colgate Triple Accion 90 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 62,
+        "product_name": "Oral-B Cepillo Dental Pro Salud",
+        "file": "products/oral-b-cepillo-dental-pro-salud-62.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/toothbrush,package,product?lock=4262",
+        "matched_name": "Oral-B Cepillo Dental Pro Salud",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 63,
+        "product_name": "Dove Jabon Barra Original 90 g",
+        "file": "products/dove-jabon-barra-original-90-g-63.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/soap,bar,bath,product?lock=4263",
+        "matched_name": "Dove Jabon Barra Original 90 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 64,
+        "product_name": "Head and Shoulders Shampoo Limpieza 375 ml",
+        "file": "products/head-and-shoulders-shampoo-limpieza-375-ml-64.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/shampoo,bottle,product?lock=4264",
+        "matched_name": "Head and Shoulders Shampoo Limpieza 375 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 65,
+        "product_name": "Rexona Desodorante Invisible 150 ml",
+        "file": "products/rexona-desodorante-invisible-150-ml-65.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/deodorant,spray,product?lock=4265",
+        "matched_name": "Rexona Desodorante Invisible 150 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 66,
+        "product_name": "Nivea Men Gel de Ducha 250 ml",
+        "file": "products/nivea-men-gel-de-ducha-250-ml-66.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/shower,gel,bottle,product?lock=4266",
+        "matched_name": "Nivea Men Gel de Ducha 250 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 67,
+        "product_name": "Kotex Toallas Higienicas Nocturnas Pack 10",
+        "file": "products/kotex-toallas-higienicas-nocturnas-pack-10-67.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sanitary,pads,package,product?lock=4267",
+        "matched_name": "Kotex Toallas Higienicas Nocturnas Pack 10",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 68,
+        "product_name": "Nosotras Protectores Diarios Pack 60",
+        "file": "products/nosotras-protectores-diarios-pack-60-68.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/panty,liners,package,product?lock=4268",
+        "matched_name": "Nosotras Protectores Diarios Pack 60",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 69,
+        "product_name": "Elite Papel Higienico Triple Hoja Pack 12",
+        "file": "products/elite-papel-higienico-triple-hoja-pack-12-69.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/toilet,paper,package,product?lock=4269",
+        "matched_name": "Elite Papel Higienico Triple Hoja Pack 12",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 70,
+        "product_name": "Listerine Cool Mint 500 ml",
+        "file": "products/listerine-cool-mint-500-ml-70.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/mouthwash,bottle,product?lock=4270",
+        "matched_name": "Listerine Cool Mint 500 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 71,
+        "product_name": "Nivea Crema Corporal Milk 400 ml",
+        "file": "products/nivea-crema-corporal-milk-400-ml-71.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/body,lotion,bottle,product?lock=4271",
+        "matched_name": "Nivea Crema Corporal Milk 400 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 72,
+        "product_name": "Garnier Agua Micelar 400 ml",
+        "file": "products/garnier-agua-micelar-400-ml-72.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/water,bottle,beverage,product?lock=4272",
+        "matched_name": "Garnier Agua Micelar 400 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 73,
+        "product_name": "Maybelline Mascara Lash Sensational",
+        "file": "products/maybelline-mascara-lash-sensational-73.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/mascara,makeup,cosmetics,product?lock=4273",
+        "matched_name": "Maybelline Mascara Lash Sensational",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 74,
+        "product_name": "L Oreal Elvive Oleo Extraordinario 200 ml",
+        "file": "products/l-oreal-elvive-oleo-extraordinario-200-ml-74.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hair,treatment,bottle,product?lock=4274",
+        "matched_name": "L Oreal Elvive Oleo Extraordinario 200 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 75,
+        "product_name": "Neutrogena Protector Solar FPS 50 120 ml",
+        "file": "products/neutrogena-protector-solar-fps-50-120-ml-75.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sunscreen,bottle,product?lock=4275",
+        "matched_name": "Neutrogena Protector Solar FPS 50 120 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 76,
+        "product_name": "Dove Crema Peinar Rizos 300 ml",
+        "file": "products/dove-crema-peinar-rizos-300-ml-76.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hair,cream,jar,product?lock=4276",
+        "matched_name": "Dove Crema Peinar Rizos 300 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 77,
+        "product_name": "Pantene Ampollas Restauracion Pack 3",
+        "file": "products/pantene-ampollas-restauracion-pack-3-77.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hair,ampoules,beauty,product?lock=4277",
+        "matched_name": "Pantene Ampollas Restauracion Pack 3",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 78,
+        "product_name": "Revlon Esmalte Unas Rojo 14 ml",
+        "file": "products/revlon-esmalte-unas-rojo-14-ml-78.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/nail,polish,cosmetics,product?lock=4278",
+        "matched_name": "Revlon Esmalte Unas Rojo 14 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 79,
+        "product_name": "Gillette Venus Maquina Depilar Pack 2",
+        "file": "products/gillette-venus-maquina-depilar-pack-2-79.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/razor,package,product?lock=4279",
+        "matched_name": "Gillette Venus Maquina Depilar Pack 2",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 80,
+        "product_name": "Eucerin pH5 Locion 400 ml",
+        "file": "products/eucerin-ph5-locion-400-ml-80.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/skin,lotion,bottle,product?lock=4280",
+        "matched_name": "Eucerin pH5 Locion 400 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 81,
+        "product_name": "Samsung Galaxy A25 5G 128 GB",
+        "file": "products/samsung-galaxy-a25-5g-128-gb-81.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/smartphone,mobile,phone,product?lock=4281",
+        "matched_name": "Samsung Galaxy A25 5G 128 GB",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 82,
+        "product_name": "Xiaomi Redmi Buds 5",
+        "file": "products/xiaomi-redmi-buds-5-82.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/smartphone,mobile,phone,product?lock=4282",
+        "matched_name": "Xiaomi Redmi Buds 5",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 83,
+        "product_name": "Logitech M185 Mouse Inalambrico",
+        "file": "products/logitech-m185-mouse-inalambrico-83.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/wireless,mouse,product?lock=4283",
+        "matched_name": "Logitech M185 Mouse Inalambrico",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 84,
+        "product_name": "Kingston DataTraveler 128 GB",
+        "file": "products/kingston-datatraveler-128-gb-84.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/usb,flash,drive,product?lock=4284",
+        "matched_name": "Kingston DataTraveler 128 GB",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 85,
+        "product_name": "TP-Link Archer T3U Adaptador WiFi",
+        "file": "products/tp-link-archer-t3u-adaptador-wifi-85.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/wifi,adapter,product?lock=4285",
+        "matched_name": "TP-Link Archer T3U Adaptador WiFi",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 86,
+        "product_name": "Lenovo Tab M9 64 GB",
+        "file": "products/lenovo-tab-m9-64-gb-86.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/tablet,product?lock=4286",
+        "matched_name": "Lenovo Tab M9 64 GB",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 87,
+        "product_name": "JBL Go 4 Parlante Bluetooth",
+        "file": "products/jbl-go-4-parlante-bluetooth-87.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/bluetooth,speaker,product?lock=4287",
+        "matched_name": "JBL Go 4 Parlante Bluetooth",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 88,
+        "product_name": "Baseus Cargador USB-C 30W",
+        "file": "products/baseus-cargador-usb-c-30w-88.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/phone,charger,product?lock=4288",
+        "matched_name": "Baseus Cargador USB-C 30W",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 89,
+        "product_name": "Cable HDMI 2.0 2 m",
+        "file": "products/cable-hdmi-20-2-m-89.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hdmi,cable,product?lock=4289",
+        "matched_name": "Cable HDMI 2.0 2 m",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 90,
+        "product_name": "Forza UPS 750VA",
+        "file": "products/forza-ups-750va-90.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/ups,battery,backup,product?lock=4290",
+        "matched_name": "Forza UPS 750VA",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 100,
+        "product_name": "Midea Ventilador Torre 32",
+        "file": "products/midea-ventilador-torre-32-100.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/tower,fan,home,appliance,product?lock=4300",
+        "matched_name": "Midea Ventilador Torre 32",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 101,
+        "product_name": "Repisa Flotante Melamina Blanca 80 cm",
+        "file": "products/repisa-flotante-melamina-blanca-80-cm-101.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/floating,shelf,furniture,product?lock=4301",
+        "matched_name": "Repisa Flotante Melamina Blanca 80 cm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 102,
+        "product_name": "Organizador Plastico 4 Niveles",
+        "file": "products/organizador-plastico-4-niveles-102.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/plastic,organizer,storage,product?lock=4302",
+        "matched_name": "Organizador Plastico 4 Niveles",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 103,
+        "product_name": "Silla Plegable Negra",
+        "file": "products/silla-plegable-negra-103.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/folding,chair,furniture,product?lock=4303",
+        "matched_name": "Silla Plegable Negra",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 104,
+        "product_name": "Mesa Auxiliar Redonda Roble",
+        "file": "products/mesa-auxiliar-redonda-roble-104.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/side,table,furniture,product?lock=4304",
+        "matched_name": "Mesa Auxiliar Redonda Roble",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 105,
+        "product_name": "Zapatera Tela 6 Niveles",
+        "file": "products/zapatera-tela-6-niveles-105.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/shoe,rack,furniture,product?lock=4305",
+        "matched_name": "Zapatera Tela 6 Niveles",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 106,
+        "product_name": "Caja Organizadora 50 L Transparente",
+        "file": "products/caja-organizadora-50-l-transparente-106.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/plastic,organizer,storage,product?lock=4306",
+        "matched_name": "Caja Organizadora 50 L Transparente",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 107,
+        "product_name": "Perchero Metalico de Pie",
+        "file": "products/perchero-metalico-de-pie-107.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/coat,rack,furniture,product?lock=4307",
+        "matched_name": "Perchero Metalico de Pie",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 108,
+        "product_name": "Canasta Rattan Rectangular",
+        "file": "products/canasta-rattan-rectangular-108.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/storage,basket,product?lock=4308",
+        "matched_name": "Canasta Rattan Rectangular",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 109,
+        "product_name": "Estante Multiuso 5 Niveles",
+        "file": "products/estante-multiuso-5-niveles-109.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/shelving,unit,furniture,product?lock=4309",
+        "matched_name": "Estante Multiuso 5 Niveles",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 110,
+        "product_name": "Cesto de Ropa con Tapa 60 L",
+        "file": "products/cesto-de-ropa-con-tapa-60-l-110.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/laundry,basket,product?lock=4310",
+        "matched_name": "Cesto de Ropa con Tapa 60 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 111,
+        "product_name": "Balon Adidas Club Numero 5",
+        "file": "products/balon-adidas-club-numero-5-111.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/soccer,ball,sports,product?lock=4311",
+        "matched_name": "Balon Adidas Club Numero 5",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 112,
+        "product_name": "Mat Yoga Antideslizante 6 mm",
+        "file": "products/mat-yoga-antideslizante-6-mm-112.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/yoga,mat,sports,product?lock=4312",
+        "matched_name": "Mat Yoga Antideslizante 6 mm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 113,
+        "product_name": "Mancuerna Neopreno 5 kg",
+        "file": "products/mancuerna-neopreno-5-kg-113.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dumbbell,sports,product?lock=4313",
+        "matched_name": "Mancuerna Neopreno 5 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 114,
+        "product_name": "Tomatodo Deportivo 1 L",
+        "file": "products/tomatodo-deportivo-1-l-114.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sports,bottle,product?lock=4314",
+        "matched_name": "Tomatodo Deportivo 1 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 115,
+        "product_name": "Cuerda Saltar con Rodajes",
+        "file": "products/cuerda-saltar-con-rodajes-115.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/jump,rope,sports,product?lock=4315",
+        "matched_name": "Cuerda Saltar con Rodajes",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 116,
+        "product_name": "Guantes Fitness Talla M",
+        "file": "products/guantes-fitness-talla-m-116.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/fitness,gloves,sports,product?lock=4316",
+        "matched_name": "Guantes Fitness Talla M",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 117,
+        "product_name": "Pelota Pilates 65 cm",
+        "file": "products/pelota-pilates-65-cm-117.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/pilates,ball,sports,product?lock=4317",
+        "matched_name": "Pelota Pilates 65 cm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 118,
+        "product_name": "Set Bandas Elasticas Resistencia",
+        "file": "products/set-bandas-elasticas-resistencia-118.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/resistance,bands,sports,product?lock=4318",
+        "matched_name": "Set Bandas Elasticas Resistencia",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 119,
+        "product_name": "Cooler Portatil 12 L",
+        "file": "products/cooler-portatil-12-l-119.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/portable,cooler,outdoor,product?lock=4319",
+        "matched_name": "Cooler Portatil 12 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 120,
+        "product_name": "Silla Camping Plegable Azul",
+        "file": "products/silla-camping-plegable-azul-120.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/camping,chair,outdoor,product?lock=4320",
+        "matched_name": "Silla Camping Plegable Azul",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 121,
+        "product_name": "Pampers Confort Sec Talla M Pack 52",
+        "file": "products/pampers-confort-sec-talla-m-pack-52-121.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/diapers,package,baby,product?lock=4321",
+        "matched_name": "Pampers Confort Sec Talla M Pack 52",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 122,
+        "product_name": "Huggies Natural Care Panitos Pack 80",
+        "file": "products/huggies-natural-care-panitos-pack-80-122.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/baby,wipes,package,product?lock=4322",
+        "matched_name": "Huggies Natural Care Panitos Pack 80",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 123,
+        "product_name": "Ninet Leche Formula Etapa 3 800 g",
+        "file": "products/ninet-leche-formula-etapa-3-800-g-123.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/baby,formula,can,product?lock=4323",
+        "matched_name": "Ninet Leche Formula Etapa 3 800 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 124,
+        "product_name": "Gerber Compota Manzana 113 g",
+        "file": "products/gerber-compota-manzana-113-g-124.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/apple,fruit,supermarket?lock=4324",
+        "matched_name": "Gerber Compota Manzana 113 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 125,
+        "product_name": "Johnson Baby Shampoo 400 ml",
+        "file": "products/johnson-baby-shampoo-400-ml-125.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/shampoo,bottle,product?lock=4325",
+        "matched_name": "Johnson Baby Shampoo 400 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 126,
+        "product_name": "Babysec Panal Premium Talla G Pack 46",
+        "file": "products/babysec-panal-premium-talla-g-pack-46-126.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/diapers,package,baby,product?lock=4326",
+        "matched_name": "Babysec Panal Premium Talla G Pack 46",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 127,
+        "product_name": "Biberon Avent Natural 260 ml",
+        "file": "products/biberon-avent-natural-260-ml-127.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/baby,bottle,product?lock=4327",
+        "matched_name": "Biberon Avent Natural 260 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 128,
+        "product_name": "Nuby Vaso Entrenador 240 ml",
+        "file": "products/nuby-vaso-entrenador-240-ml-128.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/baby,training,cup,product?lock=4328",
+        "matched_name": "Nuby Vaso Entrenador 240 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 129,
+        "product_name": "Play-Doh Set Colores Basico",
+        "file": "products/play-doh-set-colores-basico-129.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/play,dough,toy,product?lock=4329",
+        "matched_name": "Play-Doh Set Colores Basico",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 130,
+        "product_name": "Hot Wheels Auto Basico Unidad",
+        "file": "products/hot-wheels-auto-basico-unidad-130.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/toy,car,product?lock=4330",
+        "matched_name": "Hot Wheels Auto Basico Unidad",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 131,
+        "product_name": "Ricocan Adulto Carne y Cereales 3 kg",
+        "file": "products/ricocan-adulto-carne-y-cereales-3-kg-131.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,food,bag,product?lock=4331",
+        "matched_name": "Ricocan Adulto Carne y Cereales 3 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 132,
+        "product_name": "Ricocat Pescado Adulto 1 kg",
+        "file": "products/ricocat-pescado-adulto-1-kg-132.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cat,food,bag,product?lock=4332",
+        "matched_name": "Ricocat Pescado Adulto 1 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 133,
+        "product_name": "Mimaskot Cachorro 2 kg",
+        "file": "products/mimaskot-cachorro-2-kg-133.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,food,bag,product?lock=4333",
+        "matched_name": "Mimaskot Cachorro 2 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 134,
+        "product_name": "Pedigree Adulto Carne 2 kg",
+        "file": "products/pedigree-adulto-carne-2-kg-134.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,food,bag,product?lock=4334",
+        "matched_name": "Pedigree Adulto Carne 2 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 135,
+        "product_name": "Whiskas Carne Sachet 85 g",
+        "file": "products/whiskas-carne-sachet-85-g-135.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cat,food,pouch,product?lock=4335",
+        "matched_name": "Whiskas Carne Sachet 85 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 136,
+        "product_name": "Arena Sanitaria Super Cat 4 kg",
+        "file": "products/arena-sanitaria-super-cat-4-kg-136.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cat,litter,bag,product?lock=4336",
+        "matched_name": "Arena Sanitaria Super Cat 4 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 137,
+        "product_name": "Shampoo Canino Antipulgas 250 ml",
+        "file": "products/shampoo-canino-antipulgas-250-ml-137.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,shampoo,bottle,product?lock=4337",
+        "matched_name": "Shampoo Canino Antipulgas 250 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 138,
+        "product_name": "Correa Nylon Mascota Mediana",
+        "file": "products/correa-nylon-mascota-mediana-138.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,leash,product?lock=4338",
+        "matched_name": "Correa Nylon Mascota Mediana",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 139,
+        "product_name": "Plato Acero Mascota 450 ml",
+        "file": "products/plato-acero-mascota-450-ml-139.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/pet,bowl,product?lock=4339",
+        "matched_name": "Plato Acero Mascota 450 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 140,
+        "product_name": "Galletas Caninas Dentales Pack 7",
+        "file": "products/galletas-caninas-dentales-pack-7-140.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dog,treats,product?lock=4340",
+        "matched_name": "Galletas Caninas Dentales Pack 7",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 141,
+        "product_name": "Pan Frances Bolsa 10 und",
+        "file": "products/pan-frances-bolsa-10-und-141.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/bread,rolls,bakery,product?lock=4341",
+        "matched_name": "Pan Frances Bolsa 10 und",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 142,
+        "product_name": "Pan Molde Integral Bimbo 600 g",
+        "file": "products/pan-molde-integral-bimbo-600-g-142.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sliced,bread,bakery,product?lock=4342",
+        "matched_name": "Pan Molde Integral Bimbo 600 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 143,
+        "product_name": "Croissant Mantequilla Unidad",
+        "file": "products/croissant-mantequilla-unidad-143.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/butter,package,dairy,product?lock=4343",
+        "matched_name": "Croissant Mantequilla Unidad",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 144,
+        "product_name": "Empanada de Carne Horneada",
+        "file": "products/empanada-de-carne-horneada-144.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/empanada,bakery,product?lock=4344",
+        "matched_name": "Empanada de Carne Horneada",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 145,
+        "product_name": "Keke Vainilla Familiar 450 g",
+        "file": "products/keke-vainilla-familiar-450-g-145.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/vanilla,cake,bakery,product?lock=4345",
+        "matched_name": "Keke Vainilla Familiar 450 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 146,
+        "product_name": "Torta Chocolate Porcion",
+        "file": "products/torta-chocolate-porcion-146.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chocolate,cake,slice,bakery,product?lock=4346",
+        "matched_name": "Torta Chocolate Porcion",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 147,
+        "product_name": "Pan Ciabatta Pack 6 und",
+        "file": "products/pan-ciabatta-pack-6-und-147.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/ciabatta,bread,bakery,product?lock=4347",
+        "matched_name": "Pan Ciabatta Pack 6 und",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 148,
+        "product_name": "Muffin Arandanos Unidad",
+        "file": "products/muffin-arandanos-unidad-148.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/blueberry,muffin,bakery,product?lock=4348",
+        "matched_name": "Muffin Arandanos Unidad",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 149,
+        "product_name": "Pionono Manjar Blanco 500 g",
+        "file": "products/pionono-manjar-blanco-500-g-149.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/caramel,spread,jar,product?lock=4349",
+        "matched_name": "Pionono Manjar Blanco 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 150,
+        "product_name": "Galleta Artesanal Avena 6 und",
+        "file": "products/galleta-artesanal-avena-6-und-150.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/oats,bag,grocery,product?lock=4350",
+        "matched_name": "Galleta Artesanal Avena 6 und",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 151,
+        "product_name": "McCain Papas Prefritas 1 kg",
+        "file": "products/mccain-papas-prefritas-1-kg-151.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/potato,vegetable,supermarket?lock=4351",
+        "matched_name": "McCain Papas Prefritas 1 kg",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 152,
+        "product_name": "San Fernando Nuggets Pollo 400 g",
+        "file": "products/san-fernando-nuggets-pollo-400-g-152.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chicken,nuggets,frozen,food,product?lock=4352",
+        "matched_name": "San Fernando Nuggets Pollo 400 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 153,
+        "product_name": "Tottus Mix Verduras Congeladas 500 g",
+        "file": "products/tottus-mix-verduras-congeladas-500-g-153.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frozen,vegetables,product?lock=4353",
+        "matched_name": "Tottus Mix Verduras Congeladas 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 154,
+        "product_name": "D Onofrio Helado Vainilla 1 L",
+        "file": "products/d-onofrio-helado-vainilla-1-l-154.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/ice,cream,tub,product?lock=4354",
+        "matched_name": "D Onofrio Helado Vainilla 1 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 155,
+        "product_name": "Pizza Familiar Americana Congelada",
+        "file": "products/pizza-familiar-americana-congelada-155.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frozen,pizza,product?lock=4355",
+        "matched_name": "Pizza Familiar Americana Congelada",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 156,
+        "product_name": "Filete Basa Congelado 500 g",
+        "file": "products/filete-basa-congelado-500-g-156.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frozen,fish,fillet,product?lock=4356",
+        "matched_name": "Filete Basa Congelado 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 157,
+        "product_name": "Hamburguesa Parrillera Congelada Pack 6",
+        "file": "products/hamburguesa-parrillera-congelada-pack-6-157.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/burger,patties,frozen,food,product?lock=4357",
+        "matched_name": "Hamburguesa Parrillera Congelada Pack 6",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 158,
+        "product_name": "Wong Tequenos Queso 500 g",
+        "file": "products/wong-tequenos-queso-500-g-158.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cheese,package,dairy,product?lock=4358",
+        "matched_name": "Wong Tequenos Queso 500 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 159,
+        "product_name": "Frutos Rojos Congelados 400 g",
+        "file": "products/frutos-rojos-congelados-400-g-159.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frozen,berries,product?lock=4359",
+        "matched_name": "Frutos Rojos Congelados 400 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 160,
+        "product_name": "Lasagna Bolognesa Congelada 700 g",
+        "file": "products/lasagna-bolognesa-congelada-700-g-160.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frozen,lasagna,product?lock=4360",
+        "matched_name": "Lasagna Bolognesa Congelada 700 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 161,
+        "product_name": "Sarten Antiadherente 24 cm",
+        "file": "products/sarten-antiadherente-24-cm-161.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/frying,pan,kitchenware,product?lock=4361",
+        "matched_name": "Sarten Antiadherente 24 cm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 162,
+        "product_name": "Olla Acero Inoxidable 5 L",
+        "file": "products/olla-acero-inoxidable-5-l-162.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/stainless,steel,pot,product?lock=4362",
+        "matched_name": "Olla Acero Inoxidable 5 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 163,
+        "product_name": "Tabla Picar Bambu 35 cm",
+        "file": "products/tabla-picar-bambu-35-cm-163.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cutting,board,product?lock=4363",
+        "matched_name": "Tabla Picar Bambu 35 cm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 164,
+        "product_name": "Set Cuchillos Cocina 5 Piezas",
+        "file": "products/set-cuchillos-cocina-5-piezas-164.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/knife,set,product?lock=4364",
+        "matched_name": "Set Cuchillos Cocina 5 Piezas",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 165,
+        "product_name": "Taper Hermetico Vidrio 1 L",
+        "file": "products/taper-hermetico-vidrio-1-l-165.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/glass,food,container,product?lock=4365",
+        "matched_name": "Taper Hermetico Vidrio 1 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 166,
+        "product_name": "Jarra Medidora Plastica 1 L",
+        "file": "products/jarra-medidora-plastica-1-l-166.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/measuring,jug,product?lock=4366",
+        "matched_name": "Jarra Medidora Plastica 1 L",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 167,
+        "product_name": "Vaso Vidrio Alto Pack 6",
+        "file": "products/vaso-vidrio-alto-pack-6-167.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/drinking,glasses,set,product?lock=4367",
+        "matched_name": "Vaso Vidrio Alto Pack 6",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 168,
+        "product_name": "Plato Tendido Ceramica Blanco",
+        "file": "products/plato-tendido-ceramica-blanco-168.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/ceramic,plate,product?lock=4368",
+        "matched_name": "Plato Tendido Ceramica Blanco",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 169,
+        "product_name": "Escurridor Vajilla Compacto",
+        "file": "products/escurridor-vajilla-compacto-169.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/dish,rack,product?lock=4369",
+        "matched_name": "Escurridor Vajilla Compacto",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 170,
+        "product_name": "Termo Acero Inoxidable 750 ml",
+        "file": "products/termo-acero-inoxidable-750-ml-170.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/stainless,steel,thermos,product?lock=4370",
+        "matched_name": "Termo Acero Inoxidable 750 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 171,
+        "product_name": "Truper Martillo Una 16 oz",
+        "file": "products/truper-martillo-una-16-oz-171.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/hammer,tool,product?lock=4371",
+        "matched_name": "Truper Martillo Una 16 oz",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 172,
+        "product_name": "Stanley Destornillador Phillips 6",
+        "file": "products/stanley-destornillador-phillips-6-172.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/screwdriver,tool,product?lock=4372",
+        "matched_name": "Stanley Destornillador Phillips 6",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 173,
+        "product_name": "3M Cinta Aislante Negra",
+        "file": "products/3m-cinta-aislante-negra-173.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/electrical,tape,product?lock=4373",
+        "matched_name": "3M Cinta Aislante Negra",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 174,
+        "product_name": "Tesa Cinta Doble Contacto 5 m",
+        "file": "products/tesa-cinta-doble-contacto-5-m-174.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/double,sided,tape,product?lock=4374",
+        "matched_name": "Tesa Cinta Doble Contacto 5 m",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 175,
+        "product_name": "Candado Yale 40 mm",
+        "file": "products/candado-yale-40-mm-175.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/padlock,product?lock=4375",
+        "matched_name": "Candado Yale 40 mm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 176,
+        "product_name": "Foco LED Philips 9W Luz Calida",
+        "file": "products/foco-led-philips-9w-luz-calida-176.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/led,bulb,product?lock=4376",
+        "matched_name": "Foco LED Philips 9W Luz Calida",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 177,
+        "product_name": "Extension Electrica 3 Tomas 5 m",
+        "file": "products/extension-electrica-3-tomas-5-m-177.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/power,extension,cord,product?lock=4377",
+        "matched_name": "Extension Electrica 3 Tomas 5 m",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 178,
+        "product_name": "Pila Duracell AA Pack 4",
+        "file": "products/pila-duracell-aa-pack-4-178.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/aa,batteries,product?lock=4378",
+        "matched_name": "Pila Duracell AA Pack 4",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 179,
+        "product_name": "Silicona Transparente Tekbond 280 ml",
+        "file": "products/silicona-transparente-tekbond-280-ml-179.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/silicone,sealant,product?lock=4379",
+        "matched_name": "Silicona Transparente Tekbond 280 ml",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 180,
+        "product_name": "Guantes Nitrilo Trabajo Par",
+        "file": "products/guantes-nitrilo-trabajo-par-180.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/work,gloves,product?lock=4380",
+        "matched_name": "Guantes Nitrilo Trabajo Par",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 181,
+        "product_name": "Cuaderno Standford A4 100 Hojas",
+        "file": "products/cuaderno-standford-a4-100-hojas-181.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/notebook,stationery,product?lock=4381",
+        "matched_name": "Cuaderno Standford A4 100 Hojas",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 182,
+        "product_name": "Lapicero Pilot BP-1 Azul",
+        "file": "products/lapicero-pilot-bp-1-azul-182.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/blue,pen,stationery,product?lock=4382",
+        "matched_name": "Lapicero Pilot BP-1 Azul",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 183,
+        "product_name": "Resaltador Stabilo Boss Amarillo",
+        "file": "products/resaltador-stabilo-boss-amarillo-183.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/highlighter,pen,stationery,product?lock=4383",
+        "matched_name": "Resaltador Stabilo Boss Amarillo",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 184,
+        "product_name": "Papel Bond A4 75 g Millar",
+        "file": "products/papel-bond-a4-75-g-millar-184.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/copy,paper,ream,product?lock=4384",
+        "matched_name": "Papel Bond A4 75 g Millar",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 185,
+        "product_name": "Archivador Lomo Ancho Oficio",
+        "file": "products/archivador-lomo-ancho-oficio-185.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/binder,folder,product?lock=4385",
+        "matched_name": "Archivador Lomo Ancho Oficio",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 186,
+        "product_name": "Post-it Notas Adhesivas 3x3",
+        "file": "products/post-it-notas-adhesivas-3x3-186.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sticky,notes,product?lock=4386",
+        "matched_name": "Post-it Notas Adhesivas 3x3",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 187,
+        "product_name": "Tijera Escolar Maped 13 cm",
+        "file": "products/tijera-escolar-maped-13-cm-187.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/school,scissors,product?lock=4387",
+        "matched_name": "Tijera Escolar Maped 13 cm",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 188,
+        "product_name": "Goma en Barra UHU 21 g",
+        "file": "products/goma-en-barra-uhu-21-g-188.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/glue,stick,product?lock=4388",
+        "matched_name": "Goma en Barra UHU 21 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 189,
+        "product_name": "Folder Manila A4 Pack 25",
+        "file": "products/folder-manila-a4-pack-25-189.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/manila,folders,product?lock=4389",
+        "matched_name": "Folder Manila A4 Pack 25",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 190,
+        "product_name": "Calculadora Casio MX-12B",
+        "file": "products/calculadora-casio-mx-12b-190.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/calculator,product?lock=4390",
+        "matched_name": "Calculadora Casio MX-12B",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 191,
+        "product_name": "Lays Papas Clasicas 140 g",
+        "file": "products/lays-papas-clasicas-140-g-191.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/potato,vegetable,supermarket?lock=4391",
+        "matched_name": "Lays Papas Clasicas 140 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 192,
+        "product_name": "Doritos Queso Atrevido 150 g",
+        "file": "products/doritos-queso-atrevido-150-g-192.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cheese,package,dairy,product?lock=4392",
+        "matched_name": "Doritos Queso Atrevido 150 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 193,
+        "product_name": "Chizitos Queso 190 g",
+        "file": "products/chizitos-queso-190-g-193.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cheese,package,dairy,product?lock=4393",
+        "matched_name": "Chizitos Queso 190 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 194,
+        "product_name": "Sublime Chocolate Clasico 30 g",
+        "file": "products/sublime-chocolate-clasico-30-g-194.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chocolate,bar,product?lock=4394",
+        "matched_name": "Sublime Chocolate Clasico 30 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 195,
+        "product_name": "Princesa Chocolate 30 g",
+        "file": "products/princesa-chocolate-30-g-195.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/chocolate,bar,product?lock=4395",
+        "matched_name": "Princesa Chocolate 30 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 196,
+        "product_name": "Oreo Galletas Original 126 g",
+        "file": "products/oreo-galletas-original-126-g-196.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/oreo,cookies,package,product?lock=4396",
+        "matched_name": "Oreo Galletas Original 126 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 197,
+        "product_name": "Casino Menta Pack 6",
+        "file": "products/casino-menta-pack-6-197.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/sandwich,cookies,package,product?lock=4397",
+        "matched_name": "Casino Menta Pack 6",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 198,
+        "product_name": "Field Soda Crackers 204 g",
+        "file": "products/field-soda-crackers-204-g-198.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/crackers,package,product?lock=4398",
+        "matched_name": "Field Soda Crackers 204 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 199,
+        "product_name": "M&M Mani 45 g",
+        "file": "products/mm-mani-45-g-199.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/candy,bag,product?lock=4399",
+        "matched_name": "M&M Mani 45 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    },
+    {
+        "product_id": 200,
+        "product_name": "Halls Miel Limon 25 g",
+        "file": "products/halls-miel-limon-25-g-200.jpg",
+        "source": "External seed image",
+        "source_url": "https://loremflickr.com/320/320/cough,drops,package,product?lock=4400",
+        "matched_name": "Halls Miel Limon 25 g",
+        "brand": null,
+        "license_note": "Open Facts product images are published under CC BY-SA according to Open Food Facts API documentation."
+    }
+]

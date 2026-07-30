@@ -185,12 +185,6 @@ class CashRegisterService
             $totalDifference = BaseHelper::numberFormat($differences[PaymentMethodEnum::CASH->value]);
             $differenceStatus = $this->differenceStatus($totalDifference);
 
-            if ($differenceStatus !== CashDifferenceStatusEnum::BALANCED->value && blank($payload['closing_notes'] ?? null)) {
-                throw ValidationException::withMessages([
-                    'closing_notes' => 'Explica el motivo para cerrar con diferencia.',
-                ]);
-            }
-
             $cashRegister->update([
                 'closing_amount' => $declared[PaymentMethodEnum::CASH->value],
                 'expected_amount' => $system[PaymentMethodEnum::CASH->value],

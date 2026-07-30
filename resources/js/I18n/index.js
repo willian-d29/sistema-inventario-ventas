@@ -11,8 +11,9 @@ import pos from './pos.js';
 import reports from './reports.js';
 import settings from './settings.js';
 import admin from './admin.js';
+import help from './help.js';
 
-const dictionaries = [common, navigation, dashboard, products, cash, expenses, preferences, auth, sales, pos, reports, settings, admin];
+const dictionaries = [common, navigation, dashboard, products, cash, expenses, preferences, auth, sales, pos, reports, settings, admin, help];
 
 function mergeDeep(target, source) {
   for (const [key, value] of Object.entries(source)) {

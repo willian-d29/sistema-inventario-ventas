@@ -16,13 +16,13 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <header class="app-ui-page-header">
+  <header class="app-ui-page-header" data-tour="page-header">
     <div>
       <h1>{{ title }}</h1>
       <p v-if="description">{{ description }}</p>
       <p v-if="count !== null" class="app-ui-page-count">{{ t('formats.records', { count }) }}</p>
     </div>
-    <div v-if="$slots.actions || actionLabel" class="flex flex-wrap gap-2">
+    <div v-if="$slots.actions || actionLabel" class="flex flex-wrap gap-2" data-tour="primary-action">
       <slot name="actions">
         <AppButton :href="actionHref" :icon="actionIcon" @click="emit('action')">{{ actionLabel }}</AppButton>
       </slot>

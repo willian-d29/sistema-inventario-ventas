@@ -8,7 +8,10 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./:/var/www
+      - ./:/var/www:cached
+      - vendor_data:/var/www/vendor
+      - storage_data:/var/www/storage
+      - bootstrap_cache:/var/www/bootstrap/cache
     networks:
       - app-network
     depends_on:
@@ -36,7 +39,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./:/var/www
+      - ./:/var/www:cached
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
       - app-network
@@ -49,3 +52,6 @@ networks:
 
 volumes:
   dbdata:
+  vendor_data:
+  storage_data:
+  bootstrap_cache:

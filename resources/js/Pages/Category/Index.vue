@@ -112,7 +112,7 @@ function deleteCategory() {
         :count="categories.total"
       >
         <template #actions>
-          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.categories.create') }}</AppButton>
+          <AppButton icon="fa-plus" data-tour="create-button" @click="openCreateModal">{{ t('admin.categories.create') }}</AppButton>
         </template>
       </PageHeader>
 
@@ -126,7 +126,7 @@ function deleteCategory() {
         </form>
       </FilterPanel>
 
-      <section class="ihc-panel overflow-hidden">
+      <section class="ihc-panel overflow-hidden" data-tour="records-list">
         <div v-if="items.length" class="hidden overflow-x-auto lg:block">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase">
@@ -143,7 +143,7 @@ function deleteCategory() {
                   <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
+                  <div class="flex justify-end gap-2" data-tour="row-actions">
                     <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${category.name}`" @click="openEditModal(category)">
                       <span class="sr-only">{{ t('actions.edit') }}</span>
                     </AppButton>
@@ -165,7 +165,7 @@ function deleteCategory() {
               </div>
               <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
               <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${category.name}`" @click="openEditModal(category)">{{ t('actions.edit') }}</AppButton>
               <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${category.name}`" @click="openDeleteDialog(category)">{{ t('actions.delete') }}</AppButton>
             </div>

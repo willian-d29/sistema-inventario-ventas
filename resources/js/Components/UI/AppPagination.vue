@@ -26,7 +26,7 @@ function normalizedLabel(label) {
 </script>
 
 <template>
-  <nav v-if="visibleLinks.length > 1" class="app-ui-pagination" :aria-label="label">
+  <nav v-if="visibleLinks.length > 1" class="app-ui-pagination" data-tour="pagination" :aria-label="label">
     <Link
       v-for="link in visibleLinks"
       :key="`${link.label}-${link.url}`"

@@ -42,10 +42,10 @@ class CashRegisterController extends Controller
                 'registers' => $request->user()->role === 'admin' ? $report['registers'] : null,
                 'ownRegisters' => $request->user()->role === 'cajero' ? $report['registers'] : null,
                 'movementSummary' => $report['movement_summary'],
-            'saleMovementDiscrepancies' => $report['sale_movement_discrepancies'],
-            'employeeCashStates' => $request->user()->role === 'admin' ? $this->employeeCashStates() : [],
-        ]);
-    }
+                'saleMovementDiscrepancies' => $report['sale_movement_discrepancies'],
+                'employeeCashStates' => $request->user()->role === 'admin' ? $this->employeeCashStates() : [],
+            ]);
+        }
 
         return Inertia::render('CashRegister/Index', [
             'currentRegister' => $currentRegister,

@@ -3,7 +3,7 @@ const menu = [
     groupKey: 'navigation.operation',
     roles: ['admin'],
     items: [
-      { labelKey: 'navigation.dashboard', routeName: 'dashboard', icon: 'fas fa-gauge-high', active: ['dashboard'] },
+      { labelKey: 'navigation.dashboard', routeName: 'dashboard', icon: 'fas fa-tachometer-alt', active: ['dashboard'] },
       { labelKey: 'navigation.point_of_sale', routeName: 'carts.index', icon: 'fas fa-cash-register', active: ['carts.*'], highlight: true },
       { labelKey: 'navigation.sales', routeName: 'sales.index', icon: 'fas fa-receipt', active: ['sales.*'] },
       { labelKey: 'navigation.cash_shifts', legacyLabelKey: 'navigation.cash_register', routeName: 'cash-registers.index', icon: 'fas fa-lock-open', active: ['cash-registers.*'] },
@@ -32,7 +32,7 @@ const menu = [
     groupKey: 'navigation.operation',
     roles: ['cajero'],
     items: [
-      { labelKey: 'navigation.dashboard', routeName: 'dashboard', icon: 'fas fa-house', active: ['dashboard'] },
+      { labelKey: 'navigation.dashboard', routeName: 'dashboard', icon: 'fas fa-tachometer-alt', active: ['dashboard'] },
       { labelKey: 'navigation.point_of_sale', routeName: 'carts.index', icon: 'fas fa-cash-register', active: ['carts.*'], highlight: true },
       { labelKey: 'navigation.my_cash_register', routeName: 'cash-registers.index', icon: 'fas fa-lock-open', active: ['cash-registers.*'] },
       { labelKey: 'navigation.my_sales', routeName: 'sales.index', icon: 'fas fa-receipt', active: ['sales.*'] },

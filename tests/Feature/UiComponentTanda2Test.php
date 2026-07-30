@@ -74,19 +74,19 @@ test('componentes base declaran estados accesibles', function () {
 });
 
 test('perfil conserva datos si falla validacion', function () {
-    $user = User::factory()->create(['name' => 'Nombre original', 'email' => 'original@example.com']);
+    $user = User::factory()->create(['role' => 'admin', 'name' => 'Nombre original', 'email' => 'original.a@laratory.pe']);
 
     $this
         ->actingAs($user)
         ->patch(route('profile.update'), [
             'name' => 'Nuevo nombre',
-            'email' => 'correo-invalido',
+            'email_local' => 'correo inválido',
         ])
-        ->assertSessionHasErrors('email');
+        ->assertSessionHasErrors('email_local');
 
     $user->refresh();
     expect($user->name)->toBe('Nombre original');
-    expect($user->email)->toBe('original@example.com');
+    expect($user->email)->toBe('original.a@laratory.pe');
 });
 
 test('configuracion conserva datos si falla validacion', function () {
@@ -120,13 +120,17 @@ test('configuracion conserva datos si falla validacion', function () {
     expect(app(BusinessSettingsService::class)->public()['business_name'])->toBe($settings['business_name']);
 });
 
-test('producto muestra etiqueta nueva y no raiz', function () {
-    expect(resourceFile('js/Pages/Product/Create.vue'))
-        ->toContain('Producto base')
-        ->not->toContain('Raíz');
+test('producto usa modal y muestra etiqueta nueva sin raiz', function () {
+    expect(resourceFile('js/Pages/Product/Index.vue'))
+        ->toContain('<AppModal')
+        ->toContain('<ProductForm')
+        ->not->toContain("route('products.create')")
+        ->not->toContain("route('products.edit')");
 
-    expect(resourceFile('js/Pages/Product/Edit.vue'))
-        ->toContain('Producto base')
+    expect(resourceFile('js/Pages/Product/Partials/ProductForm.vue'))
+        ->toContain("t('products.root_product')")
+        ->toContain("t('common.barcode')")
+        ->not->toContain(":label=\"t('common.code')\"")
         ->not->toContain('Raíz');
 });
 

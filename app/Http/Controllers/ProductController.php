@@ -189,11 +189,9 @@ class ProductController extends Controller
             ]);
     }
 
-    public function create(): Response
+    public function create(): RedirectResponse
     {
-        return Inertia::render(
-            component: 'Product/Create'
-        );
+        return redirect()->route('products.index');
     }
 
     public function store(ProductCreateRequest $request): RedirectResponse
@@ -222,14 +220,9 @@ class ProductController extends Controller
             ->with('flash', $flash);
     }
 
-    public function edit(Product $product): Response|RedirectResponse
+    public function edit(Product $product): RedirectResponse
     {
-        return Inertia::render(
-            component: 'Product/Edit',
-            props: [
-                "product" => $product
-            ]
-        );
+        return redirect()->route('products.index');
     }
 
     public function update(ProductUpdateRequest $request, $id): RedirectResponse

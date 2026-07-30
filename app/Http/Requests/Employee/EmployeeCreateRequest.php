@@ -26,10 +26,11 @@ class EmployeeCreateRequest extends FormRequest
     {
         return [
             EmployeeFieldsEnum::NAME->value         => ["required", "string", "max:255"],
-            EmployeeFieldsEnum::EMAIL->value        => [
-                "required",
-                "email",
-                Rule::unique((new Employee())->getTable()),
+	            EmployeeFieldsEnum::EMAIL->value        => [
+	                "required",
+	                "email",
+	                "ends_with:.c@laratory.pe",
+	                Rule::unique((new Employee())->getTable()),
                 Rule::unique('users', 'email'), // Asegura que el email no exista en la tabla users
             ],
             EmployeeFieldsEnum::PHONE->value        => ["required", "string", "max:255"],

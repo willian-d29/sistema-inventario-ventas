@@ -49,6 +49,8 @@ Route::prefix('sistema')->middleware(['auth', 'role:admin,cajero'])->group(funct
 
     Route::get('/pos', [CartController::class, 'index'])->name('carts.index');
     Route::post('/carts/scan', [CartController::class, 'scan'])->name('carts.scan');
+    Route::get('/carts/barcode-lookup/{barcode}', [CartController::class, 'lookupBarcode'])->name('carts.barcode.lookup');
+    Route::post('/carts/products/quick', [CartController::class, 'quickStoreProduct'])->name('carts.products.quick-store');
     Route::post('/carts/{productId}', [CartController::class, 'addToCart'])->name('carts.store');
     Route::put('/carts/{cartId}', [CartController::class, 'updateQuantity'])->name('carts.update');
     Route::delete('/carts/all', [CartController::class, 'deleteForUser'])->name('carts.delete.all');

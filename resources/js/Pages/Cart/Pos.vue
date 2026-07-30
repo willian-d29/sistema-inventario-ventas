@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import Modal from '@/Components/Modal.vue';
 import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
+import SmartImage from '@/Components/UI/SmartImage.vue';
 import { useI18n } from '@/Composables/useI18n.js';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -20,6 +21,11 @@ const props = defineProps({
   total: Number,
   paymentMethods: Array,
   cashRegister: Object,
+  currentSummary: Object,
+  pendingBarcode: String,
+  categoryOptions: { type: Array, default: () => [] },
+  unitTypeOptions: { type: Array, default: () => [] },
+  supplierOptions: { type: Array, default: () => [] },
 });
 
 const page = usePage();
@@ -27,10 +33,25 @@ const { t } = useI18n();
 const searchInput = ref(null);
 const productQuery = ref(new URLSearchParams(window.location.search).get('keyword') || '');
 const showPaymentModal = ref(false);
+const showQuickProductModal = ref(false);
 const showCloseRegisterModal = ref(false);
 const showCloseConfirmation = ref(false);
 const showShortcutHelp = ref(false);
 const searchSubmitting = ref(false);
+const clockNow = ref(Date.now());
+const clockTimer = ref(null);
+const scanSubmitTimer = ref(null);
+const lastAutoSubmittedCode = ref('');
+const keyboardScanBuffer = ref('');
+const keyboardScanTimer = ref(null);
+const lastKeyboardScanAt = ref(0);
+const lookupLoading = ref(false);
+const lookupResult = ref(null);
+const visibleProductCount = ref(60);
+const AUTO_SCAN_DELAY = 180;
+const KEYBOARD_SCAN_DELAY = 90;
+const KEYBOARD_SCAN_RESET_MS = 260;
+const SHORT_NUMERIC_INPUT_CLEAR_DELAY = 650;
 const defaultDocumentType = computed(() => {
   const configured = page.props.businessSettings?.default_sale_document;
 
@@ -44,9 +65,19 @@ const form = useForm({
 });
 const openForm = useForm({ opening_amount: 0, notes: null });
 const closeForm = useForm({
-  declared_amounts: { cash: 0, yape: 0, plin: 0, card: 0, transfer: 0 },
-  closing_notes: null,
+  declared_amounts: { cash: 0 },
   confirmed: false,
+});
+const quickProductForm = useForm({
+  barcode: '',
+  name: '',
+  description: '',
+  category_id: null,
+  unit_type_id: null,
+  supplier_id: null,
+  buying_price: 0,
+  selling_price: 0,
+  quantity: 1,
 });
 
 const paymentIcons = {
@@ -80,6 +111,20 @@ const saleTotal = computed(() => Math.max(numberFormat(Number(props.total || 0) 
 const paymentsTotal = computed(() => numberFormat(form.payments.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0)));
 const remaining = computed(() => numberFormat(saleTotal.value - paymentsTotal.value));
 const canOpenPayment = computed(() => Boolean(props.cashRegister && props.carts.total && saleTotal.value > 0));
+const currentExpectedCash = computed(() => Number(props.currentSummary?.expected_cash || props.cashRegister?.opening_amount || 0));
+const visiblePosProducts = computed(() => (props.products?.data || []).slice(0, visibleProductCount.value));
+const hasMoreVisibleProducts = computed(() => visibleProductCount.value < (props.products?.data?.length || 0));
+const closeDifference = computed(() => Number(closeForm.declared_amounts.cash || 0) - currentExpectedCash.value);
+const closeDifferenceClass = computed(() => {
+  if (Math.abs(closeDifference.value) <= 0.01) return 'is-success';
+
+  return closeDifference.value < 0 ? 'is-danger' : 'is-warning';
+});
+const closeDifferenceLabel = computed(() => {
+  if (Math.abs(closeDifference.value) <= 0.01) return t('states.balanced');
+
+  return closeDifference.value < 0 ? t('states.missing') : t('states.surplus');
+});
 
 watch(saleTotal, (total) => {
   if (form.payments.length === 1) {
@@ -88,18 +133,61 @@ watch(saleTotal, (total) => {
   }
 }, { immediate: true });
 
+watch(productQuery, (value) => {
+  window.clearTimeout(scanSubmitTimer.value);
+  const code = value.trim();
+
+  if (/^\d{1,5}$/.test(code)) {
+    scanSubmitTimer.value = window.setTimeout(() => {
+      if (/^\d{1,5}$/.test(productQuery.value.trim())) {
+        productQuery.value = '';
+      }
+    }, SHORT_NUMERIC_INPUT_CLEAR_DELAY);
+    return;
+  }
+
+  if (!isLikelyBarcode(code) || searchSubmitting.value || code === lastAutoSubmittedCode.value) return;
+
+  scanSubmitTimer.value = window.setTimeout(() => {
+    submitProductQuery({ auto: true });
+  }, AUTO_SCAN_DELAY);
+});
+
+watch(() => [props.products?.data?.length, productQuery.value], () => {
+  visibleProductCount.value = 60;
+});
+
+watch(() => props.pendingBarcode, (barcode) => {
+  if (barcode) {
+    openQuickProductModal(barcode);
+  }
+});
+
 onMounted(() => {
   nextTick(() => searchInput.value?.focus());
   window.addEventListener('keydown', handleGlobalShortcut);
+  clockTimer.value = window.setInterval(() => {
+    clockNow.value = Date.now();
+  }, 1000);
+  if (props.pendingBarcode) {
+    openQuickProductModal(props.pendingBarcode);
+  }
 });
 
-onUnmounted(() => window.removeEventListener('keydown', handleGlobalShortcut));
+onUnmounted(() => {
+  window.clearTimeout(scanSubmitTimer.value);
+  window.clearTimeout(keyboardScanTimer.value);
+  window.clearInterval(clockTimer.value);
+  window.removeEventListener('keydown', handleGlobalShortcut);
+});
 
 function isTextField(target) {
   return ['input', 'textarea', 'select'].includes(target?.tagName?.toLowerCase()) || target?.isContentEditable;
 }
 
 function handleGlobalShortcut(event) {
+  if (captureKeyboardScanner(event)) return;
+
   if (event.key === 'F2') {
     event.preventDefault();
     searchInput.value?.focus();
@@ -119,14 +207,77 @@ function handleGlobalShortcut(event) {
   }
 }
 
-function submitProductQuery() {
+function captureKeyboardScanner(event) {
+  if (event.metaKey || event.ctrlKey || event.altKey || showPaymentModal.value || showQuickProductModal.value) return false;
+
+  const key = event.key;
+
+  if (/^\d$/.test(key) && !isTextField(event.target)) {
+    const now = Date.now();
+    if (now - lastKeyboardScanAt.value > KEYBOARD_SCAN_RESET_MS) {
+      keyboardScanBuffer.value = '';
+    }
+
+    lastKeyboardScanAt.value = now;
+    keyboardScanBuffer.value += key;
+    window.clearTimeout(keyboardScanTimer.value);
+    keyboardScanTimer.value = window.setTimeout(flushKeyboardScanBuffer, KEYBOARD_SCAN_DELAY);
+
+    return true;
+  }
+
+  if (key === 'Enter' && keyboardScanBuffer.value) {
+    event.preventDefault();
+    flushKeyboardScanBuffer();
+    return true;
+  }
+
+  return false;
+}
+
+function loadMoreVisibleProducts(event) {
+  if (!hasMoreVisibleProducts.value) return;
+
+  const element = event.target;
+  if (element.scrollTop + element.clientHeight < element.scrollHeight - 360) return;
+
+  visibleProductCount.value += 40;
+}
+
+function flushKeyboardScanBuffer() {
+  window.clearTimeout(keyboardScanTimer.value);
+  const code = keyboardScanBuffer.value.trim();
+  keyboardScanBuffer.value = '';
+
+  if (!isLikelyBarcode(code)) return;
+
+  productQuery.value = code;
+  scanProductCode(code, { source: 'keyboard' });
+}
+
+function isLikelyBarcode(code) {
+  return /^\d{6,32}$/.test(code);
+}
+
+function submitProductQuery(options = {}) {
   const code = productQuery.value.trim();
-  if (!code) return;
+  scanProductCode(code, options);
+}
+
+function scanProductCode(code, options = {}) {
+  if (!code || searchSubmitting.value) return;
+  if (options.auto && (!isLikelyBarcode(code) || code === lastAutoSubmittedCode.value)) return;
+
+  window.clearTimeout(scanSubmitTimer.value);
+  lastAutoSubmittedCode.value = options.auto ? code : '';
   searchSubmitting.value = true;
   router.post(route('carts.scan'), { code }, {
     preserveScroll: true,
     onSuccess: (page) => {
-      if (!page.url.includes('keyword=')) productQuery.value = '';
+      if (!page.url.includes('keyword=') && !page.url.includes('unknown_barcode=')) {
+        productQuery.value = '';
+        lastAutoSubmittedCode.value = '';
+      }
       if (page.props.flash?.message) showToast();
       nextTick(() => searchInput.value?.focus());
     },
@@ -134,8 +285,93 @@ function submitProductQuery() {
   });
 }
 
+function defaultCategoryId() {
+  return props.categoryOptions?.[0]?.id ?? null;
+}
+
+function defaultUnitTypeId() {
+  return props.unitTypeOptions?.[0]?.id ?? null;
+}
+
+function resetQuickProductForm(barcode) {
+  quickProductForm.clearErrors();
+  quickProductForm.reset();
+  quickProductForm.barcode = barcode;
+  quickProductForm.name = '';
+  quickProductForm.description = '';
+  quickProductForm.category_id = defaultCategoryId();
+  quickProductForm.unit_type_id = defaultUnitTypeId();
+  quickProductForm.supplier_id = props.supplierOptions?.[0]?.id ?? null;
+  quickProductForm.buying_price = 0;
+  quickProductForm.selling_price = 0;
+  quickProductForm.quantity = 1;
+  lookupResult.value = null;
+}
+
+async function openQuickProductModal(barcode) {
+  if (!barcode) return;
+
+  resetQuickProductForm(barcode);
+  showQuickProductModal.value = true;
+  window.history.replaceState({}, '', route('carts.index'));
+  await lookupBarcode(barcode);
+}
+
+async function lookupBarcode(barcode) {
+  lookupLoading.value = true;
+
+  try {
+    const { data } = await window.axios.get(route('carts.barcode.lookup', barcode));
+    lookupResult.value = data;
+
+    if (data?.found) {
+      quickProductForm.name = data.name || quickProductForm.name;
+      quickProductForm.description = data.description || quickProductForm.description;
+      selectSuggestedCategory(data.suggested_category);
+    }
+  } catch (error) {
+    lookupResult.value = { found: false, barcode };
+  } finally {
+    lookupLoading.value = false;
+  }
+}
+
+function selectSuggestedCategory(categoryName) {
+  if (!categoryName) return;
+
+  const normalized = categoryName.toLowerCase();
+  const option = props.categoryOptions.find((category) => {
+    return normalized.includes(String(category.name).toLowerCase())
+      || String(category.name).toLowerCase().includes(normalized);
+  });
+
+  if (option) {
+    quickProductForm.category_id = option.id;
+  }
+}
+
+function closeQuickProductModal() {
+  showQuickProductModal.value = false;
+  lookupLoading.value = false;
+  lookupResult.value = null;
+  nextTick(() => searchInput.value?.focus());
+}
+
+function submitQuickProduct() {
+  quickProductForm.post(route('carts.products.quick-store'), {
+    preserveScroll: true,
+    onSuccess: () => {
+      closeQuickProductModal();
+      productQuery.value = '';
+      lastAutoSubmittedCode.value = '';
+      showToast();
+    },
+  });
+}
+
 function clearSearch() {
   productQuery.value = '';
+  lastAutoSubmittedCode.value = '';
   router.get(route('carts.index'), {}, { preserveState: true, replace: true });
 }
 
@@ -211,8 +447,23 @@ function openRegister() {
 
 function closeRegister() {
   closeForm.clearErrors();
+  closeForm.declared_amounts.cash = currentExpectedCash.value;
   closeForm.confirmed = false;
   showCloseRegisterModal.value = true;
+}
+
+function elapsedSince(value) {
+  if (!value) return '--:--:--';
+
+  const startedAt = Date.parse(value);
+  if (Number.isNaN(startedAt)) return '--:--:--';
+
+  const totalSeconds = Math.max(Math.floor((clockNow.value - startedAt) / 1000), 0);
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
 }
 
 function submitCloseRegister() {
@@ -258,7 +509,7 @@ function productStockClass(product) {
     <div class="h-full min-h-0">
       <div class="pos-shell">
         <header class="pos-toolbar">
-          <form @submit.prevent="submitProductQuery">
+          <form data-tour="pos-search" @submit.prevent="submitProductQuery">
             <div class="flex items-center justify-between gap-3">
               <label for="product_query" class="ihc-label">{{ t('pos.search_label') }}</label>
               <button type="button" class="text-xs font-bold text-[var(--color-success)]" :aria-expanded="showShortcutHelp" @click="showShortcutHelp = !showShortcutHelp">
@@ -281,22 +532,29 @@ function productStockClass(product) {
             </div>
           </form>
 
-          <div>
+          <div data-tour="pos-register">
             <span class="ihc-label">{{ t('pos.register') }}</span>
-            <div v-if="cashRegister" class="mt-1 flex h-11 items-center justify-between rounded-md border border-[color-mix(in_srgb,var(--color-success)_28%,transparent)] bg-[var(--color-success-soft)] px-3">
-              <span class="font-semibold text-[var(--color-success)]"><i class="fas fa-lock-open mr-2"></i>{{ t('pos.open') }} · {{ getCurrency() }}{{ cashRegister.opening_amount }}</span>
+            <div v-if="cashRegister" class="pos-register-card is-open">
+              <div class="min-w-0">
+                <span class="pos-register-state"><i class="fas fa-lock-open"></i>{{ t('pos.open') }}</span>
+                <strong>{{ elapsedSince(cashRegister.opened_at) }}</strong>
+                <small>{{ getCurrency() }}{{ numberFormat(cashRegister.opening_amount) }}</small>
+              </div>
               <button @click="closeRegister" class="ihc-icon-button h-9 w-9 text-[var(--color-danger)]" :title="t('pos.close_register')" :aria-label="t('pos.close_register')"><i class="fas fa-lock"></i></button>
             </div>
-            <form v-else class="mt-1 flex" @submit.prevent="openRegister">
-              <input v-model="openForm.opening_amount" type="number" min="0" step="0.01" class="h-11 w-full rounded-l-md border-[var(--color-border)]" :placeholder="t('pos.opening_float')" />
-              <button class="w-12 rounded-r-md bg-[var(--color-warning)] text-white hover:opacity-90" :title="t('pos.open_register')" :aria-label="t('pos.open_register')"><i class="fas fa-lock-open"></i></button>
+            <form v-else class="pos-register-card is-closed" @submit.prevent="openRegister">
+              <div class="min-w-0 flex-1">
+                <span class="pos-register-state"><i class="fas fa-lock"></i>{{ t('states.closed') }}</span>
+                <input v-model="openForm.opening_amount" type="number" min="0" step="0.01" class="pos-register-input" :placeholder="t('pos.opening_float')" />
+              </div>
+              <button class="h-9 w-9 rounded-md bg-[var(--color-success)] text-white hover:opacity-90" :title="t('pos.open_register')" :aria-label="t('pos.open_register')"><i class="fas fa-lock-open"></i></button>
             </form>
             <InputError :message="openForm.errors.opening_amount" />
           </div>
         </header>
 
         <div class="pos-workspace">
-          <section class="pos-products-pane">
+          <section class="pos-products-pane" data-tour="pos-products">
             <div class="shrink-0 flex items-center justify-between px-1 pb-2">
               <div>
                 <h2 class="font-bold text-[var(--color-text-primary)]">{{ t('products.title') }}</h2>
@@ -309,16 +567,18 @@ function productStockClass(product) {
               <i class="fas fa-search text-2xl mb-2"></i>
               <span class="font-bold">{{ t('pos.not_found') }}</span>
               <p class="mt-1 max-w-sm text-sm">{{ t('pos.not_found_help') }}</p>
+              <button v-if="isLikelyBarcode(productQuery)" type="button" class="app-ui-button app-ui-button-primary app-ui-button-md mt-4" @click="openQuickProductModal(productQuery.trim())">
+                <i class="fas fa-plus mr-2"></i>{{ t('pos.quick_product_action') }}
+              </button>
             </div>
-            <div v-else class="pos-scroll flex-1 min-h-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 content-start gap-2 overflow-y-auto pr-1">
-              <button v-for="product in products.data" :key="product.id" @click="addToCart(product)" :disabled="product.quantity < 1"
+            <div v-else class="pos-scroll flex-1 min-h-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 content-start gap-2 overflow-y-auto pr-1" @scroll.passive="loadMoreVisibleProducts">
+              <button v-for="product in visiblePosProducts" :key="product.id" @click="addToCart(product)" :disabled="product.quantity < 1"
                 class="pos-product-card">
-                <div class="pos-product-image">
-                  <img :src="product.photo" :alt="product.name" />
+                <SmartImage :src="product.photo" :alt="product.name" class="pos-product-image" contain>
                   <span class="pos-quantity-pill" :class="productStockClass(product)">
                     Stock {{ numberFormat(product.quantity) }}
                   </span>
-                </div>
+                </SmartImage>
                 <div class="flex flex-1 flex-col justify-between gap-2 border-t border-[var(--color-border)] px-2 py-2">
                   <div class="break-words text-xs font-semibold leading-4 text-[var(--color-text-primary)]">{{ product.name }}</div>
                   <div class="flex min-w-0 flex-wrap items-end justify-between gap-x-2 gap-y-1">
@@ -330,7 +590,7 @@ function productStockClass(product) {
             </div>
           </section>
 
-          <section class="pos-cart-pane">
+          <section class="pos-cart-pane" data-tour="pos-cart">
             <div class="shrink-0 flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
               <h2 class="font-bold text-[var(--color-text-primary)]">{{ t('pos.current_sale') }} <span class="app-ui-badge app-ui-badge-neutral app-ui-badge-pill app-ui-badge-sm ml-1">{{ carts.total }}</span></h2>
               <button :disabled="!carts.total" @click="clearCart" class="ihc-icon-button text-[var(--color-danger)]" :title="t('pos.clear_sale')" :aria-label="t('pos.clear_sale')"><i class="fas fa-trash-alt"></i></button>
@@ -360,7 +620,7 @@ function productStockClass(product) {
               <div class="mt-2 flex items-center justify-between border-t border-[var(--color-border)] pt-3">
                 <span class="font-bold text-lg">Total</span><strong class="text-2xl text-[var(--color-success)]">{{ getCurrency() }}{{ saleTotal }}</strong>
               </div>
-              <button @click="openPayment" :disabled="!canOpenPayment || form.processing"
+              <button data-tour="pos-pay" @click="openPayment" :disabled="!canOpenPayment || form.processing"
                 class="pos-pay-button">
                 <i :class="cashRegister ? 'fas fa-credit-card' : 'fas fa-lock'" class="mr-2"></i>
                 {{ cashRegister ? t('pos.pay', { amount: `${getCurrency()}${saleTotal}` }) : t('pos.open_register_to_charge') }}
@@ -380,7 +640,7 @@ function productStockClass(product) {
       :submitDisabled="Math.abs(remaining) > 0.01"
       @close="showPaymentModal = false"
       @submitAction="createSale"
-      maxWidth="2xl"
+      maxWidth="4xl"
     >
       <section class="app-premium-panel p-4">
         <div class="flex items-center justify-between">
@@ -484,23 +744,134 @@ function productStockClass(product) {
       <InputError :message="form.errors.payments" />
     </Modal>
 
-    <Modal :title="t('cash.close_register')" :submitButtonText="t('cash.close_register')" :show="showCloseRegisterModal" :formProcessing="closeForm.processing"
-      @close="showCloseRegisterModal = false" @submitAction="submitCloseRegister" maxWidth="sm">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <label v-for="method in paymentMethods" :key="method.value" class="ihc-label">{{ paymentMethodLabel(method) }} {{ t('cash.declared').toLowerCase() }}
-          <input v-model.number="closeForm.declared_amounts[method.value]" type="number" min="0" step="0.01" class="ihc-field" />
+    <Modal
+      :title="t('pos.quick_product_title')"
+      :submitButtonText="t('pos.quick_product_submit')"
+      :show="showQuickProductModal"
+      :formProcessing="quickProductForm.processing"
+      @close="closeQuickProductModal"
+      @submitAction="submitQuickProduct"
+      maxWidth="4xl"
+    >
+      <section class="app-premium-panel p-4">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center">
+          <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-[var(--color-warning-soft)] text-[var(--color-warning)]">
+            <i class="fas fa-barcode text-2xl"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-black uppercase tracking-wide text-[var(--color-warning)]">{{ t('pos.quick_product_badge') }}</p>
+            <h3 class="mt-1 text-lg font-black text-[var(--color-text-primary)]">{{ quickProductForm.barcode }}</h3>
+            <p class="mt-1 text-sm font-semibold text-[var(--color-text-muted)]">{{ t('pos.quick_product_help') }}</p>
+          </div>
+          <div v-if="lookupLoading" class="rounded-md bg-[var(--color-info-soft)] px-3 py-2 text-sm font-bold text-[var(--color-info)]">
+            <i class="fas fa-spinner fa-spin mr-2"></i>{{ t('pos.lookup_loading') }}
+          </div>
+          <div v-else-if="lookupResult?.found" class="rounded-md bg-[var(--color-success-soft)] px-3 py-2 text-sm font-bold text-[var(--color-success)]">
+            <i class="fas fa-cloud-download-alt mr-2"></i>{{ t('pos.lookup_found', { source: lookupResult.source }) }}
+          </div>
+          <div v-else class="rounded-md bg-[var(--color-surface-alt)] px-3 py-2 text-sm font-bold text-[var(--color-text-muted)]">
+            <i class="fas fa-pen mr-2"></i>{{ t('pos.lookup_manual') }}
+          </div>
+        </div>
+
+        <div v-if="lookupResult?.image_url" class="mt-4 flex items-center gap-3 rounded-md border border-[var(--color-border)] bg-white p-3">
+          <SmartImage :src="lookupResult.image_url" :alt="quickProductForm.name || quickProductForm.barcode" class="h-16 w-16 shrink-0 rounded-md" contain />
+          <div>
+            <p class="text-sm font-bold text-[var(--color-text-primary)]">{{ lookupResult.name }}</p>
+            <p class="text-xs font-semibold text-[var(--color-text-muted)]">{{ lookupResult.brand || lookupResult.suggested_category }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <label class="ihc-label md:col-span-2">{{ t('pos.quick_name') }}
+          <input v-model="quickProductForm.name" class="ihc-field" :placeholder="t('pos.quick_name_placeholder')" />
+          <InputError :message="quickProductForm.errors.name" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_category') }}
+          <select v-model="quickProductForm.category_id" class="ihc-field">
+            <option v-for="category in categoryOptions" :key="category.id" :value="category.id">{{ category.name }}</option>
+          </select>
+          <InputError :message="quickProductForm.errors.category_id" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_unit') }}
+          <select v-model="quickProductForm.unit_type_id" class="ihc-field">
+            <option v-for="unit in unitTypeOptions" :key="unit.id" :value="unit.id">{{ unit.name }}{{ unit.symbol ? ` (${unit.symbol})` : '' }}</option>
+          </select>
+          <InputError :message="quickProductForm.errors.unit_type_id" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_buying_price') }}
+          <input v-model.number="quickProductForm.buying_price" type="number" min="0" step="0.01" class="ihc-field" />
+          <InputError :message="quickProductForm.errors.buying_price" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_selling_price') }}
+          <input v-model.number="quickProductForm.selling_price" type="number" min="0.01" step="0.01" class="ihc-field" />
+          <InputError :message="quickProductForm.errors.selling_price" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_stock') }}
+          <input v-model.number="quickProductForm.quantity" type="number" min="0" step="0.01" class="ihc-field" />
+          <InputError :message="quickProductForm.errors.quantity" />
+        </label>
+
+        <label class="ihc-label">{{ t('pos.quick_supplier') }}
+          <select v-model="quickProductForm.supplier_id" class="ihc-field">
+            <option :value="null">{{ t('pos.quick_without_supplier') }}</option>
+            <option v-for="supplier in supplierOptions" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
+          </select>
+          <InputError :message="quickProductForm.errors.supplier_id" />
+        </label>
+
+        <label class="ihc-label md:col-span-2">{{ t('pos.quick_description') }}
+          <textarea v-model="quickProductForm.description" rows="2" class="ihc-field" :placeholder="t('pos.quick_description_placeholder')"></textarea>
+          <InputError :message="quickProductForm.errors.description" />
+        </label>
+      </section>
+    </Modal>
+
+    <Modal :title="t('cash.close_register')" :submitButtonText="t('cash.finish_shift')" :show="showCloseRegisterModal" :formProcessing="closeForm.processing"
+      @close="showCloseRegisterModal = false" @submitAction="submitCloseRegister" maxWidth="lg">
+      <div class="space-y-4">
+        <div class="cash-status-hero is-open p-4">
+          <span class="cash-status-pill"><i class="fas fa-stopwatch"></i>{{ t('cash.elapsed_time') }}</span>
+          <h2>{{ elapsedSince(cashRegister?.opened_at) }}</h2>
+          <p>{{ t('cash.close_shift_help') }}</p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div class="cash-mini-metric is-success">
+            <span>{{ t('cash.expected_cash') }}</span>
+            <strong>{{ getCurrency() }}{{ numberFormat(currentExpectedCash) }}</strong>
+          </div>
+          <div class="cash-mini-metric" :class="closeDifferenceClass">
+            <span>{{ t('cash.difference') }}</span>
+            <strong>{{ getCurrency() }}{{ numberFormat(closeDifference) }}</strong>
+            <small>{{ closeDifferenceLabel }}</small>
+          </div>
+          <div class="cash-mini-metric is-primary">
+            <span>{{ t('cash.shift_sales') }}</span>
+            <strong>{{ currentSummary?.sales_count || 0 }}</strong>
+          </div>
+        </div>
+
+        <label class="ihc-label">
+          {{ t('cash.counted_cash') }}
+          <input v-model.number="closeForm.declared_amounts.cash" type="number" min="0" step="0.01" class="ihc-field" />
+          <span class="app-ui-help">{{ t('cash.counted_cash_help') }}</span>
+          <InputError :message="closeForm.errors['declared_amounts.cash']" />
         </label>
       </div>
       <InputError :message="closeForm.errors.declared_amounts" />
-      <label for="closing_notes" class="ihc-label mt-4">{{ t('cash.notes') }}</label>
-      <textarea id="closing_notes" v-model="closeForm.closing_notes" rows="2" class="ihc-field" :placeholder="t('pos.closing_notes_placeholder')"></textarea>
-      <InputError :message="closeForm.errors.closing_notes" />
     </Modal>
 
     <ConfirmDialog
       :show="showCloseConfirmation"
       :title="t('cash.confirm_close')"
-      :action="t('cash.close_action')"
+      :action="t('cash.finish_shift')"
       :consequence="t('cash.close_consequence')"
       :loading="closeForm.processing"
       :confirm-text="t('pos.confirm_close_text')"

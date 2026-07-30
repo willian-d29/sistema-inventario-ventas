@@ -5,7 +5,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <section class="app-ui-filter-panel" :aria-label="t('common.filters')">
+  <section class="app-ui-filter-panel" data-tour="filters-panel" :aria-label="t('common.filters')">
     <slot />
   </section>
 </template>

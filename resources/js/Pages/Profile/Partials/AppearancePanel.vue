@@ -121,7 +121,7 @@ function selectTheme(theme) {
 </script>
 
 <template>
-  <section class="ihc-panel p-5">
+  <section class="ihc-panel p-5" data-tour="appearance-panel">
     <div class="flex flex-col gap-2 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <h2 class="ihc-section-title">{{ t('preferences.title') }}</h2>

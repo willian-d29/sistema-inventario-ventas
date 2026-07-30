@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'auth' => [
+        'reset_link_failed' => 'No se pudo enviar el enlace de recuperación. Revisa la configuración de correo o intenta nuevamente.',
+    ],
     'categories' => [
         'created' => 'Categoría creada correctamente.',
         'updated' => 'Categoría actualizada correctamente.',

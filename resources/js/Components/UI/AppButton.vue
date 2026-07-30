@@ -32,6 +32,11 @@ const linkAs = computed(() => props.as || 'a');
 const isEditIcon = computed(() => props.icon?.includes('pencil') || props.icon?.includes('edit'));
 const isDeleteIcon = computed(() => props.icon?.includes('trash') || props.icon?.includes('delete'));
 const isNativeLink = computed(() => Boolean(props.href && props.target));
+const passthroughAttrs = computed(() => {
+  const { class: _class, ...rest } = attrs;
+
+  return rest;
+});
 
 const classes = computed(() => [
   'app-ui-button',
@@ -75,6 +80,7 @@ function onClick(event) {
 <template>
   <a
     v-if="href && isNativeLink"
+    v-bind="passthroughAttrs"
     :href="href"
     :class="classes"
     :aria-label="ariaLabel"
@@ -94,6 +100,7 @@ function onClick(event) {
 
   <Link
     v-else-if="href"
+    v-bind="passthroughAttrs"
     :href="href"
     :method="method"
     :as="linkAs"
@@ -115,6 +122,7 @@ function onClick(event) {
 
   <button
     v-else
+    v-bind="passthroughAttrs"
     :type="type"
     :disabled="isDisabled"
     :class="classes"

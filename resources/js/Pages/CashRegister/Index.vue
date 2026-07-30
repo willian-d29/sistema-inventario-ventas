@@ -8,8 +8,8 @@ import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
 import { useI18n } from '@/Composables/useI18n.js';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { showToast } from '@/Utils/Helper.js';
 
 const props = defineProps({
@@ -24,7 +24,11 @@ const props = defineProps({
 
 const { t } = useI18n();
 const selectedEmployee = ref(null);
+const closeTarget = ref(null);
 const showCloseModal = ref(false);
+const clockNow = ref(Date.now());
+const clockTimer = ref(null);
+const refreshTimer = ref(null);
 
 const employeeFilter = ref({
   cashier_id: props.filters?.cashier_id || '',
@@ -34,7 +38,6 @@ const employeeFilter = ref({
 const openForm = useForm({ opening_amount: 0, notes: '' });
 const closeForm = useForm({
   declared_amounts: { cash: 0 },
-  closing_notes: '',
   confirmed: true,
 });
 
@@ -45,7 +48,29 @@ function money(value) {
 function statusState(status) {
   return status === 'open'
     ? { label: t('states.open'), variant: 'success', icon: 'fa-lock-open' }
-    : { label: t('states.closed'), variant: 'neutral', icon: 'fa-lock' };
+    : { label: t('states.closed'), variant: 'warning', icon: 'fa-lock' };
+}
+
+function elapsedSince(value) {
+  if (!value) return '--:--:--';
+
+  const startedAt = Date.parse(value);
+  if (Number.isNaN(startedAt)) return '--:--:--';
+
+  const totalSeconds = Math.max(Math.floor((clockNow.value - startedAt) / 1000), 0);
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+function reloadCashData() {
+  router.reload({
+    only: ['currentRegister', 'currentSummary', 'employeeCashStates'],
+    preserveScroll: true,
+    preserveState: true,
+  });
 }
 
 function openRegister() {
@@ -55,18 +80,33 @@ function openRegister() {
   });
 }
 
-function openCloseModal() {
-  closeForm.declared_amounts.cash = Number(props.currentSummary?.expected_cash || props.currentRegister?.opening_amount || 0);
-  closeForm.closing_notes = '';
+const activeCloseTarget = computed(() => closeTarget.value || {
+  register_id: props.currentRegister?.id,
+  opened_at: props.currentRegister?.opened_at,
+  opening_amount: props.currentRegister?.opening_amount,
+  expected_cash: props.currentSummary?.expected_cash,
+  sales_count: props.currentSummary?.sales_count,
+  user: null,
+});
+
+function openCloseModal(target = null) {
+  closeTarget.value = target;
+  const expected = target?.expected_cash ?? props.currentSummary?.expected_cash ?? target?.opening_amount ?? props.currentRegister?.opening_amount ?? 0;
+
+  closeForm.declared_amounts.cash = Number(expected || 0);
   closeForm.confirmed = true;
   showCloseModal.value = true;
 }
 
 function closeRegister() {
-  closeForm.put(route('cash-registers.close', props.currentRegister.id), {
+  if (!activeCloseTarget.value?.register_id) return;
+
+  closeForm.put(route('cash-registers.close', activeCloseTarget.value.register_id), {
     preserveScroll: true,
     onSuccess: () => {
       showCloseModal.value = false;
+      closeTarget.value = null;
+      selectedEmployee.value = null;
       showToast();
     },
   });
@@ -93,7 +133,7 @@ const adminSummary = computed(() => {
   };
 });
 
-const currentExpectedCash = computed(() => Number(props.currentSummary?.expected_cash || 0));
+const currentExpectedCash = computed(() => Number(activeCloseTarget.value?.expected_cash ?? activeCloseTarget.value?.opening_amount ?? 0));
 const closeDifference = computed(() => Number(closeForm.declared_amounts.cash || 0) - currentExpectedCash.value);
 const closeDifferenceState = computed(() => {
   if (Math.abs(closeDifference.value) <= 0.01) {
@@ -103,6 +143,18 @@ const closeDifferenceState = computed(() => {
   return closeDifference.value < 0
     ? { label: t('states.missing'), variant: 'danger', icon: 'fa-arrow-trend-down' }
     : { label: t('states.surplus'), variant: 'warning', icon: 'fa-arrow-trend-up' };
+});
+
+onMounted(() => {
+  clockTimer.value = window.setInterval(() => {
+    clockNow.value = Date.now();
+  }, 1000);
+  refreshTimer.value = window.setInterval(reloadCashData, 30000);
+});
+
+onUnmounted(() => {
+  window.clearInterval(clockTimer.value);
+  window.clearInterval(refreshTimer.value);
 });
 </script>
 
@@ -120,14 +172,14 @@ const closeDifferenceState = computed(() => {
           :count="employeeCashStates.length"
         />
 
-        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" data-tour="summary-cards">
           <StatCard :title="t('cash.employees')" :value="adminSummary.employees" icon="fa-users" variant="info" />
           <StatCard :title="t('cash.open_boxes')" :value="adminSummary.open" icon="fa-lock-open" variant="success" />
           <StatCard :title="t('cash.closed_boxes')" :value="adminSummary.closed" icon="fa-lock" variant="warning" />
           <StatCard :title="t('cash.expected_cash')" :value="`S/ ${money(adminSummary.expectedCash)}`" icon="fa-wallet" variant="analytics" />
         </div>
 
-        <section class="ihc-panel p-4">
+        <section class="ihc-panel p-4" data-tour="filters-panel">
           <div class="grid gap-3 md:grid-cols-[1fr_220px_220px] md:items-end">
             <label class="ihc-label">
               {{ t('cash.employee') }}
@@ -155,11 +207,12 @@ const closeDifferenceState = computed(() => {
           </div>
         </section>
 
-        <section class="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
+        <section class="grid gap-3 lg:grid-cols-2 2xl:grid-cols-3" data-tour="records-list">
           <article
             v-for="employee in filteredEmployeeStates"
             :key="employee.user.id"
-            class="ihc-panel p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
+            class="cash-employee-card"
+            :class="employee.status === 'open' ? 'is-open' : 'is-closed'"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
@@ -172,22 +225,22 @@ const closeDifferenceState = computed(() => {
             </div>
 
             <div class="mt-4 grid grid-cols-2 gap-3">
-              <div class="rounded-md bg-[var(--color-surface-alt)] p-3">
-                <span class="app-ui-help">{{ t('cash.opened_at') }}</span>
-                <strong class="mt-1 block text-sm text-[var(--color-text-primary)]">{{ employee.opened_at || '-' }}</strong>
+              <div class="cash-mini-metric" :class="employee.status === 'open' ? 'is-success' : 'is-muted'">
+                <span>{{ employee.status === 'open' ? t('cash.elapsed_time') : t('cash.closed_status') }}</span>
+                <strong>{{ employee.status === 'open' ? elapsedSince(employee.opened_at) : '-' }}</strong>
               </div>
-              <div class="rounded-md bg-[var(--color-surface-alt)] p-3">
-                <span class="app-ui-help">{{ t('cash.opening_amount') }}</span>
-                <strong class="mt-1 block text-sm text-[var(--color-text-primary)]">S/ {{ money(employee.opening_amount) }}</strong>
+              <div class="cash-mini-metric">
+                <span>{{ t('cash.opening_amount') }}</span>
+                <strong>S/ {{ money(employee.opening_amount) }}</strong>
               </div>
-              <div class="rounded-md bg-[var(--color-success-soft)] p-3">
-                <span class="text-xs font-black uppercase text-[var(--color-success)]">{{ t('cash.shift_sales') }}</span>
-                <strong class="mt-1 block text-lg text-[var(--color-success)]">S/ {{ money(employee.sales_total) }}</strong>
-                <span class="text-xs font-semibold text-[var(--color-success)]">{{ employee.sales_count }} venta(s)</span>
+              <div class="cash-mini-metric is-success">
+                <span>{{ t('cash.shift_sales') }}</span>
+                <strong>S/ {{ money(employee.sales_total) }}</strong>
+                <small>{{ t('cash.sales_count', { count: employee.sales_count }) }}</small>
               </div>
-              <div class="rounded-md bg-[var(--color-primary-soft)] p-3">
-                <span class="text-xs font-black uppercase text-[var(--color-primary)]">{{ t('cash.expected_cash') }}</span>
-                <strong class="mt-1 block text-lg text-[var(--color-primary)]">S/ {{ money(employee.expected_cash) }}</strong>
+              <div class="cash-mini-metric is-primary">
+                <span>{{ t('cash.expected_cash') }}</span>
+                <strong>S/ {{ money(employee.expected_cash) }}</strong>
               </div>
             </div>
 
@@ -197,12 +250,23 @@ const closeDifferenceState = computed(() => {
               </AppButton>
               <AppButton
                 v-if="employee.status === 'open'"
+                data-tour="row-actions"
                 :href="route('cash-registers.index', { cashier_id: employee.user.id, status: 'open' })"
                 size="sm"
                 variant="secondary"
                 icon="fa-filter"
               >
                 {{ t('cash.view_box') }}
+              </AppButton>
+              <AppButton
+                v-if="employee.status === 'open'"
+                type="button"
+                size="sm"
+                variant="danger"
+                icon="fa-lock"
+                @click="openCloseModal(employee)"
+              >
+                {{ t('cash.close_register') }}
               </AppButton>
             </div>
           </article>
@@ -228,11 +292,11 @@ const closeDifferenceState = computed(() => {
           </template>
         </PageHeader>
 
-        <section v-if="!currentRegister" class="ihc-panel p-5">
+        <section v-if="!currentRegister" class="cash-status-hero is-closed" data-tour="cash-status">
           <div class="grid gap-4 lg:grid-cols-[1fr_1.2fr] lg:items-center">
             <div>
-              <h2 class="ihc-section-title">{{ t('cash.open_register') }}</h2>
-              <p class="mt-2 app-ui-help">{{ t('cash.opening_help') }}</p>
+              <span class="cash-status-pill"><i class="fas fa-lock"></i>{{ t('states.closed') }}</span>
+              <h2>{{ t('cash.current_closed') }}</h2>
             </div>
             <form class="grid gap-3 sm:grid-cols-[1fr_1.5fr_auto]" @submit.prevent="openRegister">
               <label class="ihc-label">
@@ -251,18 +315,20 @@ const closeDifferenceState = computed(() => {
           </div>
         </section>
 
-        <section v-else class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <section v-else class="grid gap-3 md:grid-cols-2 xl:grid-cols-5" data-tour="summary-cards">
+          <StatCard :title="t('cash.elapsed_time')" :value="elapsedSince(currentRegister.opened_at)" icon="fa-clock" variant="success" />
           <StatCard :title="t('cash.opening_amount')" :value="`S/ ${money(currentRegister.opening_amount)}`" icon="fa-cash-register" />
           <StatCard :title="t('cash.shift_sales')" :value="currentSummary?.sales_count || 0" icon="fa-receipt" variant="info" />
           <StatCard :title="t('cash.total_charged')" :value="`S/ ${money(currentSummary?.sales)}`" icon="fa-chart-line" variant="analytics" />
           <StatCard :title="t('cash.expected_cash')" :value="`S/ ${money(currentSummary?.expected_cash)}`" icon="fa-wallet" variant="success" />
         </section>
 
-        <section v-if="currentRegister" class="ihc-panel p-5">
+        <section v-if="currentRegister" class="cash-status-hero is-open" data-tour="cash-status">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 class="ihc-section-title">{{ t('cash.current_open') }}</h2>
-              <p class="mt-1 app-ui-help">{{ t('cash.opened_since', { date: currentRegister.opened_at }) }}</p>
+              <span class="cash-status-pill"><i class="fas fa-lock-open"></i>{{ t('states.open') }}</span>
+              <h2>{{ t('cash.current_open') }}</h2>
+              <p>{{ t('cash.opened_since', { date: currentRegister.opened_at }) }}</p>
             </div>
             <div class="flex flex-wrap gap-2">
               <Link :href="route('carts.index')" class="app-ui-button app-ui-button-primary app-ui-button-md">
@@ -273,9 +339,9 @@ const closeDifferenceState = computed(() => {
           </div>
 
           <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <div v-for="method in paymentMethods" :key="method.value" class="rounded-md border border-[var(--color-border)] p-3">
-              <span class="app-ui-help">{{ method.label }}</span>
-              <strong class="mt-1 block text-lg text-[var(--color-text-primary)]">S/ {{ money(currentSummary?.system_amounts?.[method.value]) }}</strong>
+            <div v-for="method in paymentMethods" :key="method.value" class="cash-mini-metric">
+              <span>{{ method.label }}</span>
+              <strong>S/ {{ money(currentSummary?.system_amounts?.[method.value]) }}</strong>
             </div>
           </div>
         </section>
@@ -283,37 +349,42 @@ const closeDifferenceState = computed(() => {
     </div>
 
     <Modal
-      :title="t('cash.close_register')"
+      :title="closeTarget?.user?.name ? t('cash.close_employee_register', { name: closeTarget.user.name }) : t('cash.close_register')"
       :show="showCloseModal"
       :formProcessing="closeForm.processing"
-      :submit-button-text="t('cash.close_action')"
-      @close="showCloseModal = false"
+      :submit-button-text="t('cash.finish_shift')"
+      @close="showCloseModal = false; closeTarget = null"
       @submitAction="closeRegister"
       maxWidth="lg"
     >
-      <div class="grid gap-3 sm:grid-cols-2">
-        <div class="rounded-md border border-[var(--color-border)] p-3">
-          <span class="app-ui-help">{{ t('cash.expected_cash') }}</span>
-          <strong class="block text-lg">S/ {{ money(currentSummary?.expected_cash) }}</strong>
+      <div class="space-y-4">
+        <div class="cash-status-hero is-open p-4">
+          <span class="cash-status-pill"><i class="fas fa-stopwatch"></i>{{ t('cash.elapsed_time') }}</span>
+          <h2>{{ elapsedSince(activeCloseTarget?.opened_at) }}</h2>
+          <p>{{ t('cash.close_shift_help') }}</p>
         </div>
-        <div class="rounded-md border border-[var(--color-border)] p-3">
-          <span class="app-ui-help">{{ t('cash.difference') }}</span>
-          <div class="mt-1 flex flex-wrap items-center justify-between gap-2">
-            <strong class="block text-lg">S/ {{ money(closeDifference) }}</strong>
-            <AppBadge :variant="closeDifferenceState.variant" :icon="closeDifferenceState.icon">
-              {{ closeDifferenceState.label }}
-            </AppBadge>
+
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div class="cash-mini-metric is-success">
+            <span>{{ t('cash.expected_cash') }}</span>
+            <strong>S/ {{ money(currentExpectedCash) }}</strong>
+          </div>
+          <div class="cash-mini-metric" :class="closeDifferenceState.variant === 'success' ? 'is-success' : closeDifferenceState.variant === 'danger' ? 'is-danger' : 'is-warning'">
+            <span>{{ t('cash.difference') }}</span>
+            <strong>S/ {{ money(closeDifference) }}</strong>
+            <small>{{ closeDifferenceState.label }}</small>
+          </div>
+          <div class="cash-mini-metric is-primary">
+            <span>{{ t('cash.shift_sales') }}</span>
+            <strong>{{ activeCloseTarget?.sales_count || 0 }}</strong>
           </div>
         </div>
+
         <label class="ihc-label sm:col-span-2">
           {{ t('cash.counted_cash') }}
           <input v-model.number="closeForm.declared_amounts.cash" type="number" min="0" step="0.01" class="ihc-field" />
+          <span class="app-ui-help">{{ t('cash.counted_cash_help') }}</span>
           <InputError :message="closeForm.errors['declared_amounts.cash']" />
-        </label>
-        <label class="ihc-label sm:col-span-2">
-          {{ t('cash.notes') }}
-          <textarea v-model="closeForm.closing_notes" rows="3" class="ihc-field"></textarea>
-          <InputError :message="closeForm.errors.closing_notes" />
         </label>
       </div>
     </Modal>
@@ -337,29 +408,35 @@ const closeDifferenceState = computed(() => {
         </div>
 
         <div class="grid gap-3 sm:grid-cols-2">
-          <div class="rounded-md bg-[var(--color-surface-alt)] p-3">
-            <span class="app-ui-help">{{ t('cash.opened_at') }}</span>
-            <strong class="block">{{ selectedEmployee.opened_at || '-' }}</strong>
+          <div class="cash-mini-metric" :class="selectedEmployee.status === 'open' ? 'is-success' : 'is-muted'">
+            <span>{{ selectedEmployee.status === 'open' ? t('cash.elapsed_time') : t('cash.closed_status') }}</span>
+            <strong>{{ selectedEmployee.status === 'open' ? elapsedSince(selectedEmployee.opened_at) : '-' }}</strong>
           </div>
-          <div class="rounded-md bg-[var(--color-surface-alt)] p-3">
-            <span class="app-ui-help">{{ t('cash.opening_amount') }}</span>
-            <strong class="block">S/ {{ money(selectedEmployee.opening_amount) }}</strong>
+          <div class="cash-mini-metric">
+            <span>{{ t('cash.opening_amount') }}</span>
+            <strong>S/ {{ money(selectedEmployee.opening_amount) }}</strong>
           </div>
-          <div class="rounded-md bg-[var(--color-success-soft)] p-3">
-            <span class="text-xs font-black uppercase text-[var(--color-success)]">{{ t('cash.total_charged') }}</span>
-            <strong class="block text-lg text-[var(--color-success)]">S/ {{ money(selectedEmployee.sales_total) }}</strong>
+          <div class="cash-mini-metric is-success">
+            <span>{{ t('cash.total_charged') }}</span>
+            <strong>S/ {{ money(selectedEmployee.sales_total) }}</strong>
           </div>
-          <div class="rounded-md bg-[var(--color-primary-soft)] p-3">
-            <span class="text-xs font-black uppercase text-[var(--color-primary)]">{{ t('cash.expected_cash') }}</span>
-            <strong class="block text-lg text-[var(--color-primary)]">S/ {{ money(selectedEmployee.expected_cash) }}</strong>
+          <div class="cash-mini-metric is-primary">
+            <span>{{ t('cash.expected_cash') }}</span>
+            <strong>S/ {{ money(selectedEmployee.expected_cash) }}</strong>
           </div>
         </div>
 
         <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          <p v-for="method in paymentMethods" :key="method.value" class="rounded-md border border-[var(--color-border)] p-3">
-            <span class="app-ui-help">{{ method.label }}</span>
-            <strong class="block">S/ {{ money(selectedEmployee.system_amounts?.[method.value]) }}</strong>
+          <p v-for="method in paymentMethods" :key="method.value" class="cash-mini-metric">
+            <span>{{ method.label }}</span>
+            <strong>S/ {{ money(selectedEmployee.system_amounts?.[method.value]) }}</strong>
           </p>
+        </div>
+
+        <div v-if="selectedEmployee.status === 'open'" class="flex justify-end">
+          <AppButton type="button" variant="danger" icon="fa-lock" @click="openCloseModal(selectedEmployee)">
+            {{ t('cash.close_register') }}
+          </AppButton>
         </div>
       </div>
     </Modal>

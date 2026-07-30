@@ -8,7 +8,7 @@ import AppPagination from '@/Components/UI/AppPagination.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { useI18n } from '@/Composables/useI18n.js';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { cleanQuery, formatDatetime, getCurrency, numberFormat } from '@/Utils/Helper.js';
 
 const props = defineProps({
@@ -23,6 +23,8 @@ const props = defineProps({
 const page = usePage();
 const printingId = ref(null);
 const printMessage = ref('');
+const activeActionSale = ref(null);
+const actionMenuStyle = ref({});
 const { t } = useI18n();
 
 const form = useForm({
@@ -69,6 +71,7 @@ function clearFilters() {
 
 async function requestPrint(sale) {
   if (printingId.value) return;
+  closeSaleActions();
   printingId.value = sale.id;
   printMessage.value = '';
   try {
@@ -93,6 +96,59 @@ function paymentsText(sale) {
     .map((payment) => paymentLabels[payment.payment_method] || payment.payment_method)
     .join(' + ') || '-';
 }
+
+function closeSaleActions() {
+  activeActionSale.value = null;
+}
+
+async function openSaleActions(sale, event) {
+  if (activeActionSale.value?.id === sale.id) {
+    closeSaleActions();
+    return;
+  }
+
+  activeActionSale.value = sale;
+  await nextTick();
+
+  const rect = event.currentTarget.getBoundingClientRect();
+  const menuWidth = 288;
+  const menuHeight = 304;
+  const margin = 12;
+  const left = Math.min(Math.max(margin, rect.right - menuWidth), window.innerWidth - menuWidth - margin);
+  const opensUp = rect.bottom + menuHeight > window.innerHeight - margin && rect.top > menuHeight;
+  const top = opensUp ? rect.top - menuHeight - 8 : rect.bottom + 8;
+
+  actionMenuStyle.value = {
+    top: `${Math.max(margin, top)}px`,
+    left: `${left}px`,
+  };
+}
+
+function handleDocumentClick(event) {
+  if (!activeActionSale.value) return;
+  if (event.target.closest?.('[data-sale-action-menu], [data-sale-action-trigger]')) return;
+  closeSaleActions();
+}
+
+function handleDocumentKeydown(event) {
+  if (event.key === 'Escape') {
+    closeSaleActions();
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleDocumentKeydown);
+  window.addEventListener('resize', closeSaleActions);
+  window.addEventListener('scroll', closeSaleActions, true);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick);
+  document.removeEventListener('keydown', handleDocumentKeydown);
+  window.removeEventListener('resize', closeSaleActions);
+  window.removeEventListener('scroll', closeSaleActions, true);
+});
 </script>
 
 <template>
@@ -108,11 +164,11 @@ function paymentsText(sale) {
         :count="sales.total"
       >
         <template #actions>
-          <AppButton :href="route('carts.index')" icon="fa-cash-register">{{ t('sales.new_sale') }}</AppButton>
+          <AppButton :href="route('carts.index')" icon="fa-cash-register" data-tour="create-button">{{ t('sales.new_sale') }}</AppButton>
         </template>
       </PageHeader>
 
-      <form class="ihc-filter-grid" :aria-label="t('sales.filters_label')" @submit.prevent="applyFilters">
+      <form class="ihc-filter-grid" data-tour="filters-panel" :aria-label="t('sales.filters_label')" @submit.prevent="applyFilters">
         <label class="ihc-label">{{ t('sales.correlative') }}
           <input v-model="form.full_document_number" class="ihc-field" placeholder="B001-00000001" />
         </label>
@@ -164,7 +220,7 @@ function paymentsText(sale) {
 
       <p v-if="printMessage" class="rounded-md bg-sky-50 px-4 py-2 text-sm font-bold text-sky-800">{{ printMessage }}</p>
 
-      <section class="ihc-panel overflow-hidden">
+      <section class="ihc-panel overflow-hidden" data-tour="records-list">
         <div class="hidden overflow-x-auto lg:block">
           <table class="w-full text-sm">
             <thead class="text-left text-xs uppercase">
@@ -176,7 +232,7 @@ function paymentsText(sale) {
                 <th>{{ t('sales.payment') }}</th>
                 <th class="text-right">{{ t('common.total') }}</th>
                 <th>{{ t('common.status') }}</th>
-                <th class="text-right">{{ t('common.actions') }}</th>
+                <th class="sales-actions-cell">{{ t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -195,22 +251,19 @@ function paymentsText(sale) {
                     {{ statusLabels[sale.status] || sale.status }}
                   </AppBadge>
                 </td>
-                <td class="text-right">
-                  <details class="relative inline-block max-w-full text-left">
-                    <summary class="app-action-trigger" :aria-label="t('sales.open_actions')">
-                      {{ t('common.actions') }} <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                    </summary>
-                    <div class="app-action-menu">
-                      <Link :href="route('sales.show', sale.id)" class="app-action-item is-view"><i class="fas fa-eye"></i>{{ t('sales.view_detail') }}</Link>
-                      <a :href="route('sales.thermal', sale.id)" target="_blank" rel="noopener noreferrer" class="app-action-item is-print"><i class="fas fa-print"></i>{{ t('sales.open_thermal') }}</a>
-                      <a :href="route('sales.pdf', sale.id)" target="_blank" rel="noopener noreferrer" class="app-action-item is-pdf"><i class="fas fa-file-pdf"></i>{{ t('sales.download_pdf') }}</a>
-                      <button type="button" class="app-action-item is-success" :disabled="printingId === sale.id" @click="requestPrint(sale)">
-                        <i class="fas fa-rotate-right"></i>{{ t('sales.request_reprint') }}
-                      </button>
-                      <Link :href="route('cash-registers.index', { cash_register_id: sale.cash_register_id })" class="app-action-item is-register"><i class="fas fa-lock-open"></i>{{ t('sales.consult_register') }}</Link>
-                      <Link :href="route('sales.show', sale.id) + '#impresiones'" class="app-action-item is-history"><i class="fas fa-history"></i>{{ t('sales.print_history') }}</Link>
-                    </div>
-                  </details>
+                <td class="sales-actions-cell">
+                  <button
+                    type="button"
+                    data-sale-action-trigger
+                    data-tour="row-actions"
+                    class="app-action-trigger"
+                    :class="{ 'is-open': activeActionSale?.id === sale.id }"
+                    :aria-label="t('sales.open_actions')"
+                    :aria-expanded="activeActionSale?.id === sale.id"
+                    @click.stop="openSaleActions(sale, $event)"
+                  >
+                    {{ t('common.actions') }} <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -227,7 +280,7 @@ function paymentsText(sale) {
               <strong>{{ getCurrency() }}{{ numberFormat(Number(sale.total)) }}</strong>
             </div>
             <p class="mt-2 text-sm"><strong>{{ t('sales.payment') }}:</strong> {{ paymentsText(sale) }}</p>
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
               <AppButton :href="route('sales.show', sale.id)" size="sm" icon="fa-eye">{{ t('sales.detail') }}</AppButton>
               <AppButton class="doc-button is-thermal" :href="route('sales.thermal', sale.id)" target="_blank" rel="noopener noreferrer" variant="secondary" size="sm" icon="fa-print">{{ t('cash.thermal') }}</AppButton>
               <AppButton class="doc-button is-pdf" :href="route('sales.pdf', sale.id)" target="_blank" rel="noopener noreferrer" variant="secondary" size="sm" icon="fa-file-pdf">PDF</AppButton>
@@ -245,5 +298,24 @@ function paymentsText(sale) {
 
       <AppPagination :links="sales.links" :label="t('sales.pagination')" />
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="activeActionSale"
+        data-sale-action-menu
+        class="app-action-menu app-action-menu-floating"
+        :style="actionMenuStyle"
+        @click.stop
+      >
+        <Link :href="route('sales.show', activeActionSale.id)" class="app-action-item is-view" @click="closeSaleActions"><i class="fas fa-eye"></i>{{ t('sales.view_detail') }}</Link>
+        <a :href="route('sales.thermal', activeActionSale.id)" target="_blank" rel="noopener noreferrer" class="app-action-item is-print" @click="closeSaleActions"><i class="fas fa-print"></i>{{ t('sales.open_thermal') }}</a>
+        <a :href="route('sales.pdf', activeActionSale.id)" target="_blank" rel="noopener noreferrer" class="app-action-item is-pdf" @click="closeSaleActions"><i class="fas fa-file-pdf"></i>{{ t('sales.download_pdf') }}</a>
+        <button type="button" class="app-action-item is-success" :disabled="printingId === activeActionSale.id" @click="requestPrint(activeActionSale)">
+          <i class="fas" :class="printingId === activeActionSale.id ? 'fa-spinner fa-spin' : 'fa-redo-alt'"></i>{{ t('sales.request_reprint') }}
+        </button>
+        <Link :href="route('cash-registers.index', { cash_register_id: activeActionSale.cash_register_id })" class="app-action-item is-register" @click="closeSaleActions"><i class="fas fa-lock-open"></i>{{ t('sales.consult_register') }}</Link>
+        <Link :href="route('sales.show', activeActionSale.id) + '#impresiones'" class="app-action-item is-history" @click="closeSaleActions"><i class="fas fa-history"></i>{{ t('sales.print_history') }}</Link>
+      </div>
+    </Teleport>
   </AuthenticatedLayout>
 </template>

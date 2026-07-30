@@ -1,6 +1,7 @@
 <script setup>
 import Sidebar from '@/Components/Sidebar/Sidebar.vue';
 import FooterAdmin from '@/Components/Footers/FooterAdmin.vue';
+import HelpWidget from '@/Components/Help/HelpWidget.vue';
 import { useAppearance } from '@/Composables/useAppearance.js';
 import { useAppShortcuts } from '@/Composables/useAppShortcuts.js';
 import { useI18n } from '@/Composables/useI18n.js';
@@ -32,11 +33,18 @@ const commandPaletteOpen = ref(false);
 const commandQuery = ref('');
 const commandInput = ref(null);
 const awaitingRouteShortcut = ref(false);
+const notificationOpen = ref(false);
+const notificationSoundEnabled = ref(typeof window === 'undefined'
+  ? true
+  : window.sessionStorage.getItem('laratory_notification_sound') !== 'off');
 let routeShortcutTimer = null;
+let notificationAudioContext = null;
 
 const user = computed(() => page.props.auth.user);
 const title = computed(() => currentRouteTitle(user.value?.role, t));
 const currentCashRegister = computed(() => page.props.currentCashRegister);
+const appNotifications = computed(() => page.props.appNotifications?.items || []);
+const notificationCount = computed(() => Number(page.props.appNotifications?.count ?? appNotifications.value.length));
 const navigationCommands = computed(() => menuForRole(user.value?.role, t)
   .flatMap((group) => group.items)
   .map((item, index) => ({
@@ -85,6 +93,10 @@ function closeCommandPalette() {
   commandPaletteOpen.value = false;
 }
 
+function closeNotifications() {
+  notificationOpen.value = false;
+}
+
 function clearRouteShortcut() {
   awaitingRouteShortcut.value = false;
   if (routeShortcutTimer) {
@@ -103,13 +115,73 @@ function runCommand(command) {
   if (!command) return;
 
   clearRouteShortcut();
+  closeNotifications();
   closeCommandPalette();
   router.visit(command.href);
+}
+
+function notificationRoute(notification) {
+  if (!notification?.route_name) return null;
+
+  return route(notification.route_name, notification.route_params || {});
+}
+
+function notificationText(notification, field) {
+  return t(notification[`${field}_key`], notification[`${field}_params`] || {});
+}
+
+function notificationToneClass(notification) {
+  return `is-${notification?.tone || 'info'}`;
+}
+
+function playNotificationSound() {
+  if (!notificationSoundEnabled.value || !notificationCount.value || typeof window === 'undefined') return;
+
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    notificationAudioContext ||= new AudioContext();
+    const context = notificationAudioContext;
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, now);
+    oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.14);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.2);
+  } catch {
+    // Audio is optional; notifications still work if the browser blocks it.
+  }
+}
+
+function toggleNotifications() {
+  notificationOpen.value = !notificationOpen.value;
+  if (notificationOpen.value) {
+    closeCommandPalette();
+    playNotificationSound();
+  }
+}
+
+function toggleNotificationSound() {
+  notificationSoundEnabled.value = !notificationSoundEnabled.value;
+  window.sessionStorage.setItem('laratory_notification_sound', notificationSoundEnabled.value ? 'on' : 'off');
 }
 
 function handleGlobalCommands(event) {
   if (event.key === 'Escape') {
     clearRouteShortcut();
+    if (notificationOpen.value) {
+      event.preventDefault();
+      closeNotifications();
+    }
     if (commandPaletteOpen.value) {
       event.preventDefault();
       closeCommandPalette();
@@ -154,6 +226,7 @@ function handleGlobalCommands(event) {
 onMounted(() => window.addEventListener('keydown', handleGlobalCommands));
 onUnmounted(() => {
   clearRouteShortcut();
+  closeNotifications();
   window.removeEventListener('keydown', handleGlobalCommands);
 });
 </script>
@@ -200,7 +273,7 @@ onUnmounted(() => {
           </div>
 
           <div class="flex items-center gap-2">
-            <button type="button" class="app-command-search" :aria-label="t('commands.open')" :title="t('commands.open')" @click="openCommandPalette">
+            <button type="button" class="app-command-search" data-tour="topbar-command" :aria-label="t('commands.open')" :title="t('commands.open')" @click="openCommandPalette">
               <i class="fas fa-search"></i>
               <span>{{ t('commands.search_placeholder') }}</span>
               <kbd>{{ commandPaletteShortcut }}</kbd>
@@ -213,9 +286,67 @@ onUnmounted(() => {
               <i class="fas mr-1" :class="currentCashRegister ? 'fa-lock-open' : 'fa-lock'"></i>
               {{ currentCashRegister ? t('cash.current_open') : t('cash.current_closed') }}
             </div>
-            <button type="button" class="ihc-icon-button" aria-label="Notificaciones" title="Notificaciones">
-              <i class="fas fa-bell"></i>
-            </button>
+            <HelpWidget />
+
+            <div class="app-notification-wrap" data-tour="topbar-notifications">
+              <button
+                type="button"
+                class="ihc-icon-button app-notification-button"
+                :class="{ 'has-alerts': notificationCount }"
+                :aria-label="t('notifications.open')"
+                :title="t('notifications.open')"
+                :aria-expanded="notificationOpen"
+                @click="toggleNotifications"
+              >
+                <i class="fas fa-bell"></i>
+                <span v-if="notificationCount" class="app-notification-count">{{ notificationCount > 9 ? '9+' : notificationCount }}</span>
+              </button>
+
+              <section v-if="notificationOpen" class="app-notification-panel" aria-live="polite">
+                <header class="app-notification-header">
+                  <div>
+                    <h2>{{ t('notifications.title') }}</h2>
+                    <p>{{ notificationCount ? t('notifications.summary', { count: notificationCount }) : t('notifications.empty') }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="ihc-icon-button h-9 w-9"
+                    :class="notificationSoundEnabled ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'"
+                    :aria-label="notificationSoundEnabled ? t('notifications.sound_on') : t('notifications.sound_off')"
+                    :title="notificationSoundEnabled ? t('notifications.sound_on') : t('notifications.sound_off')"
+                    @click="toggleNotificationSound"
+                  >
+                    <i class="fas" :class="notificationSoundEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
+                  </button>
+                </header>
+
+                <div v-if="appNotifications.length" class="app-notification-list">
+                  <Link
+                    v-for="notification in appNotifications"
+                    :key="notification.id"
+                    :href="notificationRoute(notification)"
+                    class="app-notification-item"
+                    :class="notificationToneClass(notification)"
+                    @click="closeNotifications"
+                  >
+                    <span class="app-notification-icon">
+                      <i class="fas" :class="notification.icon"></i>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                      <strong>{{ notificationText(notification, 'title') }}</strong>
+                      <small>{{ notificationText(notification, 'body') }}</small>
+                      <em>{{ notificationText(notification, 'action') }}</em>
+                    </span>
+                  </Link>
+                </div>
+
+                <div v-else class="app-notification-empty">
+                  <i class="fas fa-check-circle"></i>
+                  <strong>{{ t('notifications.empty_title') }}</strong>
+                  <span>{{ t('notifications.empty_body') }}</span>
+                </div>
+              </section>
+            </div>
             <Link :href="route('profile.edit')" class="app-topbar-avatar" :aria-label="t('navigation.profile')" :title="t('navigation.profile')">
               <img v-if="user?.photo" :src="user.photo" :alt="user.name" />
               <i v-else class="fas fa-user"></i>

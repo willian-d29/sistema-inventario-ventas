@@ -112,7 +112,7 @@ function deleteUnitType() {
     <div class="space-y-5 px-4">
       <PageHeader :title="t('admin.units.title')" :description="t('admin.units.description')" :count="unitTypes.total">
         <template #actions>
-          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.units.create') }}</AppButton>
+          <AppButton icon="fa-plus" data-tour="create-button" @click="openCreateModal">{{ t('admin.units.create') }}</AppButton>
         </template>
       </PageHeader>
 
@@ -127,7 +127,7 @@ function deleteUnitType() {
         </form>
       </FilterPanel>
 
-      <section class="ihc-panel overflow-hidden">
+      <section class="ihc-panel overflow-hidden" data-tour="records-list">
         <div v-if="items.length" class="hidden overflow-x-auto lg:block">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase">
@@ -144,7 +144,7 @@ function deleteUnitType() {
                 <td class="px-4 py-3"><AppBadge variant="info">{{ unitType.symbol }}</AppBadge></td>
                 <td class="px-4 py-3"><AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge></td>
                 <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
+                  <div class="flex justify-end gap-2" data-tour="row-actions">
                     <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${unitType.name}`" @click="openEditModal(unitType)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
                     <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${unitType.name}`" @click="openDeleteDialog(unitType)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
                   </div>
@@ -163,7 +163,7 @@ function deleteUnitType() {
               </div>
               <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
               <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${unitType.name}`" @click="openEditModal(unitType)">{{ t('actions.edit') }}</AppButton>
               <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${unitType.name}`" @click="openDeleteDialog(unitType)">{{ t('actions.delete') }}</AppButton>
             </div>

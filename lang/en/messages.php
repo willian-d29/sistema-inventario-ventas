@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'auth' => [
+        'reset_link_failed' => 'The recovery link could not be sent. Check the mail configuration or try again.',
+    ],
     'categories' => [
         'created' => 'Category created successfully.',
         'updated' => 'Category updated successfully.',

@@ -13,13 +13,14 @@ test('profile page is displayed', function () {
 });
 
 test('profile information can be updated', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => 'cajero', 'email' => 'original.c@laratory.pe']);
 
     $response = $this
         ->actingAs($user)
         ->patch('/sistema/profile', [
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email_local' => 'test.c',
+            'email' => 'test.c@laratory.pe',
         ]);
 
     $response
@@ -29,18 +30,18 @@ test('profile information can be updated', function () {
     $user->refresh();
 
     $this->assertSame('Test User', $user->name);
-    $this->assertSame('test@example.com', $user->email);
+    $this->assertSame('test.c@laratory.pe', $user->email);
     $this->assertNull($user->email_verified_at);
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['role' => 'cajero', 'email' => 'same.c@laratory.pe']);
 
     $response = $this
         ->actingAs($user)
         ->patch('/sistema/profile', [
             'name' => 'Test User',
-            'email' => $user->email,
+            'email_local' => 'same.c',
         ]);
 
     $response
@@ -48,6 +49,38 @@ test('email verification status is unchanged when the email address is unchanged
         ->assertRedirect('/sistema/profile');
 
     $this->assertNotNull($user->refresh()->email_verified_at);
+});
+
+test('profile email keeps LaraTory domain fixed', function () {
+    $user = User::factory()->create(['role' => 'admin', 'email' => 'willan.a@laratory.pe']);
+
+    $this
+        ->actingAs($user)
+        ->patch('/sistema/profile', [
+            'name' => 'Willan',
+            'email_local' => 'willan.a',
+            'email' => 'willan.ops@example.com',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/sistema/profile');
+
+    expect($user->refresh()->email)->toBe('willan.a@laratory.pe');
+});
+
+test('admin can update the editable LaraTory email alias', function () {
+    $user = User::factory()->create(['role' => 'admin', 'email' => 'willan.a@laratory.pe']);
+
+    $this
+        ->actingAs($user)
+        ->patch('/sistema/profile', [
+            'name' => 'Willan',
+            'email_local' => 'admin.a',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/sistema/profile');
+
+    expect($user->refresh()->email)->toBe('admin.a@laratory.pe')
+        ->and($user->email_verified_at)->toBeNull();
 });
 
 test('user can delete their account', function () {

@@ -11,6 +11,21 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    private const ACCOUNT_DOMAIN = 'laratory.pe';
+
+    protected function prepareForValidation(): void
+    {
+        $localPart = Str::of((string) $this->input('email', ''))
+            ->lower()
+            ->before('@')
+            ->trim()
+            ->toString();
+
+        if ($localPart !== '') {
+            $this->merge(['email' => $localPart.'@'.self::ACCOUNT_DOMAIN]);
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */

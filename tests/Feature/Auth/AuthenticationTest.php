@@ -9,10 +9,10 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['email' => 'tester.c@laratory.pe']);
 
     $response = $this->post('/login', [
-        'email' => $user->email,
+        'email' => 'tester.c',
         'password' => 'password',
     ]);
 
@@ -20,11 +20,23 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect('/sistema/dashboard');
 });
 
+test('users can authenticate with LaraTory email alias', function () {
+    $user = User::factory()->create(['role' => 'admin', 'email' => 'willan.a@laratory.pe']);
+
+    $response = $this->post('/login', [
+        'email' => 'willan.a',
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect('/sistema/dashboard');
+});
+
 test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['email' => 'wrong.c@laratory.pe']);
 
     $this->post('/login', [
-        'email' => $user->email,
+        'email' => 'wrong.c',
         'password' => 'wrong-password',
     ]);
 

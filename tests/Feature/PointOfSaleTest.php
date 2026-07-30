@@ -168,6 +168,48 @@ test('a non exact scan becomes a product search', function () {
     $response->assertRedirect('/sistema/pos?keyword=agua');
 });
 
+test('an unknown barcode opens the quick product registration flow', function () {
+    $cashier = User::factory()->create(['role' => 'cajero']);
+
+    $response = $this->actingAs($cashier)->post('/sistema/carts/scan', [
+        'code' => '7896004009582',
+    ]);
+
+    $response->assertRedirect('/sistema/pos?unknown_barcode=7896004009582');
+});
+
+test('a cashier can quickly register a scanned product and add it to the cart', function () {
+    $cashier = User::factory()->create(['role' => 'cajero']);
+    $category = Category::firstOrCreate(['name' => 'Snacks']);
+    $unit = UnitType::firstOrCreate(['name' => 'Unidad'], ['symbol' => 'und']);
+
+    $response = $this->actingAs($cashier)->post('/sistema/carts/products/quick', [
+        'barcode' => '7896004009582',
+        'name' => 'Pringles Original',
+        'description' => 'Producto autocompletado desde barcode',
+        'category_id' => $category->id,
+        'unit_type_id' => $unit->id,
+        'supplier_id' => null,
+        'buying_price' => 4.5,
+        'selling_price' => 8.9,
+        'quantity' => 12,
+    ]);
+
+    $response->assertRedirect('/sistema/pos');
+
+    $product = Product::where('barcode', '7896004009582')->first();
+
+    expect($product)->not->toBeNull()
+        ->and($product->name)->toBe('Pringles Original')
+        ->and($product->quantity)->toBe(12.0);
+
+    $this->assertDatabaseHas('carts', [
+        'user_id' => $cashier->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+    ]);
+});
+
 test('cashiers can only list their own sales through the backend', function () {
     $cashier = User::factory()->create(['role' => 'cajero']);
     $otherCashier = User::factory()->create(['role' => 'cajero']);
@@ -833,19 +875,40 @@ test('closing a cash register includes cash sales but not digital sales', functi
         ->and($register->system_amounts['yape'])->toEqual(5.0);
 });
 
-test('closing with differences requires notes and does not create a financial movement', function () {
+test('admin can close another employee open cash register', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $cashier = User::factory()->create(['role' => 'cajero']);
+    $register = openPosRegister($cashier, 80);
+
+    $this->actingAs($admin)->put("/sistema/cash-registers/{$register->id}/close", [
+        'declared_amounts' => ['cash' => 80],
+        'confirmed' => true,
+    ])->assertRedirect();
+
+    expect($register->refresh()->status)->toBe('closed')
+        ->and($register->closing_amount)->toBe('80.00');
+});
+
+test('cashier cannot close another employee cash register', function () {
+    $owner = User::factory()->create(['role' => 'cajero']);
+    $otherCashier = User::factory()->create(['role' => 'cajero']);
+    $register = openPosRegister($owner, 80);
+
+    $this->actingAs($otherCashier)->put("/sistema/cash-registers/{$register->id}/close", [
+        'declared_amounts' => ['cash' => 80],
+        'confirmed' => true,
+    ])->assertForbidden();
+
+    expect($register->refresh()->status)->toBe('open');
+});
+
+test('closing with differences is allowed and does not create a financial movement', function () {
     $cashier = User::factory()->create(['role' => 'cajero']);
     $register = openPosRegister($cashier, 100);
     $before = CashMovement::count();
 
     $this->actingAs($cashier)->put("/sistema/cash-registers/{$register->id}/close", [
         'declared_amounts' => ['cash' => 101, 'yape' => 0, 'plin' => 0, 'card' => 0, 'transfer' => 0],
-        'confirmed' => true,
-    ])->assertSessionHasErrors('closing_notes');
-
-    $this->actingAs($cashier)->put("/sistema/cash-registers/{$register->id}/close", [
-        'declared_amounts' => ['cash' => 101, 'yape' => 0, 'plin' => 0, 'card' => 0, 'transfer' => 0],
-        'closing_notes' => 'Sobrante declarado por arqueo.',
         'confirmed' => true,
     ])->assertRedirect();
 

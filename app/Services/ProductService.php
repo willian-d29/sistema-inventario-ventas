@@ -60,23 +60,33 @@ class ProductService
      */
     public function create(array $payload): mixed
     {
-        $photo = $this->fileManagerService->uploadFile(
-            file: $payload['photo'],
-            uploadPath: Product::PHOTO_PATH
-        );
+        $photo = 'default-image.jpg';
+        if (isset($payload['photo'])) {
+            $uploadedPhoto = $this->fileManagerService->uploadFile(
+                file: $payload['photo'],
+                uploadPath: Product::PHOTO_PATH
+            );
+            $photo = $uploadedPhoto ?: $photo;
+        }
+
+        $productNumber = 'P-'.Str::upper(Str::random(8));
+        $productCode = $this->presentString($payload[ProductFieldsEnum::PRODUCT_CODE->value] ?? null)
+            ?? $this->presentString($payload[ProductFieldsEnum::BARCODE->value] ?? null)
+            ?? $productNumber;
 
         $processPayload = [
             ProductFieldsEnum::CATEGORY_ID->value => $payload[ProductFieldsEnum::CATEGORY_ID->value],
-            ProductFieldsEnum::SUPPLIER_ID->value => $payload[ProductFieldsEnum::SUPPLIER_ID->value],
+            ProductFieldsEnum::SUPPLIER_ID->value => $payload[ProductFieldsEnum::SUPPLIER_ID->value] ?? null,
             ProductFieldsEnum::NAME->value => $payload[ProductFieldsEnum::NAME->value],
-            ProductFieldsEnum::DESCRIPTION->value => $payload[ProductFieldsEnum::DESCRIPTION->value],
-            ProductFieldsEnum::PRODUCT_NUMBER->value => 'P-'.Str::random(5),
-            ProductFieldsEnum::PRODUCT_CODE->value => $payload[ProductFieldsEnum::PRODUCT_CODE->value],
+            ProductFieldsEnum::DESCRIPTION->value => $payload[ProductFieldsEnum::DESCRIPTION->value] ?? null,
+            ProductFieldsEnum::PRODUCT_NUMBER->value => $productNumber,
+            ProductFieldsEnum::PRODUCT_CODE->value => $productCode,
             ProductFieldsEnum::BARCODE->value => $payload[ProductFieldsEnum::BARCODE->value] ?? null,
-            ProductFieldsEnum::ROOT->value => $payload[ProductFieldsEnum::ROOT->value],
+            ProductFieldsEnum::ROOT->value => $this->presentString($payload[ProductFieldsEnum::ROOT->value] ?? null)
+                ?? $payload[ProductFieldsEnum::NAME->value],
             ProductFieldsEnum::BUYING_PRICE->value => $payload[ProductFieldsEnum::BUYING_PRICE->value],
             ProductFieldsEnum::SELLING_PRICE->value => $payload[ProductFieldsEnum::SELLING_PRICE->value],
-            ProductFieldsEnum::BUYING_DATE->value => $payload[ProductFieldsEnum::BUYING_DATE->value],
+            ProductFieldsEnum::BUYING_DATE->value => $payload[ProductFieldsEnum::BUYING_DATE->value] ?? null,
             ProductFieldsEnum::UNIT_TYPE_ID->value => $payload[ProductFieldsEnum::UNIT_TYPE_ID->value],
             ProductFieldsEnum::QUANTITY->value => $payload[ProductFieldsEnum::QUANTITY->value],
             ProductFieldsEnum::PHOTO->value => $photo,
@@ -96,21 +106,25 @@ class ProductService
 
         $photo = $product->getRawOriginal(ProductFieldsEnum::PHOTO->value);
         if (isset($payload['photo'])) {
-            $photo = $this->fileManagerService->uploadFile(
+            $uploadedPhoto = $this->fileManagerService->uploadFile(
                 file: $payload['photo'],
                 uploadPath: Product::PHOTO_PATH,
                 deleteFileName: $photo
             );
+            $photo = $uploadedPhoto ?: $photo;
         }
 
         $processPayload = [
             ProductFieldsEnum::CATEGORY_ID->value => $payload[ProductFieldsEnum::CATEGORY_ID->value] ?? $product->category_id,
-            ProductFieldsEnum::SUPPLIER_ID->value => $payload[ProductFieldsEnum::SUPPLIER_ID->value] ?? $product->supplier_id,
+            ProductFieldsEnum::SUPPLIER_ID->value => array_key_exists(ProductFieldsEnum::SUPPLIER_ID->value, $payload)
+                ? $payload[ProductFieldsEnum::SUPPLIER_ID->value]
+                : $product->supplier_id,
             ProductFieldsEnum::NAME->value => $payload[ProductFieldsEnum::NAME->value] ?? $product->name,
             ProductFieldsEnum::DESCRIPTION->value => $payload[ProductFieldsEnum::DESCRIPTION->value] ?? $product->description,
             ProductFieldsEnum::PRODUCT_CODE->value => $payload[ProductFieldsEnum::PRODUCT_CODE->value] ?? $product->product_code,
             ProductFieldsEnum::BARCODE->value => $payload[ProductFieldsEnum::BARCODE->value] ?? $product->barcode,
-            ProductFieldsEnum::ROOT->value => $payload[ProductFieldsEnum::ROOT->value] ?? $product->root,
+            ProductFieldsEnum::ROOT->value => $this->presentString($payload[ProductFieldsEnum::ROOT->value] ?? null)
+                ?? ($payload[ProductFieldsEnum::NAME->value] ?? $product->name),
             ProductFieldsEnum::BUYING_PRICE->value => $payload[ProductFieldsEnum::BUYING_PRICE->value] ?? $product->buying_price,
             ProductFieldsEnum::SELLING_PRICE->value => $payload[ProductFieldsEnum::SELLING_PRICE->value] ?? $product->selling_price,
             ProductFieldsEnum::BUYING_DATE->value => $payload[ProductFieldsEnum::BUYING_DATE->value] ?? $product->buying_date,
@@ -140,5 +154,12 @@ class ProductService
         // Todo: prevent delete for available orders
 
         return $this->repository->delete($product);
+    }
+
+    private function presentString(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 }

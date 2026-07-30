@@ -137,7 +137,7 @@ function deleteSupplier() {
     <div class="space-y-5 px-4">
       <PageHeader :title="t('admin.suppliers.title')" :description="t('admin.suppliers.description')" :count="suppliers.total">
         <template #actions>
-          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.suppliers.create') }}</AppButton>
+          <AppButton icon="fa-plus" data-tour="create-button" @click="openCreateModal">{{ t('admin.suppliers.create') }}</AppButton>
         </template>
       </PageHeader>
 
@@ -154,13 +154,12 @@ function deleteSupplier() {
         </form>
       </FilterPanel>
 
-      <section class="ihc-panel overflow-hidden">
+      <section class="ihc-panel overflow-hidden" data-tour="records-list">
         <div v-if="items.length" class="hidden overflow-x-auto xl:block">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase">
               <tr>
                 <th scope="col" class="px-4 py-3">{{ t('admin.suppliers.title') }}</th>
-                <th scope="col" class="px-4 py-3">{{ t('admin.fields.document') }}</th>
                 <th scope="col" class="px-4 py-3">{{ t('admin.sections.contact') }}</th>
                 <th scope="col" class="px-4 py-3">{{ t('common.status') }}</th>
                 <th scope="col" class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
@@ -172,14 +171,13 @@ function deleteSupplier() {
                   <strong class="block text-[var(--color-text-primary)]">{{ supplier.name }}</strong>
                   <span class="app-ui-help">{{ supplier.shop_name || t('common.no_description') }}</span>
                 </td>
-                <td class="px-4 py-3">{{ t('admin.suppliers.no_document') }}</td>
                 <td class="px-4 py-3">
                   <span class="block">{{ supplier.phone || '-' }}</span>
                   <span class="app-ui-help">{{ supplier.email || '-' }}</span>
                 </td>
                 <td class="px-4 py-3"><AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge></td>
                 <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
+                  <div class="flex justify-end gap-2" data-tour="row-actions">
                     <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${supplier.name}`" @click="openEditModal(supplier)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
                     <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${supplier.name}`" @click="openDeleteDialog(supplier)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
                   </div>
@@ -194,12 +192,12 @@ function deleteSupplier() {
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
                 <h2 class="break-words font-black text-[var(--color-text-primary)]">{{ supplier.name }}</h2>
-                <p class="app-ui-help">{{ supplier.shop_name || t('admin.suppliers.no_document') }}</p>
+                <p class="app-ui-help">{{ supplier.shop_name || t('common.no_description') }}</p>
               </div>
               <AppBadge variant="success" icon="fa-check-circle">{{ t('admin.status.active') }}</AppBadge>
             </div>
             <p class="mt-2 text-sm text-[var(--color-text-secondary)]">{{ supplier.phone || '-' }} · {{ supplier.email || '-' }}</p>
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
               <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${supplier.name}`" @click="openEditModal(supplier)">{{ t('actions.edit') }}</AppButton>
               <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${supplier.name}`" @click="openDeleteDialog(supplier)">{{ t('actions.delete') }}</AppButton>
             </div>

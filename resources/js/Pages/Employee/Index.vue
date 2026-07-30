@@ -13,7 +13,7 @@ import FilterPanel from '@/Components/UI/FilterPanel.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { useI18n } from '@/Composables/useI18n.js';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { cleanQuery, getCurrency, numberFormat, showToast } from '@/Utils/Helper.js';
 
 const props = defineProps({
@@ -27,6 +27,7 @@ const showFormModal = ref(false);
 const showDeleteDialog = ref(false);
 const formMode = ref('create');
 const nameInput = ref(null);
+const lastSuggestedEmail = ref('');
 
 const filterForm = useForm({
   name: props.filters?.name?.value || '',
@@ -51,6 +52,35 @@ const form = useForm({
 
 const title = computed(() => formMode.value === 'create' ? t('admin.employees.create') : t('admin.employees.edit'));
 const items = computed(() => props.employees?.data || []);
+
+function emailFromName(name) {
+  const firstName = String(name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)[0]
+    ?.replace(/[^a-z0-9]/g, '');
+
+  return firstName ? `${firstName}.c@laratory.pe` : '';
+}
+
+watch(() => form.name, (name) => {
+  if (formMode.value !== 'create') {
+    return;
+  }
+
+  const suggestion = emailFromName(name);
+
+  if (!suggestion) {
+    return;
+  }
+
+  if (!form.email || form.email === lastSuggestedEmail.value) {
+    form.email = suggestion;
+    lastSuggestedEmail.value = suggestion;
+  }
+});
 
 function money(value) {
   return `${getCurrency()}${numberFormat(Number(value || 0))}`;
@@ -82,11 +112,13 @@ function fillForm(employee = null) {
     password: '',
     _method: '',
   });
+  lastSuggestedEmail.value = employee?.email || '';
 }
 
 function openCreateModal() {
   formMode.value = 'create';
   selectedEmployee.value = null;
+  lastSuggestedEmail.value = '';
   form.reset();
   fillForm();
   form.clearErrors();
@@ -150,7 +182,7 @@ function deleteEmployee() {
     <div class="space-y-5 px-4">
       <PageHeader :title="t('admin.employees.title')" :description="t('admin.employees.description')" :count="employees.total">
         <template #actions>
-          <AppButton icon="fa-plus" @click="openCreateModal">{{ t('admin.employees.create') }}</AppButton>
+          <AppButton icon="fa-plus" data-tour="create-button" @click="openCreateModal">{{ t('admin.employees.create') }}</AppButton>
         </template>
       </PageHeader>
 
@@ -159,7 +191,7 @@ function deleteEmployee() {
       <FilterPanel>
         <form class="ihc-filter-grid" @submit.prevent="applyFilters">
           <AppInput v-model="filterForm.name" :label="t('admin.filters.search')" :placeholder="t('admin.employees.search_placeholder')" />
-          <AppInput v-model="filterForm.email" :label="t('admin.fields.email')" placeholder="cajero@empresa.com" />
+          <AppInput v-model="filterForm.email" :label="t('admin.fields.email')" placeholder="nombre.c@laratory.pe" />
           <AppInput v-model="filterForm.phone" :label="t('admin.fields.phone')" placeholder="999999999" />
           <AppInput v-model="filterForm.nid" :label="t('admin.fields.document_number')" placeholder="DNI" />
           <div class="flex items-end gap-2">
@@ -169,7 +201,7 @@ function deleteEmployee() {
         </form>
       </FilterPanel>
 
-      <section class="ihc-panel overflow-hidden">
+      <section class="ihc-panel overflow-hidden" data-tour="records-list">
         <div v-if="items.length" class="hidden overflow-x-auto xl:block">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase">
@@ -199,7 +231,7 @@ function deleteEmployee() {
                 <td class="px-4 py-3 font-black">{{ money(employee.salary) }}</td>
                 <td class="px-4 py-3"><AppBadge variant="success" icon="fa-user-check">{{ t('admin.status.enabled') }}</AppBadge></td>
                 <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
+                  <div class="flex justify-end gap-2" data-tour="row-actions">
                     <AppButton class="w-9 px-0" variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${employee.name}`" @click="openEditModal(employee)"><span class="sr-only">{{ t('actions.edit') }}</span></AppButton>
                     <AppButton class="w-9 px-0" variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${employee.name}`" @click="openDeleteDialog(employee)"><span class="sr-only">{{ t('actions.delete') }}</span></AppButton>
                   </div>
@@ -220,7 +252,7 @@ function deleteEmployee() {
             </div>
             <p class="mt-2 text-sm text-[var(--color-text-secondary)]">{{ employee.phone || '-' }} · {{ employee.email || '-' }}</p>
             <p class="mt-1 text-sm font-black">{{ money(employee.salary) }}</p>
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
               <AppButton variant="success" size="sm" icon="fa-pencil-alt" :title="t('actions.edit')" :aria-label="`${t('actions.edit')} ${employee.name}`" @click="openEditModal(employee)">{{ t('actions.edit') }}</AppButton>
               <AppButton variant="danger" size="sm" icon="fa-trash-alt" :title="t('actions.delete')" :aria-label="`${t('actions.delete')} ${employee.name}`" @click="openDeleteDialog(employee)">{{ t('actions.delete') }}</AppButton>
             </div>
@@ -248,7 +280,7 @@ function deleteEmployee() {
         <section class="space-y-3">
           <h3 class="ihc-section-title">{{ t('admin.sections.access') }}</h3>
           <div class="grid gap-4 md:grid-cols-2">
-            <AppInput v-model="form.email" :label="t('admin.fields.email')" type="email" placeholder="cajero@empresa.com" :error="form.errors.email" required />
+            <AppInput v-model="form.email" :label="t('admin.fields.email')" type="email" placeholder="nombre.c@laratory.pe" :help-text="t('admin.employees.email_model')" :error="form.errors.email" required />
             <AppInput v-model="form.password" :label="t('admin.fields.password')" type="password" :placeholder="formMode === 'create' ? t('admin.fields.password') : t('admin.employees.optional_password')" :help-text="formMode === 'edit' ? t('admin.employees.optional_password') : null" :error="form.errors.password" :required="formMode === 'create'" />
           </div>
         </section>

@@ -1,5 +1,5 @@
 <template>
-    <img :src="logo" alt="LaraTory">
+    <img :src="logo" alt="LaraTory" v-bind="$attrs" class="h-10 w-auto" />
 </template>
 
 <script setup>

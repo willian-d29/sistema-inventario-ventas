@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\Cart\CartExpandEnum;
 use App\Enums\Cart\CartFiltersEnum;
+use App\Enums\CashRegister\CashRegisterStatusEnum;
 use App\Enums\Product\ProductExpandEnum;
 use App\Enums\Product\ProductFiltersEnum;
 use App\Enums\Product\ProductStatusEnum;
@@ -12,15 +13,24 @@ use App\Exceptions\CartException;
 use App\Exceptions\CartNotFoundException;
 use App\Helpers\BaseHelper;
 use App\Http\Requests\Cart\CartQuantityUpdateRequest;
+use App\Http\Requests\Product\ProductQuickStoreRequest;
 use App\Http\Requests\Product\ProductIndexRequest;
 use App\Models\CashRegister;
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
+use App\Models\UnitType;
+use App\Services\BarcodeProductLookupService;
+use App\Services\CashRegisterService;
 use App\Services\CartService;
 use App\Services\ProductService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,6 +39,8 @@ class CartController extends Controller
     public function __construct(
         private readonly ProductService $productService,
         private readonly CartService $cartService,
+        private readonly CashRegisterService $cashRegisterService,
+        private readonly BarcodeProductLookupService $barcodeLookupService,
     ) {
     }
 
@@ -68,6 +80,12 @@ class CartController extends Controller
             number: $cartSubtotal - $discountData['totalDiscount'] + $taxData['totalTax']
         );
 
+        $cashRegister = CashRegister::query()
+            ->where('user_id', auth()->id())
+            ->where('status', CashRegisterStatusEnum::OPEN->value)
+            ->latest('opened_at')
+            ->first();
+
         return Inertia::render(
             component: 'Cart/Pos',
             props: [
@@ -81,11 +99,18 @@ class CartController extends Controller
                 'totalTax' => $taxData['totalTax'],
                 'total' => $total,
                 'paymentMethods' => PaymentMethodEnum::options(),
-                'cashRegister' => CashRegister::query()
-                    ->where('user_id', auth()->id())
-                    ->where('status', 'open')
-                    ->latest('opened_at')
-                    ->first(),
+                'cashRegister' => $cashRegister,
+                'currentSummary' => $cashRegister ? $this->cashRegisterService->summary($cashRegister) : null,
+                'pendingBarcode' => $request->query('unknown_barcode'),
+                'categoryOptions' => Category::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name']),
+                'unitTypeOptions' => UnitType::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'symbol']),
+                'supplierOptions' => Supplier::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name']),
             ]
         );
     }
@@ -136,10 +161,83 @@ class CartController extends Controller
             ->first();
 
         if (! $product) {
-            return redirect()->route('carts.index', ['keyword' => $validated['code']]);
+            $query = $this->isLikelyBarcode($validated['code'])
+                ? ['unknown_barcode' => $validated['code']]
+                : ['keyword' => $validated['code']];
+
+            return redirect()->route('carts.index', $query);
         }
 
         return $this->addToCart($product->id);
+    }
+
+    public function lookupBarcode(string $barcode): JsonResponse
+    {
+        return response()->json(
+            $this->barcodeLookupService->lookup($barcode)
+        );
+    }
+
+    public function quickStoreProduct(ProductQuickStoreRequest $request): RedirectResponse
+    {
+        $payload = $request->validated();
+
+        try {
+            $product = Product::query()
+                ->where('barcode', $payload['barcode'])
+                ->first();
+
+            if (! $product) {
+                $product = DB::transaction(function () use ($payload) {
+                    return Product::query()->create([
+                        'category_id' => $payload['category_id'],
+                        'supplier_id' => $payload['supplier_id'] ?? null,
+                        'name' => $payload['name'],
+                        'description' => $payload['description'] ?? null,
+                        'product_number' => 'P-'.Str::upper(Str::random(8)),
+                        'product_code' => 'BAR-'.$payload['barcode'],
+                        'barcode' => $payload['barcode'],
+                        'root' => $payload['name'],
+                        'buying_price' => $payload['buying_price'],
+                        'selling_price' => $payload['selling_price'],
+                        'buying_date' => now(),
+                        'unit_type_id' => $payload['unit_type_id'],
+                        'quantity' => $payload['quantity'],
+                        'photo' => 'default-image.jpg',
+                        'status' => ProductStatusEnum::ACTIVE->value,
+                    ]);
+                });
+            }
+
+            $this->cartService->createOrUpdateForUser(
+                product: $product,
+                userId: auth()->id(),
+            );
+
+            $flash = [
+                'message' => 'Producto registrado y agregado a la venta.',
+            ];
+        } catch (CartException $e) {
+            $flash = [
+                'isSuccess' => false,
+                'message' => $e->getMessage(),
+            ];
+        } catch (Exception $e) {
+            $flash = [
+                'isSuccess' => false,
+                'message' => 'No se pudo registrar el producto rápido.',
+            ];
+
+            Log::error('Quick product creation failed.', [
+                'barcode' => $payload['barcode'] ?? null,
+                'message' => $e->getMessage(),
+                'traces' => $e->getTrace(),
+            ]);
+        }
+
+        return redirect()
+            ->route('carts.index')
+            ->with('flash', $flash);
     }
 
     public function updateQuantity(CartQuantityUpdateRequest $request, int $cartId): RedirectResponse
@@ -175,6 +273,11 @@ class CartController extends Controller
         return redirect()
             ->route('carts.index')
             ->with('flash', $flash);
+    }
+
+    private function isLikelyBarcode(string $code): bool
+    {
+        return (bool) preg_match('/^\d{6,32}$/', trim($code));
     }
 
     public function incrementQuantity(int $cartId): RedirectResponse

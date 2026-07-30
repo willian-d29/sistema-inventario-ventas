@@ -31,6 +31,7 @@ class EmployeeUpdateRequest extends FormRequest
             EmployeeFieldsEnum::EMAIL->value => [
                 'required',
                 'email',
+                'ends_with:.c@laratory.pe',
                 Rule::unique((new Employee())->getTable())->ignore($this->route('employee')),
                 Rule::unique('users', 'email')->ignore($employee?->user_id),
             ],

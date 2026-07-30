@@ -33,6 +33,7 @@ defineProps({
 
                 <div
                     class="ihc-panel relative mb-6 flex w-full min-w-0 flex-col break-words"
+                    data-tour="profile-account"
                 >
                     <div class="mb-0 rounded-t border-b border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-6">
                         <div class="text-center flex justify-between">

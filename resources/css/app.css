@@ -1,8 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+    html {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        min-height: 100vh;
+        background-color: #0f172a;
+        color: #f8fafc;
+    }
+
     :root {
         --palette-blue-50: #eff6ff;
         --palette-blue-100: #dbeafe;
@@ -309,28 +322,48 @@
     }
 
     .ihc-field {
-        @apply mt-1 block w-full border px-3 py-2 text-sm outline-none transition;
+        @apply mt-1 block w-full border px-3 py-2 text-sm font-semibold outline-none transition;
         min-height: var(--control-height);
-        border-color: var(--color-border);
+        border-color: color-mix(in srgb, var(--color-border-strong) 84%, var(--color-primary) 16%);
         border-radius: var(--radius-md);
-        background-color: var(--color-surface);
+        background-color: color-mix(in srgb, var(--color-surface) 92%, var(--color-surface-alt));
         color: var(--color-text-primary);
         box-shadow: var(--shadow-xs);
     }
 
-    .form-control {
-        @apply mt-1 block w-full border px-3 py-2 text-sm outline-none transition;
-        min-height: var(--control-height);
-        border-color: var(--color-border);
-        border-radius: var(--radius-md);
+    .ihc-field::placeholder,
+    .form-control::placeholder {
+        color: color-mix(in srgb, var(--color-text-muted) 58%, transparent);
+        font-weight: 600;
+    }
+
+    .ihc-field:hover,
+    .form-control:hover {
+        border-color: var(--color-border-strong);
         background-color: var(--color-surface);
+    }
+
+    .ihc-field:focus,
+    .form-control:focus {
+        border-color: var(--color-primary);
+        background-color: var(--color-surface);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 16%, transparent), var(--shadow-sm);
+    }
+
+    .form-control {
+        @apply mt-1 block w-full border px-3 py-2 text-sm font-semibold outline-none transition;
+        min-height: var(--control-height);
+        border-color: color-mix(in srgb, var(--color-border-strong) 84%, var(--color-primary) 16%);
+        border-radius: var(--radius-md);
+        background-color: color-mix(in srgb, var(--color-surface) 92%, var(--color-surface-alt));
         color: var(--color-text-primary);
         box-shadow: var(--shadow-sm);
     }
 
     .ihc-label {
-        @apply block text-xs font-semibold;
-        color: var(--color-text-secondary);
+        @apply block text-xs font-black uppercase;
+        color: var(--color-text-primary);
+        letter-spacing: 0;
     }
 
     .ihc-icon-button {
@@ -576,7 +609,8 @@
     }
 
     .app-action-trigger {
-        @apply inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-black marker:hidden;
+        @apply inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-black marker:hidden;
+        min-width: 8.5rem;
         border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-border));
         background: linear-gradient(135deg, var(--color-surface), color-mix(in srgb, var(--color-primary-soft) 42%, var(--color-surface)));
         color: var(--color-primary);
@@ -584,22 +618,36 @@
         transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
     }
 
-    .app-action-trigger:hover {
+    .app-action-trigger:hover,
+    .app-action-trigger.is-open {
         transform: translateY(-1px);
         border-color: var(--color-primary);
+        background: linear-gradient(135deg, var(--color-primary-soft), var(--color-surface));
         box-shadow: var(--shadow-sm);
     }
 
     .app-action-menu {
-        @apply absolute right-0 z-10 mt-2 w-60 rounded-md border p-2 text-left shadow-lg;
+        @apply w-72 rounded-md border p-2 text-left shadow-lg;
         border-color: var(--color-border);
         background-color: var(--color-surface);
     }
 
+    .app-action-menu-floating {
+        position: fixed;
+        z-index: 90;
+        max-width: calc(100vw - 1.5rem);
+        animation: app-menu-in 160ms var(--ease-out) both;
+    }
+
     .app-action-item {
-        @apply flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-bold;
+        @apply flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-bold;
         color: var(--color-text-secondary);
         transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+    }
+
+    .app-action-item:disabled {
+        cursor: wait;
+        opacity: 0.65;
     }
 
     .app-action-item:hover {
@@ -623,6 +671,19 @@
     .app-action-item.is-history i { background-color: var(--color-analytics-soft); color: var(--color-analytics); }
     .app-action-item.is-register:hover { background-color: var(--color-primary-soft); }
     .app-action-item.is-register i { background-color: var(--color-primary-soft); color: var(--color-primary); }
+
+    .sales-actions-cell {
+        width: 12rem;
+        min-width: 12rem;
+        padding-left: 1rem;
+        padding-right: 1.25rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    th.sales-actions-cell {
+        text-align: center;
+    }
 
     .doc-button {
         border-color: color-mix(in srgb, var(--doc-color) 72%, #000);
@@ -690,10 +751,144 @@
     .app-ui-alert-error { background-color: color-mix(in srgb, var(--color-danger) 10%, transparent); color: var(--color-danger); }
 
     .app-ui-field { @apply block; }
-    .app-ui-label { @apply mb-1 block text-sm font-bold; color: var(--color-text-secondary); }
-    .app-ui-help { @apply mt-1 block text-xs font-semibold; color: var(--color-text-muted); }
+    .app-ui-label {
+        @apply mb-1 block text-sm font-black;
+        color: var(--color-text-primary);
+        letter-spacing: 0;
+    }
+    .app-ui-help {
+        @apply mt-1 block text-[11px] font-semibold;
+        color: color-mix(in srgb, var(--color-text-muted) 78%, transparent);
+    }
     .app-ui-error { @apply mt-1 flex items-center gap-1 text-sm font-bold; color: var(--color-danger); }
-    .app-ui-field-error { border-color: var(--color-danger) !important; }
+    .app-ui-field-error {
+        border-color: var(--color-danger) !important;
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-danger) 12%, transparent), var(--shadow-xs) !important;
+    }
+
+    .profile-email-control {
+        @apply mt-1 flex min-w-0 overflow-hidden border;
+        min-height: var(--control-height);
+        border-color: color-mix(in srgb, var(--color-border-strong) 84%, var(--color-primary) 16%);
+        border-radius: var(--radius-md);
+        background-color: color-mix(in srgb, var(--color-surface) 92%, var(--color-surface-alt));
+        box-shadow: var(--shadow-xs);
+        transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+    }
+
+    .profile-email-control:focus-within {
+        border-color: var(--color-primary);
+        background-color: var(--color-surface);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 16%, transparent), var(--shadow-sm);
+    }
+
+    .profile-email-control-input {
+        @apply min-w-0 flex-1 bg-transparent px-3 py-2 text-sm font-semibold outline-none;
+        color: var(--color-text-primary);
+    }
+
+    .profile-email-control-input::placeholder {
+        color: color-mix(in srgb, var(--color-text-muted) 58%, transparent);
+        font-weight: 600;
+    }
+
+    .profile-email-domain {
+        @apply inline-flex shrink-0 items-center border-l px-3 text-sm font-black;
+        border-color: color-mix(in srgb, var(--color-border) 76%, transparent);
+        background: linear-gradient(135deg, var(--color-primary-soft), color-mix(in srgb, var(--color-info-soft) 70%, var(--color-surface)));
+        color: var(--color-primary);
+    }
+
+    .profile-email-readonly {
+        @apply mt-1 flex min-h-12 items-center gap-3 rounded-md border px-3 py-2 text-sm font-black;
+        border-color: color-mix(in srgb, var(--color-border-strong) 78%, var(--color-primary) 12%);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--color-surface-alt) 88%, var(--color-primary-soft)), var(--color-surface));
+        color: var(--color-text-primary);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .profile-email-readonly i {
+        @apply flex h-8 w-8 shrink-0 items-center justify-center rounded;
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+    }
+
+    .profile-email-readonly span {
+        @apply min-w-0 truncate;
+    }
+
+    .app-async-select {
+        @apply mt-1;
+    }
+
+    .app-async-select .vs__dropdown-toggle {
+        min-height: var(--control-height);
+        border-color: color-mix(in srgb, var(--color-border-strong) 84%, var(--color-primary) 16%);
+        border-radius: var(--radius-md);
+        background-color: color-mix(in srgb, var(--color-surface) 92%, var(--color-surface-alt));
+        box-shadow: var(--shadow-xs);
+        transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+    }
+
+    .app-async-select .vs__dropdown-toggle:hover,
+    .app-async-select.vs--open .vs__dropdown-toggle {
+        border-color: var(--color-primary);
+        background-color: var(--color-surface);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 16%, transparent), var(--shadow-sm);
+    }
+
+    .app-async-select .vs__selected,
+    .app-async-select .vs__search,
+    .app-async-select .vs__search:focus {
+        color: var(--color-text-primary);
+        font-size: 0.875rem;
+        font-weight: 700;
+    }
+
+    .app-async-select .vs__search::placeholder {
+        color: color-mix(in srgb, var(--color-text-muted) 58%, transparent);
+        font-weight: 600;
+    }
+
+    .app-async-select .vs__dropdown-menu {
+        border-color: var(--color-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface);
+        box-shadow: var(--shadow-lg);
+        color: var(--color-text-primary);
+        z-index: 9999;
+    }
+
+    body > .vs__dropdown-menu {
+        z-index: 9999;
+        max-height: min(16rem, 42vh);
+        overflow-y: auto;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface);
+        box-shadow: var(--shadow-lg);
+        color: var(--color-text-primary);
+    }
+
+    body > .vs__dropdown-menu .vs__dropdown-option {
+        font-weight: 700;
+        padding: 0.55rem 0.75rem;
+    }
+
+    body > .vs__dropdown-menu .vs__dropdown-option--highlight {
+        background-color: var(--color-primary);
+        color: #ffffff;
+    }
+
+    .app-async-select .vs__dropdown-option {
+        font-weight: 700;
+        padding: 0.55rem 0.75rem;
+    }
+
+    .app-async-select .vs__dropdown-option--highlight {
+        background-color: var(--color-primary);
+        color: #ffffff;
+    }
 
     .app-ui-checkbox {
         @apply flex items-start gap-3 border;
@@ -712,22 +907,22 @@
     }
 
     .app-ui-modal-root {
-        @apply fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-3 py-6;
+        @apply fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto px-3 py-4 sm:items-center sm:px-4 sm:py-6;
+        background: rgba(15, 23, 42, 0.4);
     }
 
     .app-ui-modal-overlay {
         @apply fixed inset-0;
-        background-color: var(--color-overlay);
-        backdrop-filter: blur(6px);
+        background-color: rgba(15, 23, 42, 0.55);
     }
 
     .app-ui-modal {
-        @apply relative z-10 max-h-[90vh] w-full overflow-hidden;
+        @apply relative z-10 flex max-h-[94dvh] min-h-0 w-full flex-col overflow-visible;
         border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
+        border-radius: 1.75rem;
         background-color: var(--color-surface);
         color: var(--color-text-primary);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 40px 120px rgba(15, 23, 42, 0.18);
     }
 
     .v-enter-active .app-ui-modal-overlay,
@@ -748,21 +943,26 @@
     .v-enter-from .app-ui-modal,
     .v-leave-to .app-ui-modal {
         opacity: 0;
-        transform: translateY(10px) scale(0.98);
+        transform: translateY(12px) scale(0.98);
     }
 
     .app-ui-modal-header,
     .app-ui-modal-footer {
-        @apply flex items-center justify-between gap-3 border-b p-4;
+        @apply flex shrink-0 items-center justify-between gap-4;
         border-color: var(--color-border);
+        border-bottom-width: 1px;
+        padding: 1.25rem 1.5rem;
     }
 
     .app-ui-modal-footer {
-        @apply justify-end border-b-0 border-t;
+        @apply flex-wrap justify-end border-b-0 border-t;
+        background-color: var(--color-surface);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 
     .app-ui-modal-body {
-        @apply max-h-[calc(90vh-8rem)] overflow-y-auto p-4;
+        @apply min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5;
     }
 
     .app-ui-page-header {
@@ -876,6 +1076,41 @@
     .app-ui-stat-card-info i { background-color: var(--color-info-soft); color: var(--color-info); }
     .app-ui-stat-card-analytics i { background-color: var(--color-analytics-soft); color: var(--color-analytics); }
 
+    .smart-image {
+        @apply relative grid shrink-0 place-items-center overflow-hidden;
+        background: linear-gradient(135deg, var(--color-info-soft), var(--color-primary-soft));
+        color: var(--color-primary);
+        contain: layout paint;
+    }
+
+    .smart-image-placeholder {
+        @apply absolute inset-0;
+        background:
+            linear-gradient(90deg, transparent, rgb(255 255 255 / 0.58), transparent),
+            linear-gradient(135deg, var(--color-info-soft), var(--color-primary-soft));
+        background-size: 180% 100%, 100% 100%;
+        animation: app-image-skeleton 950ms ease-in-out infinite;
+    }
+
+    .smart-image img {
+        @apply relative z-10 h-full w-full select-none;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 140ms var(--ease-out), transform var(--duration-fast) var(--ease-out);
+    }
+
+    .smart-image.is-contain img {
+        object-fit: contain;
+    }
+
+    .smart-image.is-loaded img {
+        opacity: 1;
+    }
+
+    .smart-image > i {
+        @apply relative z-10 text-base;
+    }
+
     .product-inventory-shell {
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
@@ -885,18 +1120,9 @@
     }
 
     .product-thumb {
-        @apply flex shrink-0 items-center justify-center overflow-hidden;
         width: 44px;
         height: 44px;
         border-radius: var(--radius-md);
-        background: linear-gradient(135deg, var(--color-info-soft), var(--color-primary-soft));
-        color: var(--color-primary);
-    }
-
-    .product-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
     }
 
     .product-inventory-shell tbody tr:hover .product-thumb {
@@ -921,9 +1147,8 @@
 
     .app-topbar {
         border-bottom: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
-        background-color: var(--color-surface-glass);
+        background-color: color-mix(in srgb, var(--color-surface) 96%, transparent);
         box-shadow: 0 10px 30px rgb(15 23 42 / 0.04);
-        backdrop-filter: blur(18px);
     }
 
     .app-command-search {
@@ -973,6 +1198,517 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+    }
+
+    .app-notification-wrap {
+        @apply relative;
+    }
+
+    .app-notification-button {
+        position: relative;
+    }
+
+    .app-notification-button.has-alerts {
+        border-color: color-mix(in srgb, var(--color-danger) 32%, var(--color-border));
+        background-color: var(--color-danger-soft);
+        color: var(--color-danger);
+        animation: notification-pulse 1.8s ease-in-out infinite;
+    }
+
+    .app-notification-count {
+        @apply absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full px-1 text-[10px] font-black leading-none text-white;
+        background-color: var(--color-danger);
+        box-shadow: 0 0 0 2px var(--color-surface);
+    }
+
+    .app-notification-panel {
+        @apply absolute right-0 top-12 z-50 w-[min(22rem,calc(100vw-1.5rem))] overflow-hidden rounded-lg border;
+        border-color: var(--color-border);
+        background-color: var(--color-surface);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .app-notification-header {
+        @apply flex items-start justify-between gap-3 border-b px-4 py-3;
+        border-color: var(--color-border);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-soft) 54%, var(--color-surface)), var(--color-surface));
+    }
+
+    .app-notification-header h2 {
+        @apply text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-notification-header p {
+        @apply mt-0.5 text-xs font-semibold;
+        color: var(--color-text-muted);
+    }
+
+    .app-notification-list {
+        @apply max-h-[24rem] overflow-y-auto p-2;
+    }
+
+    .app-notification-item {
+        @apply flex gap-3 rounded-md border px-3 py-3 text-left transition;
+        border-color: transparent;
+        color: var(--color-text-primary);
+    }
+
+    .app-notification-item:hover,
+    .app-notification-item:focus-visible {
+        border-color: var(--color-border);
+        background-color: var(--color-surface-alt);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    .app-notification-icon {
+        @apply grid h-10 w-10 shrink-0 place-items-center rounded-md;
+        background-color: var(--color-info-soft);
+        color: var(--color-info);
+    }
+
+    .app-notification-item strong {
+        @apply block truncate text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-notification-item small {
+        @apply mt-0.5 block text-xs font-semibold leading-5;
+        color: var(--color-text-muted);
+    }
+
+    .app-notification-item em {
+        @apply mt-1 inline-flex text-xs font-black not-italic;
+        color: var(--color-primary);
+    }
+
+    .app-notification-item.is-success .app-notification-icon {
+        background-color: var(--color-success-soft);
+        color: var(--color-success);
+    }
+
+    .app-notification-item.is-warning .app-notification-icon {
+        background-color: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .app-notification-item.is-danger .app-notification-icon {
+        background-color: var(--color-danger-soft);
+        color: var(--color-danger);
+    }
+
+    .app-notification-empty {
+        @apply grid place-items-center gap-1 px-6 py-8 text-center;
+        color: var(--color-text-muted);
+    }
+
+    .app-notification-empty i {
+        @apply text-2xl;
+        color: var(--color-success);
+    }
+
+    .app-notification-empty strong {
+        @apply text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-notification-empty span {
+        @apply text-xs font-semibold;
+    }
+
+    @keyframes notification-pulse {
+        0%, 100% {
+            box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-danger) 24%, transparent);
+        }
+
+        50% {
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-danger) 0%, transparent);
+        }
+    }
+
+    .app-help-wrap {
+        @apply relative;
+    }
+
+    .app-help-button {
+        position: relative;
+        overflow: hidden;
+        border-color: color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
+        background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-soft) 80%, #fff), color-mix(in srgb, var(--color-warning-soft) 58%, #fff));
+        color: var(--color-primary);
+    }
+
+    .app-help-button::after {
+        content: '';
+        position: absolute;
+        inset: 6px;
+        border-radius: inherit;
+        border: 1px solid rgb(255 255 255 / 0.55);
+        pointer-events: none;
+    }
+
+    .app-help-button:hover {
+        transform: translateY(-1px) rotate(-2deg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .app-help-panel {
+        @apply absolute right-0 top-12 z-50 w-[min(31rem,calc(100vw-1.5rem))] overflow-hidden rounded-lg border;
+        border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
+        background-color: var(--color-surface);
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+        animation: app-menu-in 180ms var(--ease-out) both;
+    }
+
+    .app-help-header {
+        @apply flex items-start justify-between gap-4 border-b px-5 py-4;
+        border-color: var(--color-border);
+        background:
+            radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary-soft) 92%, transparent), transparent 46%),
+            linear-gradient(135deg, var(--color-surface), color-mix(in srgb, var(--color-info-soft) 42%, var(--color-surface)));
+    }
+
+    .app-help-header p {
+        @apply text-[11px] font-black uppercase;
+        color: var(--color-primary);
+        letter-spacing: 0;
+    }
+
+    .app-help-header h2 {
+        @apply mt-1 text-lg font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-help-header span {
+        @apply mt-1 block text-sm font-semibold leading-5;
+        color: var(--color-text-muted);
+    }
+
+    .app-help-tabs {
+        @apply grid grid-cols-3 gap-1 border-b p-2;
+        border-color: var(--color-border);
+        background-color: color-mix(in srgb, var(--color-surface-alt) 70%, var(--color-surface));
+    }
+
+    .app-help-tabs button {
+        @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-2 text-xs font-black transition;
+        color: var(--color-text-secondary);
+    }
+
+    .app-help-tabs button:hover,
+    .app-help-tabs button.is-active {
+        background-color: var(--color-surface);
+        color: var(--color-primary);
+        box-shadow: var(--shadow-xs);
+    }
+
+    .app-help-body {
+        @apply max-h-[min(34rem,calc(100dvh-9rem))] overflow-y-auto p-4;
+    }
+
+    .app-help-manual-grid {
+        @apply grid gap-3;
+    }
+
+    .app-help-card {
+        @apply flex gap-3 rounded-md border p-3;
+        border-color: var(--color-border);
+        background: linear-gradient(135deg, var(--color-surface), color-mix(in srgb, var(--help-soft, var(--color-primary-soft)) 46%, var(--color-surface)));
+        box-shadow: var(--shadow-xs);
+    }
+
+    .app-help-card.is-primary { --help-soft: var(--color-primary-soft); --help-strong: var(--color-primary); }
+    .app-help-card.is-success { --help-soft: var(--color-success-soft); --help-strong: var(--color-success); }
+    .app-help-card.is-info { --help-soft: var(--color-info-soft); --help-strong: var(--color-info); }
+    .app-help-card.is-warning { --help-soft: var(--color-warning-soft); --help-strong: var(--color-warning); }
+
+    .app-help-card-icon {
+        @apply grid h-11 w-11 shrink-0 place-items-center rounded-md text-lg;
+        background-color: var(--help-soft, var(--color-primary-soft));
+        color: var(--help-strong, var(--color-primary));
+    }
+
+    .app-help-card h3 {
+        @apply text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-help-card p {
+        @apply mt-1 text-xs font-semibold leading-5;
+        color: var(--color-text-muted);
+    }
+
+    .app-help-card ul {
+        @apply mt-2 space-y-1;
+    }
+
+    .app-help-card li {
+        @apply flex gap-2 text-xs font-bold leading-5;
+        color: var(--color-text-secondary);
+    }
+
+    .app-help-card li i {
+        @apply mt-1 text-[10px];
+        color: var(--help-strong, var(--color-primary));
+    }
+
+    .app-help-faq-list {
+        @apply space-y-2;
+    }
+
+    .app-help-faq-item {
+        @apply overflow-hidden rounded-md border;
+        border-color: var(--color-border);
+        background-color: var(--color-surface);
+    }
+
+    .app-help-faq-item summary {
+        @apply flex cursor-pointer list-none items-center gap-3 px-3 py-3;
+    }
+
+    .app-help-faq-item summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .app-help-faq-item summary span {
+        @apply grid h-9 w-9 shrink-0 place-items-center rounded-md;
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+    }
+
+    .app-help-faq-item summary strong {
+        @apply min-w-0 flex-1 text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-help-faq-item summary > i {
+        @apply text-xs transition;
+        color: var(--color-text-muted);
+    }
+
+    .app-help-faq-item[open] summary > i {
+        transform: rotate(180deg);
+    }
+
+    .app-help-faq-item p {
+        @apply border-t px-4 py-3 text-sm font-semibold leading-6;
+        border-color: var(--color-border);
+        color: var(--color-text-secondary);
+        background-color: var(--color-surface-alt);
+    }
+
+    .app-help-tour-card {
+        @apply rounded-lg border p-4;
+        border-color: color-mix(in srgb, var(--color-primary) 24%, var(--color-border));
+        background:
+            radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--color-primary-soft) 80%, transparent), transparent 36%),
+            linear-gradient(135deg, var(--color-surface), color-mix(in srgb, var(--color-warning-soft) 44%, var(--color-surface)));
+    }
+
+    .app-help-tour-visual {
+        @apply flex items-center gap-3;
+    }
+
+    .app-help-tour-visual > span {
+        @apply grid h-14 w-14 shrink-0 place-items-center rounded-lg text-xl text-white;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        box-shadow: 0 14px 30px color-mix(in srgb, var(--color-primary) 26%, transparent);
+    }
+
+    .app-help-tour-visual h3 {
+        @apply text-base font-black;
+        color: var(--color-text-primary);
+    }
+
+    .app-help-tour-visual p {
+        @apply mt-1 text-sm font-semibold leading-5;
+        color: var(--color-text-muted);
+    }
+
+    .app-help-tour-action {
+        @apply mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-sm font-black text-white transition;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        box-shadow: 0 12px 28px color-mix(in srgb, var(--color-primary) 22%, transparent);
+    }
+
+    .app-help-tour-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 34px color-mix(in srgb, var(--color-primary) 28%, transparent);
+    }
+
+    .app-tour-lock {
+        overflow: hidden;
+    }
+
+    .app-tour-layer {
+        @apply fixed inset-0 z-[80];
+    }
+
+    .app-tour-backdrop {
+        @apply absolute inset-0;
+        background: rgba(15, 23, 42, 0.7);
+        animation: app-fade-up 160ms var(--ease-out) both;
+    }
+
+    .app-tour-spotlight {
+        @apply fixed rounded-lg border-2;
+        z-index: 86;
+        border-color: #ffffff;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 9999px rgba(15, 23, 42, 0.62),
+            0 0 0 7px color-mix(in srgb, var(--color-primary) 32%, transparent),
+            0 18px 54px rgba(15, 23, 42, 0.26);
+        pointer-events: none;
+        transition: all 220ms var(--ease-out);
+        animation: app-tour-spotlight-enter 260ms var(--ease-out) both, app-tour-spotlight-pulse 1.6s ease-in-out infinite;
+    }
+
+    .app-tour-spotlight span {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 0%, rgb(255 255 255 / 0.28) 42%, transparent 64%);
+        transform: translateX(-120%);
+        animation: app-tour-scan 1.4s ease-in-out infinite;
+    }
+
+    .app-tour-target-active {
+        position: relative !important;
+        z-index: 85 !important;
+        border-radius: var(--radius-md);
+    }
+
+    .app-tour-tooltip {
+        @apply fixed overflow-hidden rounded-lg border;
+        z-index: 90;
+        border-color: color-mix(in srgb, var(--color-primary) 26%, var(--color-border));
+        background-color: var(--color-surface);
+        color: var(--color-text-primary);
+        box-shadow: 0 26px 90px rgba(15, 23, 42, 0.28);
+        animation: app-tour-pop 200ms var(--ease-out) both;
+    }
+
+    .app-tour-progress {
+        @apply h-1 w-full;
+        background-color: var(--color-surface-alt);
+    }
+
+    .app-tour-progress span {
+        @apply block h-full;
+        background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-success));
+        transition: width 220ms var(--ease-out);
+    }
+
+    .app-tour-tooltip header {
+        @apply flex items-start gap-3 px-4 pb-3 pt-4;
+    }
+
+    .app-tour-icon {
+        @apply grid h-11 w-11 shrink-0 place-items-center rounded-md text-white;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        box-shadow: 0 12px 24px color-mix(in srgb, var(--color-primary) 24%, transparent);
+    }
+
+    .app-tour-tooltip small {
+        @apply text-[11px] font-black uppercase;
+        color: var(--color-primary);
+        letter-spacing: 0;
+    }
+
+    .app-tour-tooltip h2 {
+        @apply mt-1 text-lg font-black leading-tight;
+        color: var(--color-text-primary);
+    }
+
+    .app-tour-tooltip p {
+        @apply px-4 pb-4 text-sm font-semibold leading-6;
+        color: var(--color-text-secondary);
+    }
+
+    .app-tour-tooltip footer {
+        @apply flex flex-wrap items-center justify-between gap-2 border-t px-4 py-3;
+        border-color: var(--color-border);
+        background-color: var(--color-surface-alt);
+    }
+
+    .app-tour-tooltip footer div {
+        @apply flex flex-wrap items-center gap-2;
+    }
+
+    .app-tour-primary,
+    .app-tour-secondary {
+        @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-black transition;
+    }
+
+    .app-tour-primary {
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        color: #ffffff;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .app-tour-primary:hover,
+    .app-tour-secondary:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    .app-tour-secondary {
+        border: 1px solid var(--color-border);
+        background-color: var(--color-surface);
+        color: var(--color-text-secondary);
+    }
+
+    .app-tour-secondary:disabled {
+        cursor: not-allowed;
+        opacity: 0.48;
+    }
+
+    @keyframes app-tour-pop {
+        from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes app-tour-spotlight-enter {
+        from {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes app-tour-spotlight-pulse {
+        0%, 100% {
+            border-color: #ffffff;
+            box-shadow:
+                0 0 0 9999px rgba(15, 23, 42, 0.62),
+                0 0 0 7px color-mix(in srgb, var(--color-primary) 32%, transparent),
+                0 18px 54px rgba(15, 23, 42, 0.26);
+        }
+        50% {
+            border-color: color-mix(in srgb, var(--color-success) 60%, #ffffff);
+            box-shadow:
+                0 0 0 9999px rgba(15, 23, 42, 0.62),
+                0 0 0 10px color-mix(in srgb, var(--color-primary) 18%, transparent),
+                0 20px 60px rgba(15, 23, 42, 0.3);
+        }
+    }
+
+    @keyframes app-tour-scan {
+        0% {
+            transform: translateX(-120%);
+        }
+        52%, 100% {
+            transform: translateX(120%);
+        }
     }
 
     .app-sidebar {
@@ -1074,6 +1810,112 @@
         animation: app-fade-up 420ms var(--ease-out) both;
     }
 
+    .product-form-hero,
+    .product-form-minimal-head,
+    .product-form-section {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-xs);
+        animation: app-fade-up 420ms var(--ease-out) both;
+    }
+
+    .product-form-hero,
+    .product-form-minimal-head {
+        @apply flex flex-col gap-3 p-3 md:flex-row md:items-center;
+    }
+
+    .product-form-photo {
+        @apply relative flex h-24 w-full shrink-0 items-center justify-center overflow-hidden border p-2 md:w-28;
+        border-color: color-mix(in srgb, var(--color-border-strong) 82%, var(--color-primary) 18%);
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface-alt);
+        box-shadow: var(--shadow-xs);
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .product-form-photo:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+
+    .product-form-photo-preview {
+        @apply h-full w-full rounded;
+    }
+
+    .product-form-photo img {
+        @apply h-full w-full object-contain;
+    }
+
+    .product-form-photo-action {
+        @apply absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-2 rounded px-2 py-1 text-xs font-black;
+        background-color: rgb(15 23 42 / 0.78);
+        color: #ffffff;
+    }
+
+    .product-form-kicker {
+        @apply inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-black uppercase;
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+        letter-spacing: 0;
+    }
+
+    .product-form-scan-badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-black;
+    }
+
+    .product-form-scan-badge.is-loading {
+        background-color: var(--color-info-soft);
+        color: var(--color-info);
+    }
+
+    .product-form-scan-badge.is-found {
+        background-color: var(--color-success-soft);
+        color: var(--color-success);
+    }
+
+    .product-form-scan-badge.is-manual {
+        background-color: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .product-form-section {
+        @apply p-3;
+    }
+
+    .product-form-section-heading {
+        @apply mb-3 flex items-center gap-2;
+    }
+
+    .product-form-section-heading > span {
+        @apply flex h-8 w-8 shrink-0 items-center justify-center text-sm;
+        border-radius: var(--radius-md);
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+    }
+
+    .product-form-section-heading h3 {
+        @apply text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .product-form-section-heading p {
+        @apply hidden;
+    }
+
+    .product-form-grid {
+        @apply grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .product-form-actions {
+        @apply sticky bottom-3 z-10 flex flex-wrap justify-end gap-2 border p-3;
+        border-color: var(--color-border);
+        border-radius: var(--radius-lg);
+        background-color: color-mix(in srgb, var(--color-surface) 96%, var(--color-surface-alt));
+        box-shadow: var(--shadow-md), var(--shadow-ring);
+    }
+
     .app-premium-list-row {
         @apply flex items-center justify-between gap-3 border-b px-1 py-2 text-sm;
         border-color: color-mix(in srgb, var(--color-border) 72%, transparent);
@@ -1103,6 +1945,127 @@
     .app-alert-link:hover {
         transform: translateY(-1px);
         box-shadow: var(--shadow-sm);
+    }
+
+    .cash-status-hero {
+        @apply rounded-lg border p-5;
+        box-shadow: var(--shadow-sm), var(--shadow-ring);
+        animation: app-fade-up 360ms var(--ease-out) both;
+    }
+
+    .cash-status-hero.is-open {
+        border-color: color-mix(in srgb, var(--color-success) 34%, transparent);
+        background: linear-gradient(135deg, var(--color-success-soft), var(--color-surface));
+    }
+
+    .cash-status-hero.is-closed {
+        border-color: color-mix(in srgb, var(--color-warning) 42%, transparent);
+        background: linear-gradient(135deg, var(--color-warning-soft), var(--color-surface));
+    }
+
+    .cash-status-pill {
+        @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-black uppercase;
+        letter-spacing: 0;
+    }
+
+    .cash-status-hero.is-open .cash-status-pill {
+        background-color: var(--color-success-soft);
+        color: var(--color-success);
+    }
+
+    .cash-status-hero.is-closed .cash-status-pill {
+        background-color: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .cash-status-hero h2 {
+        @apply mt-2 text-2xl font-black;
+        color: var(--color-text-primary);
+    }
+
+    .cash-status-hero p {
+        @apply mt-1 text-sm font-semibold;
+        color: var(--color-text-muted);
+    }
+
+    .cash-employee-card {
+        @apply rounded-lg border p-4 transition duration-200 hover:-translate-y-0.5;
+        background-color: var(--color-surface);
+        box-shadow: var(--shadow-sm), var(--shadow-ring);
+    }
+
+    .cash-employee-card.is-open {
+        border-color: color-mix(in srgb, var(--color-success) 34%, var(--color-border));
+    }
+
+    .cash-employee-card.is-closed {
+        border-color: color-mix(in srgb, var(--color-warning) 30%, var(--color-border));
+        background: linear-gradient(180deg, color-mix(in srgb, var(--color-warning-soft) 24%, var(--color-surface)), var(--color-surface));
+    }
+
+    .cash-mini-metric {
+        @apply rounded-md border p-3;
+        border-color: var(--color-border);
+        background-color: var(--color-surface-alt);
+    }
+
+    .cash-mini-metric.is-success {
+        border-color: color-mix(in srgb, var(--color-success) 28%, transparent);
+        background-color: var(--color-success-soft);
+    }
+
+    .cash-mini-metric.is-primary {
+        border-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
+        background-color: var(--color-primary-soft);
+    }
+
+    .cash-mini-metric.is-muted {
+        background-color: color-mix(in srgb, var(--color-warning-soft) 65%, var(--color-surface));
+    }
+
+    .cash-mini-metric.is-warning {
+        border-color: color-mix(in srgb, var(--color-warning) 32%, transparent);
+        background-color: var(--color-warning-soft);
+    }
+
+    .cash-mini-metric.is-danger {
+        border-color: color-mix(in srgb, var(--color-danger) 32%, transparent);
+        background-color: var(--color-danger-soft);
+    }
+
+    .cash-mini-metric span {
+        @apply block text-xs font-black uppercase;
+        color: var(--color-text-muted);
+        letter-spacing: 0;
+    }
+
+    .cash-mini-metric.is-success span,
+    .cash-mini-metric.is-success strong {
+        color: var(--color-success);
+    }
+
+    .cash-mini-metric.is-primary span,
+    .cash-mini-metric.is-primary strong {
+        color: var(--color-primary);
+    }
+
+    .cash-mini-metric.is-warning span,
+    .cash-mini-metric.is-warning strong {
+        color: var(--color-warning);
+    }
+
+    .cash-mini-metric.is-danger span,
+    .cash-mini-metric.is-danger strong {
+        color: var(--color-danger);
+    }
+
+    .cash-mini-metric strong {
+        @apply mt-1 block text-lg font-black tabular-nums;
+        color: var(--color-text-primary);
+    }
+
+    .cash-mini-metric small {
+        @apply mt-1 block text-xs font-bold;
     }
 
     .pos-shell {
@@ -1161,12 +2124,58 @@
         background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     }
 
+    .pos-register-card {
+        @apply mt-1 flex min-h-14 items-center justify-between gap-3 rounded-md border px-3 py-2;
+        box-shadow: var(--shadow-xs);
+    }
+
+    .pos-register-card.is-open {
+        border-color: color-mix(in srgb, var(--color-success) 34%, transparent);
+        background: linear-gradient(135deg, var(--color-success-soft), color-mix(in srgb, var(--color-surface) 86%, var(--color-success-soft)));
+    }
+
+    .pos-register-card.is-closed {
+        border-color: color-mix(in srgb, var(--color-warning) 38%, transparent);
+        background: linear-gradient(135deg, var(--color-warning-soft), color-mix(in srgb, var(--color-surface) 88%, var(--color-warning-soft)));
+    }
+
+    .pos-register-state {
+        @apply flex items-center gap-1 text-xs font-black uppercase;
+        color: var(--color-text-primary);
+        letter-spacing: 0;
+    }
+
+    .pos-register-card.is-open .pos-register-state {
+        color: var(--color-success);
+    }
+
+    .pos-register-card.is-closed .pos-register-state {
+        color: var(--color-warning);
+    }
+
+    .pos-register-card strong {
+        @apply mt-0.5 block font-black tabular-nums;
+        color: var(--color-text-primary);
+    }
+
+    .pos-register-card small {
+        @apply block text-xs font-bold;
+        color: var(--color-text-muted);
+    }
+
+    .pos-register-input {
+        @apply mt-1 h-7 w-full border-0 bg-transparent p-0 text-sm font-black outline-none;
+        color: var(--color-text-primary);
+    }
+
     .pos-product-card {
         @apply flex min-h-40 flex-col overflow-hidden text-left disabled:opacity-50;
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
         background-color: var(--color-surface);
         box-shadow: var(--shadow-xs);
+        content-visibility: auto;
+        contain-intrinsic-size: 160px;
         transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
     }
 
@@ -1178,12 +2187,11 @@
     }
 
     .pos-product-image {
-        @apply relative h-20 shrink-0 overflow-hidden;
-        background: linear-gradient(135deg, var(--color-info-soft), var(--color-primary-soft));
+        @apply h-20;
     }
 
     .pos-product-image img {
-        @apply h-full w-full object-contain p-1 transition-transform;
+        @apply p-1;
     }
 
     .pos-product-card:hover .pos-product-image img {
@@ -1195,7 +2203,7 @@
     }
 
     .pos-quantity-pill {
-        @apply absolute right-1 top-1 rounded px-1.5 py-0.5 text-[11px] font-black;
+        @apply absolute right-1 top-1 z-20 rounded px-1.5 py-0.5 text-[11px] font-black;
         background-color: var(--color-surface-glass);
         color: var(--color-text-secondary);
         box-shadow: var(--shadow-xs);
@@ -1322,6 +2330,66 @@
         animation: app-menu-in 160ms var(--ease-out) both;
     }
 
+    .auth-card-motion {
+        animation: auth-card-in 420ms var(--ease-out) both;
+    }
+
+    .auth-icon-motion {
+        animation: auth-icon-float 3.8s ease-in-out infinite;
+    }
+
+    .auth-primary-action {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-primary-action::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 0%, rgb(255 255 255 / 0.18) 42%, transparent 68%);
+        transform: translateX(-115%);
+        transition: transform 520ms var(--ease-out);
+    }
+
+    .auth-primary-action:hover::before,
+    .auth-primary-action:focus-visible::before {
+        transform: translateX(115%);
+    }
+
+    .auth-primary-action > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-login-email-control {
+        @apply relative flex min-h-12 overflow-hidden rounded-md border shadow-sm transition duration-150;
+        border-color: var(--color-border);
+        background-color: var(--color-surface-alt);
+    }
+
+    .auth-login-email-control:focus-within {
+        border-color: var(--color-primary);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-focus) 38%, transparent);
+    }
+
+    .auth-login-email-input {
+        @apply min-w-0 flex-1 bg-transparent py-3 pl-14 pr-3 text-sm font-bold text-slate-900 outline-none;
+    }
+
+    .auth-login-email-input::placeholder {
+        color: rgb(148 163 184 / 0.7);
+        font-weight: 600;
+    }
+
+    .auth-login-email-domain {
+        @apply inline-flex shrink-0 items-center border-l px-3 text-sm font-black;
+        border-color: color-mix(in srgb, var(--color-border) 76%, transparent);
+        background: linear-gradient(135deg, var(--color-primary-soft), color-mix(in srgb, var(--color-info-soft) 70%, white));
+        color: var(--color-primary);
+    }
+
     @keyframes app-fade-up {
         from {
             opacity: 0;
@@ -1333,6 +2401,15 @@
         }
     }
 
+    @keyframes app-image-skeleton {
+        from {
+            background-position: 180% 0, 0 0;
+        }
+        to {
+            background-position: -180% 0, 0 0;
+        }
+    }
+
     @keyframes app-menu-in {
         from {
             opacity: 0;
@@ -1341,6 +2418,29 @@
         to {
             opacity: 1;
             transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes auth-card-in {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.985);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes auth-icon-float {
+        0%,
+        100% {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 5px rgb(255 255 255 / 0.5), 0 8px 22px rgb(37 99 235 / 0.12);
+        }
+        50% {
+            transform: translateY(-4px);
+            box-shadow: inset 0 2px 5px rgb(255 255 255 / 0.5), 0 14px 28px rgb(37 99 235 / 0.18);
         }
     }
 
@@ -1423,9 +2523,8 @@
         @apply relative z-[1] w-full max-w-sm border p-4 text-center;
         border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
         border-radius: var(--radius-lg);
-        background-color: var(--color-surface-glass);
+        background-color: color-mix(in srgb, var(--color-surface) 96%, var(--color-primary-soft));
         box-shadow: var(--shadow-lg);
-        backdrop-filter: blur(14px);
     }
 
     .dashboard-result-card small {
@@ -1561,12 +2660,11 @@
     }
 
     .reports-hero-card {
-        @apply flex min-h-48 flex-col justify-center border p-5;
+        @apply flex min-h-48 flex-col items-center justify-center gap-5 border p-5 sm:flex-row sm:justify-start;
         border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
         border-radius: var(--radius-lg);
-        background-color: var(--color-surface-glass);
+        background-color: color-mix(in srgb, var(--color-surface) 96%, var(--color-info-soft));
         box-shadow: var(--shadow-lg);
-        backdrop-filter: blur(14px);
     }
 
     .reports-hero-card small {
@@ -1588,27 +2686,49 @@
         color: var(--color-text-secondary);
     }
 
-    .reports-profit-meter,
+    .reports-profit-gauge {
+        @apply relative flex aspect-square w-32 shrink-0 flex-col items-center justify-center rounded-full sm:w-36;
+        background: conic-gradient(var(--gauge-color) 0 var(--gauge-value), color-mix(in srgb, var(--color-border) 68%, transparent) var(--gauge-value) 100%);
+        box-shadow: 0 18px 34px color-mix(in srgb, var(--gauge-color) 18%, transparent);
+    }
+
+    .reports-profit-gauge::after {
+        content: "";
+        position: absolute;
+        inset: 1rem;
+        border-radius: 999px;
+        background-color: var(--color-surface);
+        box-shadow: inset 0 0 0 1px var(--color-border);
+    }
+
+    .reports-profit-gauge span,
+    .reports-profit-gauge small {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .reports-profit-gauge span {
+        @apply text-2xl font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-profit-gauge small {
+        @apply mt-1 block text-[0.62rem] font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
     .reports-meter-track {
         @apply overflow-hidden rounded-full;
         background-color: color-mix(in srgb, var(--color-border) 55%, transparent);
     }
 
-    .reports-profit-meter {
-        @apply mt-5 h-3;
-    }
-
-    .reports-profit-meter span,
     .reports-meter-fill {
         @apply block h-full rounded-full;
         min-width: .35rem;
         width: var(--bar-width, 0%);
         background: linear-gradient(90deg, var(--color-success), #14b8a6);
         transition: width 520ms var(--ease-out);
-    }
-
-    .reports-hero-card.is-negative .reports-profit-meter span {
-        background: linear-gradient(90deg, var(--color-danger), var(--color-pink));
     }
 
     .reports-panel {
@@ -1618,6 +2738,19 @@
         background-color: var(--color-surface);
         box-shadow: var(--shadow-sm), var(--shadow-ring);
         animation: app-fade-up 380ms var(--ease-out) both;
+    }
+
+    .reports-analytics-masonry {
+        @apply grid grid-cols-1 items-start gap-6 lg:grid-cols-2;
+    }
+
+    .reports-analytics-column {
+        @apply grid min-w-0 gap-6;
+    }
+
+    .reports-analytics-column > .reports-panel {
+        @apply min-w-0;
+        animation: none;
     }
 
     .reports-panel-header {
@@ -1758,6 +2891,591 @@
     .reports-document-card small {
         @apply mt-1 block text-xs font-bold;
         color: var(--color-text-muted);
+    }
+
+    @keyframes app-soft-pulse {
+        0%,
+        100% {
+            opacity: 0.72;
+            transform: scale(0.92);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+    }
+
+    @keyframes app-chart-draw {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes app-column-rise {
+        from {
+            opacity: 0;
+            transform: scaleY(0.35);
+        }
+        to {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+
+    .dashboard-panel-title {
+        @apply mb-4 flex items-start justify-between gap-4;
+    }
+
+    .dashboard-panel-title span {
+        @apply text-xs font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-panel-title > strong,
+    .dashboard-panel-title > i {
+        @apply inline-flex shrink-0 items-center justify-center rounded-md text-sm font-black;
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+        padding: 0.5rem;
+        background: linear-gradient(135deg, var(--color-primary-soft), var(--color-info-soft));
+        color: var(--color-primary);
+    }
+
+    .dashboard-donut-layout {
+        @apply grid gap-4 md:grid-cols-[10rem_1fr] xl:grid-cols-1 2xl:grid-cols-[10rem_1fr];
+    }
+
+    .dashboard-donut,
+    .reports-payment-donut {
+        @apply relative mx-auto grid aspect-square w-40 place-items-center rounded-full;
+        background: var(--donut-fill);
+        box-shadow: 0 18px 36px rgb(37 99 235 / 0.16);
+    }
+
+    .dashboard-donut::after,
+    .reports-payment-donut::after {
+        content: "";
+        position: absolute;
+        inset: 1.25rem;
+        border-radius: 999px;
+        background: var(--color-surface);
+        box-shadow: inset 0 0 0 1px var(--color-border);
+    }
+
+    .dashboard-donut > div,
+    .reports-payment-donut > span,
+    .reports-payment-donut > small {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .dashboard-donut span,
+    .reports-payment-donut small {
+        @apply block text-[0.68rem] font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-donut strong,
+    .reports-payment-donut span {
+        @apply block text-lg font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-donut-legend {
+        @apply grid gap-2;
+    }
+
+    .dashboard-donut-item {
+        @apply grid grid-cols-[2.25rem_1fr_auto] items-center gap-x-3 gap-y-1 rounded-md border p-2 text-sm;
+        border-color: color-mix(in srgb, var(--accent) 24%, var(--color-border));
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--color-surface)), var(--color-surface));
+    }
+
+    .dashboard-donut-item i {
+        @apply row-span-2 flex h-9 w-9 items-center justify-center rounded;
+        background-color: color-mix(in srgb, var(--accent) 14%, white);
+        color: var(--accent);
+    }
+
+    .dashboard-donut-item span {
+        @apply min-w-0 truncate font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-donut-item strong {
+        @apply font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-donut-item small {
+        @apply col-span-2 col-start-2 text-xs font-bold;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-rank-stack {
+        @apply space-y-3;
+    }
+
+    .dashboard-rank-card {
+        @apply relative grid min-h-16 grid-cols-[2.5rem_1fr_2.5rem] items-center gap-3 overflow-hidden rounded-md border p-3;
+        border-color: color-mix(in srgb, var(--accent) 24%, var(--color-border));
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--color-surface)), var(--color-surface));
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .dashboard-rank-card::before {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        left: 0;
+        width: var(--rank-size);
+        background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent);
+        transition: width 520ms var(--ease-out);
+    }
+
+    .dashboard-rank-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .dashboard-rank-number,
+    .dashboard-rank-card strong,
+    .dashboard-rank-card small,
+    .dashboard-rank-pulse {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-rank-number {
+        @apply grid h-10 w-10 place-items-center rounded text-sm font-black;
+        background-color: color-mix(in srgb, var(--accent) 16%, white);
+        color: var(--accent);
+    }
+
+    .dashboard-rank-card strong {
+        @apply block truncate text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-rank-card small {
+        @apply block text-xs font-bold;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-rank-pulse {
+        @apply h-3 w-3 justify-self-end rounded-full;
+        background-color: var(--accent);
+        animation: app-soft-pulse 1500ms var(--ease-out) infinite;
+    }
+
+    .dashboard-profit-cloud {
+        @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2;
+    }
+
+    .dashboard-profit-chip {
+        @apply relative flex min-h-24 items-center gap-3 overflow-hidden rounded-md border p-3;
+        border-color: color-mix(in srgb, var(--accent) 25%, var(--color-border));
+        background:
+            radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 34%),
+            linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--color-surface)), var(--color-surface));
+    }
+
+    .dashboard-profit-chip::after {
+        content: "";
+        position: absolute;
+        inset-block: auto 0;
+        left: 0;
+        height: 0.28rem;
+        width: var(--chip-size);
+        background-color: var(--accent);
+        transition: width 520ms var(--ease-out);
+    }
+
+    .dashboard-profit-chip i {
+        @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-md;
+        background-color: color-mix(in srgb, var(--accent) 15%, white);
+        color: var(--accent);
+    }
+
+    .dashboard-profit-chip strong {
+        @apply block text-lg font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-profit-chip span {
+        @apply block text-xs font-bold;
+        color: var(--color-text-secondary);
+    }
+
+    .dashboard-trend-panel {
+        @apply min-w-0 overflow-hidden p-4 sm:p-5;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background:
+            linear-gradient(135deg, color-mix(in srgb, var(--color-info-soft) 42%, var(--color-surface)), var(--color-surface) 56%),
+            var(--color-surface);
+        box-shadow: var(--shadow-sm), var(--shadow-ring);
+        animation: app-fade-up 380ms var(--ease-out) both;
+    }
+
+    .dashboard-trend-stats {
+        @apply mb-4 grid gap-3 sm:grid-cols-3;
+    }
+
+    .dashboard-trend-stats div {
+        @apply rounded-md border px-3 py-2;
+        border-color: color-mix(in srgb, var(--color-border) 78%, transparent);
+        background-color: color-mix(in srgb, var(--color-surface-glass) 78%, var(--color-surface));
+    }
+
+    .dashboard-trend-stats span {
+        @apply block text-[0.68rem] font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-trend-stats strong {
+        @apply mt-1 block text-lg font-black;
+        color: var(--color-text-primary);
+    }
+
+    .dashboard-trend-grid {
+        @apply grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem];
+    }
+
+    .dashboard-chart-card {
+        @apply min-w-0 rounded-md border p-3 sm:p-4;
+        border-color: var(--color-border);
+        background-color: color-mix(in srgb, var(--color-surface-glass) 82%, var(--color-surface));
+        box-shadow: var(--shadow-xs);
+    }
+
+    .dashboard-chart-card.is-compact {
+        @apply flex flex-col;
+    }
+
+    .dashboard-chart-legend {
+        @apply mb-3 flex flex-wrap items-center gap-3 text-xs font-black;
+        color: var(--color-text-secondary);
+    }
+
+    .dashboard-chart-legend span {
+        @apply inline-flex items-center gap-2;
+    }
+
+    .dashboard-chart-legend i {
+        @apply block h-2.5 w-2.5 rounded-full;
+    }
+
+    .dashboard-chart-legend i.is-current {
+        background-color: var(--color-primary);
+    }
+
+    .dashboard-chart-legend i.is-last {
+        background-color: var(--color-warning);
+    }
+
+    .dashboard-chart-legend i.is-volume {
+        background-color: var(--color-success);
+    }
+
+    .dashboard-line-chart {
+        @apply h-48 rounded-md p-3 sm:h-52;
+        background:
+            linear-gradient(180deg, transparent calc(25% - 1px), color-mix(in srgb, var(--color-border) 58%, transparent) 25%, transparent calc(25% + 1px)),
+            linear-gradient(180deg, transparent calc(50% - 1px), color-mix(in srgb, var(--color-border) 58%, transparent) 50%, transparent calc(50% + 1px)),
+            linear-gradient(180deg, transparent calc(75% - 1px), color-mix(in srgb, var(--color-border) 58%, transparent) 75%, transparent calc(75% + 1px)),
+            var(--color-surface-glass);
+    }
+
+    .dashboard-line-chart svg {
+        @apply h-full w-full overflow-visible;
+    }
+
+    .dashboard-line-area {
+        fill: color-mix(in srgb, var(--color-primary) 16%, transparent);
+    }
+
+    .dashboard-line-current,
+    .dashboard-line-last {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .dashboard-line-current {
+        stroke: var(--color-primary);
+        stroke-width: 3;
+        stroke-dasharray: 220;
+        stroke-dashoffset: 220;
+        animation: app-chart-draw 900ms var(--ease-out) forwards;
+    }
+
+    .dashboard-line-last {
+        stroke: var(--color-warning);
+        stroke-width: 2;
+        stroke-dasharray: 4 5;
+        opacity: 0.9;
+    }
+
+    .dashboard-chart-axis {
+        @apply mt-3 grid grid-cols-7 gap-1 text-center text-[0.64rem] font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-order-bars {
+        @apply grid h-56 grid-cols-7 items-end gap-2 rounded-md p-3;
+        background: linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--color-success-soft) 42%, var(--color-surface)));
+    }
+
+    .dashboard-order-column {
+        @apply flex h-full flex-col items-center justify-end gap-2;
+    }
+
+    .dashboard-order-column span {
+        @apply block w-full rounded-t-md;
+        min-height: 10%;
+        background: linear-gradient(180deg, var(--color-success), #14b8a6);
+        transform-origin: bottom;
+        animation: app-column-rise 620ms var(--ease-out) both;
+    }
+
+    .dashboard-order-column small {
+        @apply text-[0.62rem] font-black uppercase;
+        color: var(--color-text-muted);
+    }
+
+    .dashboard-empty-visual {
+        @apply grid min-h-40 place-items-center gap-2 rounded-md border text-sm font-bold;
+        border-color: var(--color-border);
+        color: var(--color-text-muted);
+        background-color: var(--color-surface-alt);
+    }
+
+    .dashboard-empty-visual i {
+        @apply text-2xl;
+        color: var(--color-primary);
+    }
+
+    .reports-payment-board {
+        @apply grid items-center gap-4 xl:grid-cols-[11rem_1fr];
+    }
+
+    .reports-payment-grid {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .reports-payment-tile {
+        @apply min-w-0 rounded-md border p-3;
+        border-color: color-mix(in srgb, var(--accent) 25%, var(--color-border));
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--color-surface)), var(--color-surface));
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .reports-payment-tile:hover,
+    .reports-product-card:hover,
+    .reports-category-card:hover,
+    .reports-cashier-row:hover,
+    .reports-document-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .reports-payment-tile i {
+        @apply mb-3 flex h-10 w-10 items-center justify-center rounded-md;
+        background-color: color-mix(in srgb, var(--accent) 15%, white);
+        color: var(--accent);
+    }
+
+    .reports-payment-tile span,
+    .reports-product-card strong,
+    .reports-category-card strong,
+    .reports-cashier-row span {
+        @apply block truncate text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-payment-tile strong {
+        @apply block text-lg font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-payment-tile small,
+    .reports-product-card small,
+    .reports-category-card small,
+    .reports-cashier-row small {
+        @apply block text-xs font-bold;
+        color: var(--color-text-muted);
+    }
+
+    .reports-product-board {
+        @apply grid gap-2.5;
+    }
+
+    .reports-product-card {
+        @apply relative grid min-h-16 grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-md border px-3 py-2.5;
+        border-color: color-mix(in srgb, var(--accent) 22%, var(--color-border));
+        background-color: var(--color-surface);
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .reports-product-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        width: var(--score);
+        background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent);
+    }
+
+    .reports-product-rank,
+    .reports-product-card > div,
+    .reports-product-profit,
+    .reports-product-score {
+        position: relative;
+        z-index: 1;
+    }
+
+    .reports-product-rank {
+        @apply grid h-10 w-10 place-items-center rounded-md text-sm font-black;
+        background-color: color-mix(in srgb, var(--accent) 15%, white);
+        color: var(--accent);
+    }
+
+    .reports-product-profit {
+        @apply whitespace-nowrap text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-product-score {
+        @apply absolute bottom-0 left-0 h-1 rounded-r-full;
+        width: var(--score);
+        background-color: var(--accent);
+    }
+
+    .reports-category-mosaic {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .reports-category-card {
+        @apply grid min-h-36 grid-cols-[4rem_minmax(0,1fr)] gap-3 rounded-md border p-4;
+        border-color: color-mix(in srgb, var(--accent) 23%, var(--color-border));
+        background:
+            linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, var(--color-surface)), var(--color-surface)),
+            var(--color-surface);
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .reports-category-ring {
+        @apply grid h-16 w-16 place-items-center rounded-full;
+        background: conic-gradient(var(--accent) 0 var(--share), color-mix(in srgb, var(--color-border) 72%, transparent) var(--share) 100%);
+    }
+
+    .reports-category-ring span {
+        @apply grid h-11 w-11 place-items-center rounded-full text-[0.68rem] font-black;
+        background-color: var(--color-surface);
+        color: var(--color-text-primary);
+    }
+
+    .reports-category-card b {
+        @apply col-span-2 text-xl font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-category-card em {
+        @apply col-span-2 text-xs font-bold not-italic;
+        color: var(--color-text-muted);
+    }
+
+    .reports-cashier-board {
+        @apply space-y-4;
+    }
+
+    .reports-cashier-podium {
+        @apply grid min-h-48 grid-cols-3 items-end gap-3;
+    }
+
+    .reports-cashier-tower {
+        @apply flex min-h-28 flex-col justify-end overflow-hidden rounded-md border p-3 text-center;
+        height: var(--height);
+        border-color: color-mix(in srgb, var(--accent) 24%, var(--color-border));
+        background:
+            linear-gradient(180deg, color-mix(in srgb, var(--accent) 24%, transparent), transparent 38%),
+            linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--accent) 12%, var(--color-surface)));
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .reports-cashier-tower:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .reports-cashier-tower span {
+        @apply mx-auto mb-3 grid h-9 w-9 place-items-center rounded-full text-sm font-black;
+        background-color: var(--accent);
+        color: white;
+    }
+
+    .reports-cashier-tower strong {
+        @apply truncate text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-cashier-tower small {
+        @apply text-xs font-bold;
+        color: var(--color-text-secondary);
+    }
+
+    .reports-cashier-list {
+        @apply grid gap-2;
+    }
+
+    .reports-cashier-row {
+        @apply grid grid-cols-[1fr_auto] items-center gap-x-3 rounded-md border px-3 py-2;
+        border-color: color-mix(in srgb, var(--accent) 18%, var(--color-border));
+        background-color: color-mix(in srgb, var(--accent) 7%, var(--color-surface));
+        transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .reports-cashier-row strong {
+        @apply text-sm font-black;
+        color: var(--color-text-primary);
+    }
+
+    .reports-cashier-row small {
+        @apply col-span-2;
+    }
+
+    .reports-document-card {
+        @apply relative overflow-hidden;
+        border-color: color-mix(in srgb, var(--accent) 24%, var(--color-border));
+        background:
+            radial-gradient(circle at 90% 18%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 36%),
+            var(--color-surface);
+    }
+
+    .reports-document-card b {
+        @apply mt-4 block h-2 rounded-full;
+        background: linear-gradient(90deg, var(--accent) var(--doc-share), color-mix(in srgb, var(--color-border) 62%, transparent) var(--doc-share));
+    }
+
+    @media (max-width: 640px) {
+        .reports-product-card {
+            grid-template-columns: 2.75rem minmax(0, 1fr);
+        }
+
+        .reports-product-profit {
+            grid-column: 2;
+        }
+
+        .reports-category-card {
+            grid-template-columns: 3.75rem minmax(0, 1fr);
+        }
+
+        .dashboard-donut,
+        .reports-payment-donut {
+            width: 9.5rem;
+        }
     }
 
     .profile-showcase {

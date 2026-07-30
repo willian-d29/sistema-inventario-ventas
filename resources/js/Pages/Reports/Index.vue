@@ -65,6 +65,45 @@ const cashierTotalMax = computed(() => maxRows(props.summary.ventasPorCajero));
 const documentTotal = computed(() => sumRows(props.summary.ventasPorDocumento));
 const periodLabel = computed(() => `${form.date_from || t('reports.range_start')} - ${form.date_to || t('reports.range_current')}`);
 const profitTone = computed(() => Number(props.summary.utilidadBruta || 0) >= 0 ? 'is-positive' : 'is-negative');
+const visualPalette = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#e11d48', '#0284c7'];
+const marginGaugeStyle = computed(() => {
+  const rawMargin = Math.max(0, Math.min(100, Number(props.summary.margenBruto || 0)));
+  const color = Number(props.summary.utilidadBruta || 0) >= 0 ? '#059669' : '#e11d48';
+
+  return {
+    '--gauge-value': `${rawMargin}%`,
+    '--gauge-color': color,
+  };
+});
+const paymentSegments = computed(() => {
+  let start = 0;
+
+  return (props.summary.ventasPorMetodo || []).map((payment, index) => {
+    const percentage = paymentTotal.value > 0 ? (Number(payment.total || 0) / paymentTotal.value) * 100 : 0;
+    const segment = {
+      ...payment,
+      color: visualPalette[index % visualPalette.length],
+      percentage,
+      start,
+      end: start + percentage,
+    };
+
+    start += percentage;
+
+    return segment;
+  });
+});
+const paymentDonutStyle = computed(() => {
+  if (!paymentSegments.value.length) {
+    return { '--donut-fill': 'conic-gradient(#d7e2ea 0% 100%)' };
+  }
+
+  return {
+    '--donut-fill': `conic-gradient(${paymentSegments.value.map((segment) => `${segment.color} ${segment.start}% ${segment.end}%`).join(', ')})`,
+  };
+});
+const topCashiers = computed(() => (props.summary.ventasPorCajero || []).slice(0, 3));
+const restCashiers = computed(() => (props.summary.ventasPorCajero || []).slice(3));
 
 function money(value) {
   return Number(value || 0).toFixed(2);
@@ -86,8 +125,15 @@ function ratio(value, total) {
   return Math.max(4, Math.min(100, (Number(value || 0) / Number(total)) * 100));
 }
 
-function barStyle(value, total) {
-  return { '--bar-width': `${ratio(value, total)}%` };
+function visualStyle(index) {
+  return { '--accent': visualPalette[index % visualPalette.length] };
+}
+
+function towerStyle(cashier, index) {
+  return {
+    ...visualStyle(index),
+    '--height': `${112 + (ratio(cashier.total, cashierTotalMax.value) * 0.9)}px`,
+  };
 }
 
 function tone(index) {
@@ -187,16 +233,19 @@ function exportUrl(routeName) {
           </div>
         </div>
         <div class="reports-hero-card" :class="profitTone">
-          <small>{{ t('reports.gross_profit') }}</small>
-          <strong>S/ {{ money(summary.utilidadBruta) }}</strong>
-          <span>{{ t('reports.net_income') }} S/ {{ money(summary.ingresoNetoProductos) }}</span>
-          <div class="reports-profit-meter">
-            <span :style="barStyle(summary.utilidadBruta, Math.max(Number(summary.ingresoNetoProductos || 0), 1))"></span>
+          <div class="reports-profit-gauge" :style="marginGaugeStyle">
+            <span>{{ money(summary.margenBruto) }}%</span>
+            <small>{{ t('reports.gross_margin') }}</small>
+          </div>
+          <div>
+            <small>{{ t('reports.gross_profit') }}</small>
+            <strong>S/ {{ money(summary.utilidadBruta) }}</strong>
+            <span>{{ t('reports.net_income') }} S/ {{ money(summary.ingresoNetoProductos) }}</span>
           </div>
         </div>
       </section>
 
-      <form class="ihc-filter-grid" @submit.prevent="applyFilters">
+      <form class="ihc-filter-grid" data-tour="reports-filters" @submit.prevent="applyFilters">
         <label class="ihc-label">{{ t('reports.from') }}
           <input v-model="form.date_from" type="date" class="ihc-field" />
         </label>
@@ -237,7 +286,7 @@ function exportUrl(routeName) {
         </div>
       </form>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" data-tour="summary-cards">
         <StatCard :title="t('reports.income')" :value="`S/ ${money(summary.totalVentas)}`" icon="fa-chart-line" variant="info" />
         <StatCard :title="t('reports.sold_cost')" :value="`S/ ${money(summary.totalCosto)}`" icon="fa-box" />
         <StatCard :title="t('reports.gross_profit')" :value="`S/ ${money(summary.utilidadBruta)}`" icon="fa-chart-line" variant="success" />
@@ -247,129 +296,128 @@ function exportUrl(routeName) {
         <StatCard :title="t('reports.sold_units')" :value="Number(summary.totalItems || 0).toFixed(0)" icon="fa-boxes" variant="success" />
       </div>
 
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section class="reports-panel">
-          <div class="reports-panel-header">
-            <div>
-              <span>{{ t('reports.collection') }}</span>
-              <h2>{{ t('reports.payments_by_method') }}</h2>
+      <div class="reports-analytics-masonry" data-tour="reports-analytics">
+        <div class="reports-analytics-column">
+          <section class="reports-panel">
+            <div class="reports-panel-header">
+              <div>
+                <span>{{ t('reports.collection') }}</span>
+                <h2>{{ t('reports.payments_by_method') }}</h2>
+              </div>
+              <strong>S/ {{ money(paymentTotal) }}</strong>
             </div>
-            <strong>S/ {{ money(paymentTotal) }}</strong>
-          </div>
-          <div v-if="summary.ventasPorMetodo?.length" class="reports-meter-list">
-            <div v-for="(payment, index) in summary.ventasPorMetodo" :key="payment.method" class="reports-meter-row">
-              <div class="reports-meter-head">
-                <span><i class="fas" :class="[paymentIcon(payment.method), tone(index)]" aria-hidden="true"></i>{{ paymentLabels[payment.method] || payment.label }}</span>
-                <strong>S/ {{ money(payment.total) }}</strong>
+            <div v-if="summary.ventasPorMetodo?.length" class="reports-payment-board">
+              <div class="reports-payment-donut" :style="paymentDonutStyle" aria-hidden="true">
+                <span>{{ money(paymentTotal) }}</span>
+                <small>S/ total</small>
               </div>
-              <div class="reports-meter-meta">
-                <span>{{ payment.count }} {{ t('reports.operations') }}</span>
-                <span>{{ money(ratio(payment.total, paymentTotal)) }}%</span>
-              </div>
-              <div class="reports-meter-track">
-                <span class="reports-meter-fill" :class="tone(index)" :style="barStyle(payment.total, paymentTotal)"></span>
+              <div class="reports-payment-grid">
+                <div v-for="(payment, index) in paymentSegments" :key="payment.method" class="reports-payment-tile" :style="visualStyle(index)">
+                  <i class="fas" :class="paymentIcon(payment.method)" aria-hidden="true"></i>
+                  <span>{{ paymentLabels[payment.method] || payment.label }}</span>
+                  <strong>S/ {{ money(payment.total) }}</strong>
+                  <small>{{ payment.count }} {{ t('reports.operations') }} · {{ money(payment.percentage) }}%</small>
+                </div>
               </div>
             </div>
-          </div>
-          <p v-else class="app-ui-help">{{ t('reports.no_payments') }}</p>
-        </section>
+            <p v-else class="app-ui-help">{{ t('reports.no_payments') }}</p>
+          </section>
 
-        <section class="reports-panel">
-          <div class="reports-panel-header">
-            <div>
-              <span>{{ t('reports.ranking') }}</span>
-              <h2>{{ t('reports.sales_by_product') }}</h2>
+          <section class="reports-panel">
+            <div class="reports-panel-header">
+              <div>
+                <span>{{ t('reports.mix') }}</span>
+                <h2>{{ t('reports.sales_by_category') }}</h2>
+              </div>
+              <i class="fas fa-layer-group" aria-hidden="true"></i>
             </div>
-            <i class="fas fa-box-open" aria-hidden="true"></i>
-          </div>
-          <div v-if="summary.ventasPorProducto?.length" class="reports-meter-list">
-            <div v-for="(product, index) in summary.ventasPorProducto" :key="product.name" class="reports-meter-row">
-              <div class="reports-meter-head">
-                <span><i class="fas fa-box" :class="tone(index)" aria-hidden="true"></i>{{ product.name }}</span>
-                <strong>S/ {{ money(product.gross_profit) }}</strong>
-              </div>
-              <div class="reports-meter-meta">
-                <span>{{ Number(product.quantity).toFixed(0) }} {{ t('reports.units') }} · S/ {{ money(product.total) }}</span>
-                <span>{{ money(product.margin) }}%</span>
-              </div>
-              <div class="reports-meter-track">
-                <span class="reports-meter-fill" :class="tone(index)" :style="barStyle(product.gross_profit, productProfitMax)"></span>
+            <div v-if="summary.ventasPorCategoria?.length" class="reports-category-mosaic">
+              <div v-for="(category, index) in summary.ventasPorCategoria" :key="category.name" class="reports-category-card" :style="{ ...visualStyle(index + 2), '--share': `${ratio(category.total, categoryTotalMax)}%` }">
+                <div class="reports-category-ring">
+                  <span>{{ money(category.margin) }}%</span>
+                </div>
+                <div class="min-w-0">
+                  <strong>{{ category.name }}</strong>
+                  <small>{{ Number(category.quantity || 0).toFixed(0) }} {{ t('reports.units') }}</small>
+                </div>
+                <b>S/ {{ money(category.total) }}</b>
+                <em>S/ {{ money(category.gross_profit) }} {{ t('reports.gross_profit').toLowerCase() }}</em>
               </div>
             </div>
-          </div>
-          <p v-else class="app-ui-help">{{ t('reports.no_products') }}</p>
-        </section>
+            <p v-else class="app-ui-help">{{ t('reports.no_categories') }}</p>
+          </section>
 
-        <section class="reports-panel">
-          <div class="reports-panel-header">
-            <div>
-              <span>{{ t('reports.mix') }}</span>
-              <h2>{{ t('reports.sales_by_category') }}</h2>
+          <section class="reports-panel">
+            <div class="reports-panel-header">
+              <div>
+                <span>{{ t('reports.documents') }}</span>
+                <h2>{{ t('reports.sales_by_document') }}</h2>
+              </div>
+              <strong>{{ summary.totalComprobantes }}</strong>
             </div>
-            <i class="fas fa-layer-group" aria-hidden="true"></i>
-          </div>
-          <div v-if="summary.ventasPorCategoria?.length" class="reports-meter-list">
-            <div v-for="(category, index) in summary.ventasPorCategoria" :key="category.name" class="reports-meter-row">
-              <div class="reports-meter-head">
-                <span><i class="fas fa-tags" :class="tone(index)" aria-hidden="true"></i>{{ category.name }}</span>
-                <strong>S/ {{ money(category.total) }}</strong>
-              </div>
-              <div class="reports-meter-meta">
-                <span>{{ Number(category.quantity || 0).toFixed(0) }} {{ t('reports.units') }}</span>
-                <span>S/ {{ money(category.gross_profit) }} · {{ money(category.margin) }}%</span>
-              </div>
-              <div class="reports-meter-track">
-                <span class="reports-meter-fill" :class="tone(index)" :style="barStyle(category.total, categoryTotalMax)"></span>
+            <div v-if="summary.ventasPorDocumento?.length" class="reports-document-grid">
+              <div v-for="(document, index) in summary.ventasPorDocumento" :key="document.document_type" class="reports-document-card" :style="{ ...visualStyle(index + 4), '--doc-share': `${ratio(document.total, documentTotal)}%` }">
+                <i class="fas" :class="[documentIcon(document.document_type), tone(index)]" aria-hidden="true"></i>
+                <span>{{ documentLabels[document.document_type] || document.label }}</span>
+                <strong>S/ {{ money(document.total) }}</strong>
+                <small>{{ document.count }} {{ t('reports.documents') }} · {{ money(ratio(document.total, documentTotal)) }}%</small>
+                <b aria-hidden="true"></b>
               </div>
             </div>
-          </div>
-          <p v-else class="app-ui-help">{{ t('reports.no_categories') }}</p>
-        </section>
+            <p v-else class="app-ui-help">{{ t('reports.no_documents') }}</p>
+          </section>
+        </div>
 
-        <section class="reports-panel">
-          <div class="reports-panel-header">
-            <div>
-              <span>{{ t('reports.team') }}</span>
-              <h2>{{ t('reports.sales_by_cashier') }}</h2>
+        <div class="reports-analytics-column">
+          <section class="reports-panel">
+            <div class="reports-panel-header">
+              <div>
+                <span>{{ t('reports.ranking') }}</span>
+                <h2>{{ t('reports.sales_by_product') }}</h2>
+              </div>
+              <i class="fas fa-box-open" aria-hidden="true"></i>
             </div>
-            <i class="fas fa-user-tie" aria-hidden="true"></i>
-          </div>
-          <div v-if="summary.ventasPorCajero?.length" class="reports-meter-list">
-            <div v-for="(cashier, index) in summary.ventasPorCajero" :key="cashier.name" class="reports-meter-row">
-              <div class="reports-meter-head">
-                <span><i class="fas fa-user-check" :class="tone(index)" aria-hidden="true"></i>{{ cashier.name }}</span>
-                <strong>S/ {{ money(cashier.total) }}</strong>
-              </div>
-              <div class="reports-meter-meta">
-                <span>{{ cashier.count }} {{ t('reports.documents') }}</span>
-                <span>{{ money(ratio(cashier.total, cashierTotalMax)) }}%</span>
-              </div>
-              <div class="reports-meter-track">
-                <span class="reports-meter-fill" :class="tone(index)" :style="barStyle(cashier.total, cashierTotalMax)"></span>
+            <div v-if="summary.ventasPorProducto?.length" class="reports-product-board">
+              <div v-for="(product, index) in summary.ventasPorProducto" :key="product.name" class="reports-product-card" :style="{ ...visualStyle(index), '--score': `${ratio(product.gross_profit, productProfitMax)}%` }">
+                <span class="reports-product-rank">#{{ index + 1 }}</span>
+                <div class="min-w-0">
+                  <strong>{{ product.name }}</strong>
+                  <small>{{ Number(product.quantity).toFixed(0) }} {{ t('reports.units') }} · S/ {{ money(product.total) }}</small>
+                </div>
+                <span class="reports-product-profit">S/ {{ money(product.gross_profit) }}</span>
+                <span class="reports-product-score" aria-hidden="true"></span>
               </div>
             </div>
-          </div>
-          <p v-else class="app-ui-help">{{ t('reports.no_cashiers') }}</p>
-        </section>
+            <p v-else class="app-ui-help">{{ t('reports.no_products') }}</p>
+          </section>
 
-        <section class="reports-panel lg:col-span-2">
-          <div class="reports-panel-header">
-            <div>
-              <span>{{ t('reports.documents') }}</span>
-              <h2>{{ t('reports.sales_by_document') }}</h2>
+          <section class="reports-panel">
+            <div class="reports-panel-header">
+              <div>
+                <span>{{ t('reports.team') }}</span>
+                <h2>{{ t('reports.sales_by_cashier') }}</h2>
+              </div>
+              <i class="fas fa-user-tie" aria-hidden="true"></i>
             </div>
-            <strong>{{ summary.totalComprobantes }}</strong>
-          </div>
-          <div v-if="summary.ventasPorDocumento?.length" class="reports-document-grid">
-            <div v-for="(document, index) in summary.ventasPorDocumento" :key="document.document_type" class="reports-document-card">
-              <i class="fas" :class="[documentIcon(document.document_type), tone(index)]" aria-hidden="true"></i>
-              <span>{{ documentLabels[document.document_type] || document.label }}</span>
-              <strong>S/ {{ money(document.total) }}</strong>
-              <small>{{ document.count }} {{ t('reports.documents') }} · {{ money(ratio(document.total, documentTotal)) }}%</small>
+            <div v-if="summary.ventasPorCajero?.length" class="reports-cashier-board">
+              <div class="reports-cashier-podium">
+                <div v-for="(cashier, index) in topCashiers" :key="cashier.name" class="reports-cashier-tower" :style="towerStyle(cashier, index)">
+                  <span>{{ index + 1 }}</span>
+                  <strong>{{ cashier.name }}</strong>
+                  <small>S/ {{ money(cashier.total) }}</small>
+                </div>
+              </div>
+              <div v-if="restCashiers.length" class="reports-cashier-list">
+                <div v-for="(cashier, index) in restCashiers" :key="cashier.name" class="reports-cashier-row" :style="visualStyle(index + 3)">
+                  <span>{{ cashier.name }}</span>
+                  <strong>S/ {{ money(cashier.total) }}</strong>
+                  <small>{{ cashier.count }} {{ t('reports.documents') }}</small>
+                </div>
+              </div>
             </div>
-          </div>
-          <p v-else class="app-ui-help">{{ t('reports.no_documents') }}</p>
-        </section>
+            <p v-else class="app-ui-help">{{ t('reports.no_cashiers') }}</p>
+          </section>
+        </div>
       </div>
     </div>
   </AuthenticatedLayout>

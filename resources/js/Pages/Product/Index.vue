@@ -4,15 +4,18 @@ import AppBadge from '@/Components/UI/AppBadge.vue';
 import AppButton from '@/Components/UI/AppButton.vue';
 import AppEmptyState from '@/Components/UI/AppEmptyState.vue';
 import AppInput from '@/Components/UI/AppInput.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
 import AppPagination from '@/Components/UI/AppPagination.vue';
 import AppSelect from '@/Components/UI/AppSelect.vue';
 import ConfirmDialog from '@/Components/UI/ConfirmDialog.vue';
 import FilterPanel from '@/Components/UI/FilterPanel.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import SmartImage from '@/Components/UI/SmartImage.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
+import ProductForm from '@/Pages/Product/Partials/ProductForm.vue';
 import { useI18n } from '@/Composables/useI18n.js';
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { cleanQuery, numberFormat, showToast, truncateString } from '@/Utils/Helper.js';
 
 const props = defineProps({
@@ -23,9 +26,12 @@ const props = defineProps({
 });
 
 const selectedProduct = ref(null);
+const showFormModal = ref(false);
 const showDeleteDialog = ref(false);
+const formMode = ref('create');
 const filterProcessing = ref(false);
 const deleteForm = useForm({});
+const productFormRef = ref(null);
 const { t } = useI18n();
 
 const stockRangeByStatus = {
@@ -55,6 +61,23 @@ const filterForm = useForm({
   stock_status: resolveStockStatus(filterValue('quantities', [])),
 });
 
+const productForm = useForm({
+  category_id: null,
+  supplier_id: null,
+  name: '',
+  description: '',
+  product_code: '',
+  barcode: '',
+  root: '',
+  buying_date: '',
+  buying_price: '',
+  selling_price: '',
+  unit_type_id: null,
+  quantity: 1,
+  photo: null,
+  status: 'active',
+});
+
 const statusOptions = computed(() => [
   { value: 'active', label: t('states.active') },
   { value: 'inactive', label: t('states.inactive') },
@@ -65,6 +88,72 @@ const stockOptions = computed(() => [
   { value: 'low', label: t('products.low_stock') },
   { value: 'out', label: t('products.out_of_stock') },
 ]);
+
+const formTitle = computed(() => formMode.value === 'create' ? t('products.create_title') : t('products.edit_title'));
+
+function fillProductForm(product = null) {
+  Object.assign(productForm, {
+    category_id: product?.category_id ?? null,
+    supplier_id: product?.supplier_id ?? null,
+    name: product?.name || '',
+    description: product?.description || '',
+    product_code: product?.product_code || '',
+    barcode: product?.barcode || '',
+    root: product?.root || '',
+    buying_date: product?.buying_date ? String(product.buying_date).split(' ')[0] : '',
+    buying_price: product?.buying_price ?? '',
+    selling_price: product?.selling_price ?? '',
+    unit_type_id: product?.unit_type_id ?? null,
+    quantity: product?.quantity ?? 1,
+    photo: null,
+    status: product?.status || 'active',
+  });
+}
+
+function productIdentifier(product) {
+  return product.barcode || product.product_code || product.product_number || '-';
+}
+
+function openCreateModal() {
+  formMode.value = 'create';
+  selectedProduct.value = null;
+  productForm.reset();
+  fillProductForm();
+  productForm.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => productFormRef.value?.focusBarcode?.());
+}
+
+function openEditModal(product) {
+  formMode.value = 'edit';
+  selectedProduct.value = product;
+  fillProductForm(product);
+  productForm.clearErrors();
+  showFormModal.value = true;
+  nextTick(() => productFormRef.value?.focusBarcode?.());
+}
+
+function submitProductForm() {
+  productForm.product_code = productForm.barcode || productForm.product_code || '';
+
+  const options = {
+    preserveScroll: true,
+    forceFormData: true,
+    onSuccess: () => {
+      showFormModal.value = false;
+      showToast();
+      productForm.reset();
+    },
+  };
+
+  if (formMode.value === 'create') {
+    productForm.transform((data) => data).post(route('products.store'), options);
+    return;
+  }
+
+  productForm.transform((data) => ({ ...data, _method: 'put' }))
+    .post(route('products.update', selectedProduct.value.id), options);
+}
 
 function stockState(product) {
   const quantity = Number(product.quantity || 0);
@@ -163,11 +252,11 @@ const activeFilterCount = computed(() => [
         :count="products.total"
       >
         <template v-if="canManageProducts" #actions>
-          <AppButton :href="route('products.create')" icon="fa-plus">{{ t('actions.new_product') }}</AppButton>
+          <AppButton icon="fa-plus" data-tour="create-button" @click="openCreateModal">{{ t('actions.new_product') }}</AppButton>
         </template>
       </PageHeader>
 
-      <div class="grid gap-3 sm:grid-cols-2" :class="canManageProducts ? 'xl:grid-cols-5' : 'xl:grid-cols-4'">
+      <div class="grid gap-3 sm:grid-cols-2" data-tour="summary-cards" :class="canManageProducts ? 'xl:grid-cols-5' : 'xl:grid-cols-4'">
         <StatCard :title="t('products.total')" :value="summary.total" icon="fa-boxes" variant="info" />
         <StatCard :title="t('products.available')" :value="summary.available" icon="fa-check-circle" variant="success" />
         <StatCard :title="t('products.low_stock')" :value="summary.lowStock" icon="fa-triangle-exclamation" variant="warning" />
@@ -222,13 +311,13 @@ const activeFilterCount = computed(() => [
         </form>
       </FilterPanel>
 
-      <section class="product-inventory-shell overflow-hidden">
+      <section class="product-inventory-shell overflow-hidden" data-tour="records-list">
         <div class="hidden overflow-x-auto xl:block">
           <table class="w-full text-left text-sm">
             <thead class="text-xs uppercase">
               <tr>
                 <th scope="col" class="px-4 py-3">{{ t('products.table_product') }}</th>
-                <th scope="col" class="px-3 py-3">{{ t('products.code_barcode') }}</th>
+                <th scope="col" class="px-3 py-3">{{ t('products.barcode_column') }}</th>
                 <th scope="col" class="px-3 py-3">{{ t('common.category') }}</th>
                 <th scope="col" class="px-3 py-3">Stock</th>
                 <th v-if="canManageProducts" scope="col" class="px-3 py-3 text-right">{{ t('common.cost') }}</th>
@@ -241,10 +330,7 @@ const activeFilterCount = computed(() => [
               <tr v-for="product in visibleProducts" :key="product.id">
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
-                    <div class="product-thumb">
-                      <img v-if="product.photo" :src="product.photo" :alt="product.name" />
-                      <i v-else class="fas fa-box-open" aria-hidden="true"></i>
-                    </div>
+                    <SmartImage :src="product.photo" :alt="product.name" class="product-thumb" contain />
                     <div class="min-w-0">
                       <strong class="block truncate text-[var(--color-text-primary)]">{{ product.name }}</strong>
                       <span class="app-ui-help">{{ t('products.supplier') }}: {{ product.supplier?.name || '-' }}</span>
@@ -252,8 +338,7 @@ const activeFilterCount = computed(() => [
                   </div>
                 </td>
                 <td class="px-3 py-3">
-                  <span class="block font-semibold">{{ product.product_code || product.product_number || '-' }}</span>
-                  <span class="app-ui-help">{{ product.barcode || t('products.no_barcode') }}</span>
+                  <span class="block font-semibold">{{ productIdentifier(product) }}</span>
                 </td>
                 <td class="px-3 py-3">{{ product.category?.name || '-' }}</td>
                 <td class="px-3 py-3">
@@ -270,15 +355,15 @@ const activeFilterCount = computed(() => [
                   </AppBadge>
                 </td>
                 <td v-if="canManageProducts" class="px-4 py-3 text-right">
-                  <div class="flex justify-end gap-2">
+                  <div class="flex justify-end gap-2" data-tour="row-actions">
                     <AppButton
-                      :href="route('products.edit', product.id)"
                       class="h-9 w-9 px-0"
                       variant="success"
                       size="sm"
                       icon="fa-pencil-alt"
                       :aria-label="`${t('actions.edit')} ${product.name}`"
                       :title="t('actions.edit')"
+                      @click="openEditModal(product)"
                     >
                       <span class="sr-only">{{ t('actions.edit') }}</span>
                     </AppButton>
@@ -304,13 +389,10 @@ const activeFilterCount = computed(() => [
           <article v-for="product in visibleProducts" :key="product.id" class="p-4">
             <div class="flex items-start justify-between gap-3">
               <div class="flex min-w-0 gap-3">
-                <div class="product-thumb">
-                  <img v-if="product.photo" :src="product.photo" :alt="product.name" />
-                  <i v-else class="fas fa-box-open" aria-hidden="true"></i>
-                </div>
+                <SmartImage :src="product.photo" :alt="product.name" class="product-thumb" contain />
                 <div class="min-w-0">
                   <h2 class="truncate font-black text-[var(--color-text-primary)]">{{ product.name }}</h2>
-                  <p class="app-ui-help">{{ product.product_code || product.product_number || '-' }} · {{ product.barcode || t('products.no_barcode') }}</p>
+                  <p class="app-ui-help">{{ productIdentifier(product) }}</p>
                 </div>
               </div>
               <strong class="shrink-0">S/ {{ numberFormat(product.selling_price || 0) }}</strong>
@@ -333,8 +415,8 @@ const activeFilterCount = computed(() => [
                 {{ statusState(product).label }}
               </AppBadge>
             </div>
-            <div v-if="canManageProducts" class="mt-3 flex flex-wrap gap-2">
-              <AppButton :href="route('products.edit', product.id)" variant="success" size="sm" icon="fa-pencil-alt">{{ t('actions.edit') }}</AppButton>
+            <div v-if="canManageProducts" class="mt-3 flex flex-wrap gap-2" data-tour="row-actions">
+              <AppButton variant="success" size="sm" icon="fa-pencil-alt" @click="openEditModal(product)">{{ t('actions.edit') }}</AppButton>
               <AppButton variant="danger" size="sm" icon="fa-trash-alt" @click="deleteProductModal(product)">{{ t('actions.delete') }}</AppButton>
             </div>
           </article>
@@ -346,12 +428,36 @@ const activeFilterCount = computed(() => [
           :description="t('products.create_first')"
           icon="fa-box"
           :action-label="canManageProducts ? t('actions.new_product') : null"
-          :action-href="canManageProducts ? route('products.create') : null"
+          @action="openCreateModal"
         />
       </section>
 
       <AppPagination :links="products.links" :label="t('pagination.label')" />
     </div>
+
+    <AppModal
+      v-if="canManageProducts"
+      :show="showFormModal"
+      :title="formTitle"
+      size="xl"
+      @close="showFormModal = false"
+    >
+      <ProductForm
+        :key="`${formMode}-${selectedProduct?.id || 'new'}-${showFormModal ? 'open' : 'closed'}`"
+        ref="productFormRef"
+        :form="productForm"
+        :mode="formMode"
+        :product-photo="selectedProduct?.photo"
+        :show-actions="false"
+        @submit="submitProductForm"
+      />
+      <template #footer>
+        <AppButton variant="secondary" :disabled="productForm.processing" @click="showFormModal = false">{{ t('actions.cancel') }}</AppButton>
+        <AppButton icon="fa-save" data-tour="product-form-save" :loading="productForm.processing" :loading-text="t('common.loading')" @click="submitProductForm">
+          {{ formMode === 'edit' ? t('actions.save_changes') : t('actions.save') }}
+        </AppButton>
+      </template>
+    </AppModal>
 
     <ConfirmDialog
       v-if="canManageProducts"

@@ -44,7 +44,7 @@ function handleFileChange(event) {
 </script>
 
 <template>
-  <aside class="profile-showcase">
+  <aside class="profile-showcase" data-tour="profile-card">
     <div class="profile-showcase-cover">
       <span></span>
       <span></span>

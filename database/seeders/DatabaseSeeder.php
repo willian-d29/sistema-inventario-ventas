@@ -20,11 +20,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             BusinessSettingsSeeder::class,
-            SupplierSeeder::class,
-            CategorySeeder::class,
-            UnitTypeSeeder::class,
-            ProductSeeder::class,
-            UserSeeder::class
+            LaraToryDemoSeeder::class,
         ]);
 
     }

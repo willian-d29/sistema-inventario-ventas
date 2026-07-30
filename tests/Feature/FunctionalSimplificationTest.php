@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Cart;
+use App\Models\CashRegister;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\DocumentPrintLog;
@@ -94,6 +95,56 @@ test('caja muestra estado de empleados y apertura funcional del cajero', functio
         ->toContain("sidebarShortcut = computed(() => '[')");
 });
 
+test('cajero conserva caja cerrada al entrar a caja y pos', function () {
+    $cashier = User::factory()->create(['role' => 'cajero']);
+
+    $this->actingAs($cashier)
+        ->get(route('cash-registers.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('CashRegister/Index')
+            ->where('currentRegister', null));
+
+    $this->actingAs($cashier)
+        ->get(route('carts.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Cart/Pos')
+            ->where('cashRegister', null));
+
+    expect(CashRegister::where('user_id', $cashier->id)->exists())->toBeFalse();
+});
+
+test('campana muestra alertas operativas por rol', function () {
+    $cashier = User::factory()->create(['role' => 'cajero']);
+
+    $this->actingAs($cashier)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('appNotifications.items.0.id', 'cash-closed')
+            ->where('appNotifications.items.0.title_key', 'notifications.cash_closed_title'));
+
+    simplificationOpenRegister($cashier, 50);
+
+    $this->actingAs($cashier)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('appNotifications.count', 0)
+            ->where('appNotifications.items', []));
+
+    $admin = User::factory()->create(['role' => 'admin']);
+    simplificationProduct(['quantity' => 3]);
+
+    $this->actingAs($admin)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('appNotifications.items')
+            ->where('appNotifications.items.0.id', 'low-stock'));
+});
+
 test('administrador recibe estado de cajas por empleado', function () {
     $admin = User::factory()->create(['role' => 'admin', 'name' => 'Z Admin']);
     $cashier = User::factory()->create(['role' => 'cajero', 'name' => 'A Caja Demo']);
@@ -141,8 +192,41 @@ test('administrador conserva acceso completo a productos', function () {
             ->where('products.data.0.id', $product->id)
             ->where('products.data.0.buying_price', 3.5));
 
-    $this->actingAs($admin)->get(route('products.create'))->assertOk();
-    $this->actingAs($admin)->get(route('products.edit', $product))->assertOk();
+    $this->actingAs($admin)->get(route('products.create'))->assertRedirect(route('products.index'));
+    $this->actingAs($admin)->get(route('products.edit', $product))->assertRedirect(route('products.index'));
+});
+
+test('administrador puede crear producto con datos minimos de inventario', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $category = Category::firstOrCreate(['name' => 'Bebidas']);
+    $unit = UnitType::firstOrCreate(['name' => 'Unidad'], ['symbol' => 'und']);
+
+    $response = $this->actingAs($admin)->post(route('products.store'), [
+        'category_id' => $category->id,
+        'supplier_id' => null,
+        'name' => 'Agua mineral 625 ml',
+        'description' => null,
+        'product_code' => null,
+        'barcode' => '7751234599999',
+        'root' => null,
+        'buying_date' => null,
+        'buying_price' => 0.8,
+        'selling_price' => 1.5,
+        'unit_type_id' => $unit->id,
+        'quantity' => 24,
+        'photo' => null,
+        'status' => 'active',
+    ]);
+
+    $response->assertRedirect(route('products.index'));
+
+    $this->assertDatabaseHas('products', [
+        'name' => 'Agua mineral 625 ml',
+        'barcode' => '7751234599999',
+        'supplier_id' => null,
+        'root' => 'Agua mineral 625 ml',
+        'photo' => 'default-image.jpg',
+    ]);
 });
 
 test('filtros de productos combinan busqueda categoria stock y codigo', function () {

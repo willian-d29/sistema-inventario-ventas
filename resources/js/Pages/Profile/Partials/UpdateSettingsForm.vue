@@ -35,7 +35,7 @@ onMounted(() => {
             >
                 <div class="relative w-full mb-3">
                     <label
-                        class="block uppercase text-slate-600 text-xs font-bold mb-2"
+                        class="app-ui-label"
                         :for="settingField.value"
                     >
                         {{ settingField.label }}
@@ -43,7 +43,7 @@ onMounted(() => {
                     <input
                         :id="settingField.value"
                         type="text"
-                        class="border-0 px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        class="ihc-field"
                         v-model="form[settingField.value]"
                     />
 <!--                    <InputError :message="form.errors[settingField.value]"/>-->

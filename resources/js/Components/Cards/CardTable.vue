@@ -15,14 +15,14 @@
                             v-for="(filter, key, index) in filters" :key="index"
                             class="flex flex-col"
                         >
-                            <label :for="key" class="text-stone-600 text-sm font-medium">{{ filter.label }}</label>
+                            <label :for="key" class="app-ui-label">{{ filter.label }}</label>
                             <input
                                 v-if="filter.type === 'string'"
                                 :id="key"
                                 :placeholder="filter.placeholder"
                                 v-model="form[key]"
                                 type="text"
-                                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+                                class="ihc-field"
                             />
                             <input
                                 v-if="filter.type === 'date'"
@@ -30,7 +30,7 @@
                                 :placeholder="filter.placeholder"
                                 v-model="form[key]"
                                 type="date"
-                                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+                                class="ihc-field"
                             />
                             <input
                                 v-if="filter.type === 'month'"
@@ -38,13 +38,13 @@
                                 :placeholder="filter.placeholder"
                                 v-model="form[key]"
                                 type="month"
-                                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+                                class="ihc-field"
                             />
                             <select
                                 v-else-if="filter.type === 'select_static'"
                                 :id="key"
                                 v-model="form[key]"
-                                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                class="ihc-field"
                             >
                                 <option value="">{{ filter.placeholder }}</option>
                                 <option
@@ -59,7 +59,7 @@
                             <AsyncVueSelect
                                 v-if="filter.type === 'select'"
                                 v-model="form[key]"
-                                class="mt-2"
+                                class="app-async-select"
                                 :resource="filter.resource"
                                 :resourceLabel="filter.resourceLabel"
                                 :placeholder="filter.placeholder"
@@ -72,7 +72,7 @@
                                 v-model="form[key]"
                                 @input="form[key] = $event.target.value.replace(/[^0-9-]/g, '')"
                                 type="text"
-                                class="mt-2 block w-full rounded-md border border-gray-200 px-2 py-2 shadow-sm outline-none focus:outline-none focus:shadow-outline"
+                                class="ihc-field"
                             />
 
                             <Datepicker

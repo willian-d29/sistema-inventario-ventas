@@ -96,7 +96,7 @@ const maxWidthClass = computed(() => {
     <Teleport to="body">
         <Transition leave-active-class="duration-200">
             <div v-show="show"
-                 class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
+                 class="fixed inset-0 z-[60] flex items-start justify-center overflow-x-hidden overflow-y-auto px-2 py-4 outline-none focus:outline-none sm:items-center sm:px-4"
                  scroll-region>
                 <Transition
                     enter-active-class="ease-out duration-300"
@@ -126,13 +126,12 @@ const maxWidthClass = computed(() => {
                         aria-modal="true"
                         :aria-labelledby="titleId"
                         tabindex="-1"
-                        class="mx-3 mb-6 max-h-[90vh] overflow-hidden bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-lg)] transform transition-all sm:w-full sm:mx-auto"
+                        class="mx-2 flex max-h-[94dvh] min-h-0 transform flex-col overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] shadow-[0_40px_120px_rgba(15,23,42,0.16)] transition-all sm:mx-auto sm:w-full sm:rounded-[28px]"
                         :class="maxWidthClass"
-                        :style="{ borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }"
                     >
                         <div
-                            class="flex items-start justify-between border-b border-solid border-[var(--color-border)] p-3">
-                            <h6 :id="titleId" class="text-lg font-semibold text-[var(--color-text-primary)]">
+                            class="flex shrink-0 items-start justify-between gap-4 border-b border-solid border-[var(--color-border)] px-4 py-4 sm:px-6 sm:py-5">
+                            <h6 :id="titleId" class="min-w-0 break-words text-lg font-semibold text-[var(--color-text-primary)]">
                                 {{ title }}
                             </h6>
                             <button
@@ -142,28 +141,28 @@ const maxWidthClass = computed(() => {
                                 aria-label="Cerrar modal"
                             >
                                 <span
-                                    class="block h-6 w-6 bg-transparent text-2xl text-[var(--color-text-primary)] opacity-100 outline-none focus:outline-none">
-                                    <i class="fas fa-times text-base"></i>
+                                    class="block h-8 w-8 rounded-full bg-[var(--color-surface-alt)] text-center leading-8 text-[var(--color-text-primary)] outline-none focus:outline-none hover:bg-[var(--color-surface)] transition"
+                                >
+                                    <i class="fas fa-times text-sm"></i>
                                 </span>
                             </button>
                         </div>
 
-                        <div class="max-h-[calc(90vh-4rem)] overflow-y-auto p-5">
-
+                        <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
                             <slot v-if="show"/>
+                        </div>
 
-                            <div class="mt-6 flex justify-end">
-                                <Button type="gray" @click="close">Cancelar</Button>
-                                <SubmitButton
-                                    v-if="showSubmitButton"
-                                    :processing="formProcessing"
-                                    :disabled="submitDisabled"
-                                    @click="submitAction"
-                                    class="app-button app-button-primary mr-1"
-                                >
-                                    {{ submitButtonText }}
-                                </SubmitButton>
-                            </div>
+                        <div class="flex shrink-0 flex-col-reverse gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 sm:flex-row sm:justify-end sm:px-6 sm:py-4">
+                            <Button type="gray" @click="close">Cancelar</Button>
+                            <SubmitButton
+                                v-if="showSubmitButton"
+                                :processing="formProcessing"
+                                :disabled="submitDisabled"
+                                @click="submitAction"
+                                class="app-button app-button-primary"
+                            >
+                                {{ submitButtonText }}
+                            </SubmitButton>
                         </div>
                     </div>
                 </Transition>

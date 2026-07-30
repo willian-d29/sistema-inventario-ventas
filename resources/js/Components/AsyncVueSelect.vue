@@ -37,6 +37,15 @@ export default {
         this.apiCall();
     },
     methods: {
+        calculateDropdownPosition(dropdownList, component, {width, top, left}) {
+            dropdownList.style.position = 'absolute';
+            dropdownList.style.width = width;
+            dropdownList.style.top = top;
+            dropdownList.style.left = left;
+            dropdownList.style.zIndex = '9999';
+
+            return () => {};
+        },
         apiCall() {
             let queries = {
                 page: this.page,
@@ -65,7 +74,7 @@ export default {
             }
         },
         onClose() {
-            this.observer.disconnect()
+            this.observer?.disconnect()
         },
         async infiniteScroll([{isIntersecting, target}]) {
             if (isIntersecting) {
@@ -101,6 +110,8 @@ export default {
         :label="resourceLabel"
         :placeholder="this.placeholder"
         :model-value="modelValue"
+        :append-to-body="true"
+        :calculate-position="calculateDropdownPosition"
         @update:model-value="$emit('update:modelValue', $event)"
     >
         <template #list-footer>
